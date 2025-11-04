@@ -1,0 +1,19 @@
+@charset "UTF-8";
+body {
+    margin: 0;
+    background: #f0f0f0;
+    overflow: hidden;
+}
+
+.mini-window {
+    position: absolute;
+    width: 600px;
+    height: 150px;
+    background: white;
+    border: 2px solid #555;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+    cursor: move;
+    top: 50px;
+    left: 50px;
+}
