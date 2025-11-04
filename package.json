@@ -1,0 +1,24 @@
+{
+  "name": "project_c",
+  "version": "1.0.0",
+  "description": "EVEは、あなたと対話するAIアシスタントです。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sa-k1/Project_C.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Sa-k1/Project_C/issues"
+  },
+  "homepage": "https://github.com/Sa-k1/Project_C#readme",
+  "devDependencies": {
+    "electron": "^39.0.0"
+  }
+}
