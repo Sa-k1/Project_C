@@ -6,6 +6,7 @@ function createWindow() {
     width: 800,
     height: 600,
     autoHideMenuBar: true,
+    fullscreen: true, 
     title: ''
   });
   win.loadFile('index.html');
