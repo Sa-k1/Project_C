@@ -9,8 +9,8 @@ body {
 
 .mini-window {
     position: absolute;
-    width: 600px;
-    height: 150px;
+    width: 800px;
+    height: 400px;
     background: rgb(39, 163, 208);
     border: 2px solid #555;
     border-radius: 8px;
@@ -18,6 +18,12 @@ body {
     cursor: move;
     top: 50px;
     left: 50px;
+}
+
+.box {
+    position: fixed;
+    height: 50px;
+    background-color: aliceblue;
 }
 
 .terminal {
