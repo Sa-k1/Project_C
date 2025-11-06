@@ -30,7 +30,7 @@ phase0: {
     },
     {
         player: "exit",
-        eve: "exitコマンドを検出しました。 終了しますか？"
+        eve: "exitコマンドを検出しました。"
     }
     ]
 }
