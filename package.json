@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Sa-k1/Project_C#readme",
   "devDependencies": {
-    "electron": "^39.0.0"
+    "electron": "^39.0.0",
+    "electron-reload": "^2.0.0-alpha.1"
   }
 }
