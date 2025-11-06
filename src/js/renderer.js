@@ -7,6 +7,8 @@ let phase = "phase0";
 let step = 0;
 let mode = "intro"; // intro → chat → locked → ending
 
+
+
 // タイプ風出力
 function slowPrint(text, delay = 35) {
     return new Promise(resolve => {
