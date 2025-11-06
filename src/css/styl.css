@@ -1,4 +1,7 @@
 @charset "UTF-8";
+
+/*     main     */
+
 body {
     margin: 0;
     background-image: url(../pic/test.jpg);
@@ -7,11 +10,13 @@ body {
     overflow: hidden;
 }
 
+/*     terminal and chatarea     */
+
 .mini-window {
     position: absolute;
     width: 800px;
     height: 400px;
-    background: rgb(39, 163, 208);
+    background: rgb(176, 199, 207);
     border: 2px solid #555;
     border-radius: 8px;
     box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
@@ -20,16 +25,46 @@ body {
     left: 50px;
 }
 
+.terminal {
+    position: absolute;
+    z-index: 30;
+}
+
 .box {
-    position: fixed;
-    height: 50px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 45px;
     background-color: aliceblue;
+    z-index: 10;
+    border-radius: 7px 6px 0px 0px;
 }
 
 .terminal {
     margin-top: 10px;
     margin: 10px;
 }
+
+.text {
+    width: 200px;
+    position: relative;
+    top: 90%;
+    left: 50%;
+    resize: none;
+    transform: translateX(-50%);
+}
+
+.icon_ALL {
+    text-align: right;
+    position: absolute;
+    top: 2%;
+    z-index: 40;
+    width: 100%;
+    justify-content: space-between;
+}
+
+/*     icon     */
 
 .icon {
     margin: 25px;
