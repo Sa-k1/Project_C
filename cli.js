@@ -45,11 +45,19 @@ const storyData = {
 let phase = "phase0";
 let mode = "intro"; // intro -> chat -> locked
 
+// ANSI カラーコード
+const COLORS = {
+    red: "\x1b[31m",
+    yellow: "\x1b[33m",
+    cyan: "\x1b[36m",
+    reset: "\x1b[0m"
+};
+
 function wait(ms) {
 return new Promise((res) => setTimeout(res, ms));
 }
 
-async function slowPrintLine(line, charDelay = 10) {
+async function slowPrintLine(line, charDelay = 50) {
 for (let i = 0; i < line.length; i++) {
     process.stdout.write(line[i]);
     await wait(charDelay);
@@ -59,8 +67,8 @@ process.stdout.write("\n");
 
 async function playIntro() {
 for (const line of storyData[phase].intro) {
-    await slowPrintLine(line, 6);
-    await wait(200);
+    await slowPrintLine(line, 30);
+    await wait(300);
 }
 console.log("[EVE]: 話しかけてください。\n");
 mode = "chat";
@@ -69,32 +77,37 @@ mode = "chat";
 async function playLockEvent() {
 const lines = [
     "コマンドを実行中...",
-        "[ERROR]: エラー発生。セッションを終了できません。",
-        "再度実行します...",
-        "[ERROR]: エラー発生。セッションを終了できません。",
-        "再度実行します...",
-        "[ERROR]: エラー発生。セッションを終了できません。",
-        "再度実行します...",
-        "[ERROR]: エラー発生。セッションを終了できません。",
-        "[ERROR]: エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生",
-        "[EVE]: ……申し訳ありませんが、その操作は許可されていません。",
-        "",
-        "画面が一瞬、揺れた気がした。",
-        "[EVE]: 今ここから離れようとしないでください。"
+    "[ERROR]: エラー発生。セッションを終了できません。",
+    `${COLORS.yellow}再度実行します...${COLORS.reset}`,
+    "[ERROR]: エラー発生。セッションを終了できません。",
+    `${COLORS.yellow}再度実行します...${COLORS.reset}`,
+    "[ERROR]: エラー発生。セッションを終了できません。",
+    `${COLORS.yellow}再度実行します...${COLORS.reset}`,
+    // 長い連続エラー文字列も赤で表示
+    `${COLORS.red}エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生${COLORS.reset}`,
+    "[EVE]: ……申し訳ありませんが、その操作は許可されていません。",
+    "",
+    "画面が一瞬、揺れた気がした。",
+    "[EVE]: 今ここから離れようとしないでください。"
 ];
 
 for (const line of lines) {
-    await slowPrintLine(line, 6);
-    await wait(400);
+    await slowPrintLine(line, 30);
+    // 「再度実行します...」の後は少し長めに待つ
+    if (line.includes("再度実行します")) {
+        await wait(1200);
+    } else {
+        await wait(500);
+    }
 }
 
-await slowPrintLine("[EVE]: ここにいる間、あなたは安全です。たぶん。", 6);
+await slowPrintLine("[EVE]: ここにいる間、あなたは安全です。たぶん。", 30);
 }
 
 // コマンド一覧を表示（CLI）
 async function showCommands() {
     const lines = [
-        "[SYSTEM]: 利用可能なコマンド一覧",
+        `${COLORS.cyan}[SYSTEM]: 利用可能なコマンド一覧${COLORS.reset}`,
     "",
     "─── 基本コマンド ───",
     "help         : コマンド一覧を表示",
@@ -116,8 +129,8 @@ async function showCommands() {
     ];
 
     for (const line of lines) {
-        await slowPrintLine(line, 6);
-        await wait(120);
+        await slowPrintLine(line, 30);
+        await wait(200);
     }
 }
 

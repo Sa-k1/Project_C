@@ -9,8 +9,8 @@ let mode = "intro"; // intro → chat → locked → ending
 
 
 
-// タイプ風出力
-function slowPrint(text, delay = 35) {
+// タイプ風出力（遅め）
+function slowPrint(text, delay = 80) {
     return new Promise(resolve => {
     let i = 0;
     const interval = setInterval(() => {
@@ -111,8 +111,13 @@ async function playLockEvent() {
     ];
 
     for (const line of lines) {
-        await slowPrint(line, 30);
-        await wait(600);
+        await slowPrint(line, 60);
+        // 「再度実行します...」の後は少し長めに待つ
+        if (line.includes("再度実行します")) {
+            await wait(1200);
+        } else {
+            await wait(600);
+        }
     }
 
         await slowPrint("[EVE]: ここにいる間、あなたは安全です。たぶん。");
