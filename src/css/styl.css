@@ -69,7 +69,98 @@ body {
 .icon {
     margin: 25px;
 }
+/* ドラッグ可能なアイテムのスタイル */
+.draggable-item {
+    padding: 10px;
+    margin: 10px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    cursor: grab; /* マウスカーソルをドラッグ用に変更 */
+    width: 200px;
+    text-align: center;
+    
+/* ゴミ箱エリアのスタイル */
+#trash-can {
+    /* 絶対位置指定で、画面上のどこにでも配置可能に */
+    position: absolute; 
+    top: 20px; /* 初期位置 */
+    right: 20px; /* 初期位置 */
+    
+    width: 80px;  /* コンパクトなサイズ */
+    height: 80px; /* コンパクトなサイズ */
+    
+    display: flex; /* 画像を中央に配置 */
+    justify-content: center;
+    align-items: center;
+    flex-direction: column; /* 縦方向に並べる */
+    gap: 5px; /* ボタンとアイコンの間隔 */
+    
+    border: 2px solid transparent; /* 初期は透明なボーダー */
+    border-radius: 10px; /* 少し丸みを持たせる */
+    background-color: rgba(255, 255, 255, 0.8); /* 少し透明感のある背景 */
+    cursor: grab; /* ゴミ箱自体もドラッグできるように */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* 少し影をつけて立体感を出す */
+    transition: all 0.2s ease-in-out; /* ホバーやドラッグ時の変化を滑らかに */
+}
 
-.icon_d {
-    width: 48px;
+/* ゴミ箱にファイルがドラッグされてきた時のスタイル */
+#trash-can.drag-over {
+    border-color: #ff0000; /* 赤い点線に変更 */
+    background-color: #ffe6e6; /* 薄い赤色の背景 */
+    transform: scale(1.05); /* 少し大きくする */
+}
+
+
+/* ゴミ箱画像のスタイル */
+#trash-image {
+    width: 60px; /* 画像もコンパクトに */
+    height: 60px; /* 画像もコンパクトに */
+    object-fit: contain; /* 画像が歪まないように */
+}
+
+#trash-content {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.trash-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.trash-item button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.trash-item button:hover {
+    background: #45a049;
+}
+
+.trash-button {
+    width: 100%;
+    padding: 5px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.trash-button:hover {
+    background-color: #e0e0e0;
 }

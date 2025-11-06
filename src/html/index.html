@@ -16,16 +16,20 @@
       <img src="../pic/close.png" alt="" class="Sm">
     </div>
   </div>
-  <div class="icon">
-    <img src="../pic/ゴミ箱の無料アイコン.png" alt="" class="icon_d">
-    <img src="../pic/ゴミ箱の無料アイコン.png" alt="" class="icon_d">
-  </div>
-    <div class="icon">
-    <img src="../pic/ゴミ箱の無料アイコン.png" alt="" class="icon_d">
-    <img src="../pic/ゴミ箱の無料アイコン.png" alt="" class="icon_d">
-  </div>
 
+  <div id="trash-can">
+    <img src="../pic/ゴミ箱の無料アイコン.png" alt="ゴミ箱" id="trash-image">
+  </div>
+  
+  <div id="trash-content" style="display: none;">
+    <h3>🗑️ ゴミ箱の中身 (移動済み要素)</h3>
+  </div>
+    
+  <div class="draggable-item" draggable="true" id="file1">重要なデータ.txt</div>
+  <div class="draggable-item" draggable="true" id="file2">古いメモ.doc</div>
+  <div class="draggable-item" draggable="true" id="file3">不要な写真.jpg</div>
 
-</body>
+  <!-- script はここに1つだけ置く -->
   <script src="../js/index.js"></script>
+</body>
 </html>
