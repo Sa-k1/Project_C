@@ -30,6 +30,7 @@ function wait(ms) {
     return new Promise(res => setTimeout(res, ms));
 }
 
+
 // Phase0導入
 async function playIntro() {
     for (const line of storyData[phase].intro) {
@@ -44,6 +45,13 @@ async function playIntro() {
 async function handleInput(command) {
     if (!command) return;
     await slowPrint(`> ${command}`);
+
+    // help は常にコマンド一覧を表示する
+    if (command.toLowerCase().includes("help")) {
+        await showCommands();
+        terminal.scrollTop = terminal.scrollHeight;
+        return;
+    }
 
   // -----------------------------------------------------
   // ① 会話モード
@@ -64,6 +72,7 @@ async function handleInput(command) {
     } else {
             await slowPrint("[EVE]: その質問には答えられません。");
     }
+    
 }
 
   // -----------------------------------------------------
@@ -73,7 +82,7 @@ async function handleInput(command) {
     if (command.toLowerCase().includes("exit") || command.toLowerCase().includes("quit")) {
         await slowPrint("[EVE]: ……まだ理解していないようですね。");
     } else if (command.toLowerCase().includes("help")) {
-        await slowPrint("[SYSTEM]: コマンド一覧は現在非表示です。");
+        await showHelp(); 
     } else {
         await slowPrint("[EVE]: あなたの入力は記録されています。続けてください。");
     }
