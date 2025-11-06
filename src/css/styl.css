@@ -78,7 +78,7 @@ body {
     cursor: grab; /* マウスカーソルをドラッグ用に変更 */
     width: 200px;
     text-align: center;
-    
+}
 /* ゴミ箱エリアのスタイル */
 #trash-can {
     /* 絶対位置指定で、画面上のどこにでも配置可能に */
