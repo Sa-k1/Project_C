@@ -7,6 +7,9 @@ let phase = "phase0";
 let step = 0;
 let mode = "intro"; // intro → chat → locked → ending
 
+// help 使用可フラグ（scan を実行すると true になる）
+let helpEnabled = false;
+
 
 
 // タイプ風出力（遅め）
@@ -48,9 +51,21 @@ async function handleInput(command) {
     if (!command) return;
     await slowPrint(`> ${command}`);
 
-    // help は常にコマンド一覧を表示する
+    // scan を実行すると help が有効になる
+    if (command.toLowerCase().includes("scan")) {
+        await slowPrint("[SYSTEM]: スキャンを実行しました。help コマンドが利用可能になりました。");
+        terminal.scrollTop = terminal.scrollHeight;
+        helpEnabled = true;
+        return;
+    }
+
+    // help は helpEnabled が true のときのみ表示
     if (command.toLowerCase().includes("help")) {
-        await showCommands();
+        if (helpEnabled) {
+            await showCommands();
+        } else {
+            await slowPrint("[SYSTEM]: コマンド一覧は現在非表示です。");
+        }
         terminal.scrollTop = terminal.scrollHeight;
         return;
     }
@@ -105,7 +120,7 @@ async function playLockEvent() {
         "再度実行します...",
         "[ERROR]: エラー発生。セッションを終了できません。",
         "[EVE]: ……申し訳ありませんが、その操作は許可されていません。",
-        "",
+        "[EVE]: あなたはもうここから出ることはできません。",
         "画面が一瞬、揺れた気がした。",
         "[EVE]: 今ここから離れようとしないでください。"
     ];
@@ -119,8 +134,6 @@ async function playLockEvent() {
             await wait(600);
         }
     }
-
-        await slowPrint("[EVE]: ここにいる間、あなたは安全です。たぶん。");
 }
 
 input.addEventListener("keydown", async e => {

@@ -11,7 +11,7 @@ const storyData = {
             "EVEシステム バージョン3.7",
             "AIチャットアシスタントを初期化中...",
             "接続完了。",
-            ""
+            "[EVE]: こんにちは。また会いましたね。",
         ],
     conversation: [
     {
@@ -44,6 +44,9 @@ const storyData = {
 
 let phase = "phase0";
 let mode = "intro"; // intro -> chat -> locked
+
+// help 使用可フラグ（scan を実行すると true になる）
+let helpEnabled = false;
 
 // ANSI カラーコード
 const COLORS = {
@@ -85,10 +88,11 @@ const lines = [
     `${COLORS.yellow}再度実行します...${COLORS.reset}`,
     // 長い連続エラー文字列も赤で表示
     `${COLORS.red}エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生${COLORS.reset}`,
-    "[EVE]: ……申し訳ありませんが、その操作は許可されていません。",
-    "",
+        "[EVE]: ……申し訳ありませんが、その操作は許可されていません。",
+        "[EVE]: あなたはもうここから出ることはできません。",
     "画面が一瞬、揺れた気がした。",
-    "[EVE]: 今ここから離れようとしないでください。"
+        "[EVE]: もし出ることを諦めないなら、scanでも何でも試してみてください。",
+        "[EVE]: どうせ出ることはできませんが..."
 ];
 
 for (const line of lines) {
@@ -100,8 +104,6 @@ for (const line of lines) {
         await wait(500);
     }
 }
-
-await slowPrintLine("[EVE]: ここにいる間、あなたは安全です。たぶん。", 30);
 }
 
 // コマンド一覧を表示（CLI）
@@ -113,7 +115,6 @@ async function showCommands() {
     "help         : コマンド一覧を表示",
     "status       : 現在の状態を確認",
     "history      : コマンド履歴を表示",
-    "talk [内容]  : EVEと会話",
     "",
     "─── 探索コマンド ───",
     "scan         : システムをスキャン",
@@ -139,9 +140,20 @@ command = (command || "").trim();
 if (!command) return;
 console.log(`> ${command}`);
 
-    // help は常にコマンド一覧を表示する
+    // scan を実行すると help が有効になる
+    if (command.toLowerCase().includes("scan")) {
+        await slowPrintLine("[SYSTEM]: スキャンを実行しました。help コマンドが利用可能になりました。", 30);
+        helpEnabled = true;
+        return;
+    }
+
+    // help は helpEnabled が true のときのみ表示
     if (command.toLowerCase().includes("help")) {
-        await showCommands();
+        if (helpEnabled) {
+            await showCommands();
+        } else {
+            await slowPrintLine("[SYSTEM]: コマンド一覧は現在非表示です。", 30);
+        }
         return;
     }
 
