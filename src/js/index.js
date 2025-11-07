@@ -101,3 +101,47 @@ window.restoreItem = function(id, content) {
         trashItem.parentElement.removeChild(trashItem);
     }
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+    const eveImage = document.getElementById('eve-image');
+
+  // 簡易トグル関数（既にあるなら重複を避けてください）
+    function toggleElement(el) {
+    if (!el) return;
+    const cur = window.getComputedStyle(el).display;
+    el.style.display = (cur === 'none' || cur === '') ? 'block' : 'none';
+    }
+
+  // --- 追加: EVE アイコンをクリックで開閉（ドラッグと衝突しないようにする） ---
+    if (eveImage && mini) {
+    let possibleDrag = false;
+    let dragged = false;
+    let startX = 0, startY = 0;
+
+    eveImage.addEventListener('mousedown', (e) => {
+        possibleDrag = true;
+        dragged = false;
+        startX = e.clientX;
+        startY = e.clientY;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!possibleDrag) return;
+        if (Math.hypot(e.clientX - startX, e.clientY - startY) > 6) {
+        dragged = true;
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        possibleDrag = false;
+      // 小さな遅延でフラグをリセット
+        setTimeout(() => { dragged = false; }, 50);
+    });
+
+    eveImage.addEventListener('dblclick', (e) => {
+      if (dragged) return; // ドラッグ中のクリックは無視
+        e.preventDefault();
+        toggleElement(mini);
+    });
+    }
+});
