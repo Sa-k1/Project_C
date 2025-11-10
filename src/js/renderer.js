@@ -23,20 +23,23 @@ helpUnlocked: false,
 // タイプ風出力（遅め）
 // =============================
 function slowPrint(text, delay = 80) {
-return new Promise(resolve => {
-    let i = 0;
-    const interval = setInterval(() => {
-    if (i < text.length) {
-        terminal.innerHTML += text[i];
-        i++;
-    } else {
-        clearInterval(interval);
-        terminal.innerHTML += "<br>";
-        terminal.scrollTop = terminal.scrollHeight;
-        resolve();
-    }
-    }, delay);
-});
+    // guard: ensure text is a string to avoid reading .length on undefined
+    if (text == null) text = "";
+    else if (typeof text !== "string") text = String(text);
+    return new Promise(resolve => {
+        let i = 0;
+        const interval = setInterval(() => {
+            if (i < text.length) {
+                terminal.innerHTML += text[i];
+                i++;
+            } else {
+                clearInterval(interval);
+                terminal.innerHTML += "<br>";
+                terminal.scrollTop = terminal.scrollHeight;
+                resolve();
+            }
+        }, delay);
+    });
 }
 
 // =============================

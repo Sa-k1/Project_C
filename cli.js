@@ -43,6 +43,12 @@ function wait(ms) {
 }
 
 async function slowPrintLine(line, charDelay = 30) {
+    // guard: if line is undefined/null, avoid reading .length
+    if (line == null) {
+        line = "";
+    } else if (typeof line !== "string") {
+        line = String(line);
+    }
     for (let i = 0; i < line.length; i++) {
         process.stdout.write(line[i]);
         await wait(charDelay);
@@ -170,7 +176,7 @@ async function handleInput(command) {
             return;
         } else {
             await slowPrintLine("[SYSTEM]: exit コマンドは現在使用できません。", 30);
-            await slowPrintLine("[EVE]: すでに対策済みです。", 30);
+            await slowPrintLine("[EVE]: 私が対策してないとでも思いましたか？", 30);
             return;
         }
     }
