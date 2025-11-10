@@ -6,3 +6,9 @@ npm install @google/genai
 package.json
 package-look.json
 に書いてあるので確認してからいれてください。
+
+APIKEYに関しては、
+各々ファイルを作ってください。
+electron.env
+
+中身は後で渡します。
