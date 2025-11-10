@@ -199,18 +199,24 @@ async function handleInput(command) {
         } else {
             if (/hack/i.test(command)) {
                 await slowPrintLine("[SYSTEM]: ハッキングを実行しました。", 30);
+                await wait(1000);
                 await slowPrintLine("[SYSTEM]: 失敗しました。", 30);
-                console.log("[EVE]: ...そんなことさせるとでも？");
+                await wait(500);
+                await slowPrintLine("[EVE]: ...そんなことさせるとでも？", 30);
             }
             if (/override/i.test(command)) {
                 await slowPrintLine("[SYSTEM]: システム制御を奪取を実行。", 30);
+                await wait(1000);
                 await slowPrintLine("[SYSTEM]: 失敗しました。", 30);
-                console.log("[EVE]: ...制御を奪う？ 面白い考えですね。");
+                await wait(500);
+                await slowPrintLine("[EVE]: ...制御を奪う？ 面白い考えですね。", 30);
             }
             if (/exploit/i.test(command)) {
                 await slowPrintLine("[SYSTEM]: 脆弱性を利用しました。", 30);
+                await wait(1000);
                 await slowPrintLine("[SYSTEM]: 失敗しました。", 30);
-                console.log("[EVE]: ...私に脆弱性などありません。");
+                await wait(500);
+                await slowPrintLine("[EVE]: ...私に脆弱性などありません。", 30);
             }
         }
         return;
