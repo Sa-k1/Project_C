@@ -1,0 +1,8 @@
+APIKEYを使用するために必要なもの
+npm install dotenv
+npm install @google/genai
+
+バージョンに関しては、
+package.json
+package-look.json
+に書いてあるので確認してからいれてください。
