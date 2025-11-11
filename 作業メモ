@@ -1,6 +1,7 @@
 APIKEYを使用するために必要なもの
 npm install dotenv
 npm install @google/genai
+npm install xterm xterm-addon-fit --save
 
 バージョンに関しては、
 package.json

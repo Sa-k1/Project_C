@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <title>親ウィンドウですわ</title>
   <link rel="stylesheet" href="../css/styl.css">
 </head>
 <body>
-  <div class="mini-window" id="miniWindow">
+  <div class="mini-window" id="miniWindow" style="display: none;">
     <div class="box"></div>
     <p class="terminal">アシスタントAI： EVE</p>
     <textarea name="" id="" class="text"></textarea>
@@ -35,6 +35,7 @@
   <div class="draggable-item" draggable="true" id="file2">古いメモ.doc</div>
   <div class="draggable-item" draggable="true" id="file3">不要な写真.jpg</div>
 
+  <iframe src="../html/mini.html" frameborder="0"></iframe>
   <!-- script はここに1つだけ置く -->
   <script src="../js/index.js"></script>
 </body>
