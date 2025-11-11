@@ -107,9 +107,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 簡易トグル関数（既にあるなら重複を避けてください）
     function toggleElement(el) {
-    if (!el) return;
-    const cur = window.getComputedStyle(el).display;
-    el.style.display = (cur === 'none' || cur === '') ? 'block' : 'none';
+        if (!el) return;
+        const cur = window.getComputedStyle(el).display;
+        // 表示に切り替えるとき、iframe の src を JS でセットして consoll.html を読み込む
+        if (cur === 'none' || cur === '') {
+            el.style.display = 'block';
+            const iframe = document.getElementById('mini-iframe');
+                if (iframe && !iframe.dataset.loaded) {
+                // 相対パスで xterm_demo.html を読み込む（index.html と同じディレクトリなので相対パスは 'xterm_demo.html'）
+                iframe.src = 'xterm_demo.html';
+                    // iframe が読み込まれたら textarea（既存コンソール）を隠す
+                    iframe.addEventListener('load', () => {
+                        iframe.dataset.loaded = 'true';
+                        const ta = document.querySelector('.text');
+                        if (ta) ta.style.display = 'none';
+                    }, { once: true });
+                }
+        } else {
+                    el.style.display = 'none';
+                    // miniWindow を閉じたら textarea を再表示しておく
+                    const ta = document.querySelector('.text');
+                    if (ta) ta.style.display = '';
+        }
     }
 
   // --- 追加: EVE アイコンをクリックで開閉（ドラッグと衝突しないようにする） ---
