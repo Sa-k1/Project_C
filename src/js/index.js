@@ -2,9 +2,18 @@ const mini = document.getElementById('miniWindow');
 let offsetX, offsetY, isDragging = false;
 
 mini.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    offsetX = e.offsetX;
-    offsetY = e.offsetY;
+        // Only start dragging when the user clicks the title area (the visible top bar / handle).
+        // Also ignore clicks on interactive controls inside that area (buttons, tabs, icons).
+        const handle = e.target.closest('.box, .titlebar');
+        if (!handle) return; // not clicking the titlebar area -> do not start drag
+
+        // If clicked element is an interactive child (button, control, tab, icon, inputs), don't start drag
+        const ignored = e.target.closest('.window-controls, .ctrl, .tab, .tab-icon, .tab-label, .icon_ALL, .icon, .text, #mini-iframe, #trash-can, #trash-image, .draggable-item, .trash-button, #eve, #eve-image');
+        if (ignored) return;
+
+        isDragging = true;
+        offsetX = e.offsetX;
+        offsetY = e.offsetY;
 });
 
 document.addEventListener('mouseup', () => isDragging = false);

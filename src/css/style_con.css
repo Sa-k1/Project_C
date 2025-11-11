@@ -1,0 +1,39 @@
+@charset "UTF-8";
+html, body {
+    height: 100%;
+    margin: 0;
+    background: #111;
+    overflow: hidden; /* ページ側のスクロールを消す */
+}
+#terminal {
+    width: 100%;
+    height: 100%;
+    padding: 8px 8px 0px 8px;
+    box-sizing: border-box;
+    overflow: hidden; /* xterm の内部スクロールだけを使う */
+}
+/* xterm が生成するビューポート（内部スクロール）向けのカスタムスクロールバー */
+.xterm-viewport, .xterm-screen, .xterm-scroll-area {
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: rgba(200,200,200,0.6) rgba(0,0,0,0.15);
+}
+
+/* WebKit ブラウザ用のスクロールバースタイル */
+.xterm-viewport::-webkit-scrollbar, .xterm-screen::-webkit-scrollbar, .xterm-scroll-area::-webkit-scrollbar {
+    width: 8px; /* 棒の太さ（画像参照） */
+}
+
+.xterm-viewport::-webkit-scrollbar-track, .xterm-screen::-webkit-scrollbar-track, .xterm-scroll-area::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.12);
+    border-radius: 8px;
+}
+
+.xterm-viewport::-webkit-scrollbar-thumb, .xterm-screen::-webkit-scrollbar-thumb, .xterm-scroll-area::-webkit-scrollbar-thumb {
+    /* background: rgba(220,220,220,0.8); */
+    border-radius: 8px;
+    border: 3px solid rgba(0,0,0,0.12); /* 内側の余白風 */
+}
+
+.xterm-viewport::-webkit-scrollbar-thumb:hover, .xterm-screen::-webkit-scrollbar-thumb:hover, .xterm-scroll-area::-webkit-scrollbar-thumb:hover {
+background: rgba(240,240,240,0.95);
+}

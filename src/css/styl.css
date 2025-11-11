@@ -16,7 +16,7 @@ body {
     position: absolute;
     width: 800px;
     height: 400px;
-    background: rgb(240, 243, 245);
+    background-color: #000000;
     border: 2px solid #555;
     border-radius: 10px;
     box-shadow: 2px 2px 18px rgba(0,0,0,0.25);
@@ -135,11 +135,7 @@ body {
     top: 6px;
     height: 30px;
 }
-.tab.add {
-    background: transparent;
-    color: #bbb;
-    font-weight: 700;
-}
+
 
 .window-controls {
     display: flex;
@@ -189,7 +185,7 @@ body {
     top: 20px; /* 初期位置 */
     right: 20px; /* 初期位置 */
     
-    width: 80px;  /* コンパクトなサイズ */
+    width: 80px  /* コンパクトなサイズ */
     height: 80px; /* コンパクトなサイズ */
     
     display: flex; /* 画像を中央に配置 */
@@ -268,12 +264,34 @@ body {
     background-color: #e0e0e0;
 }
 
-/*    task    */
+/*    taskbar    */
 
 .win_surch {
-    position: absolute;
-    top: 95%;
-    background-color: #45a049;
-    height: 50px;
+    position: fixed;
+    bottom: 0;
     width: 100%;
+    height: 50px;
+    background-color: #eeeeee;
+    display: flex;
+}
+
+.win_surch .app-pill {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 5px 15px;
+    border-radius: 25px;
+    color: #000;
+    font-size: 14px;
+    width: 200px;
+    height: 25px;
+    margin: auto 0;
+    margin-left: 10%;
+    border: solid 1px #000 ;
+}
+
+.win_surch .app-pill img {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
 }
