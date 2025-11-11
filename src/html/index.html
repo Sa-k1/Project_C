@@ -7,14 +7,25 @@
 </head>
 <body>
   <div class="mini-window" id="miniWindow" style="display: none;">
-    <div class="box"></div>
-    <p class="terminal">アシスタントAI： EVE</p>
-    <textarea name="" id="" class="text"></textarea>
-    <div class="icon_ALL">
-      <img src="../pic/minimize.png" alt="" class="De">
-      <img src="../pic/fullscreen.png" alt="" class="Bi">
-      <img src="../pic/close.png" alt="" class="Sm">
+    <div class="box">
+      <div class="titlebar">
+        <div class="tabs">
+          <div class="tab active">
+            <span class="tab-icon" aria-hidden="true"></span>
+            <span class="tab-label">アシスタントAI : EVE</span>
+          </div>
+          <div class="tab add">＋</div>
+        </div>
+        <div class="window-controls">
+          <button class="ctrl minimize" title="最小化">−</button>
+          <button class="ctrl maximize" title="最大化">▢</button>
+          <button class="ctrl close" title="閉じる">✕</button>
+        </div>
+      </div>
     </div>
+    <p class="terminal"></p>
+    <!-- コンソールを読み込む iframe（JS で src をセットします） -->
+    <iframe id="mini-iframe" frameborder="0" style="width:100%;height:100%;display:block;"></iframe>
   </div>
 
   <div id="trash-can">
@@ -35,7 +46,7 @@
   <div class="draggable-item" draggable="true" id="file2">古いメモ.doc</div>
   <div class="draggable-item" draggable="true" id="file3">不要な写真.jpg</div>
 
-  <iframe src="../html/mini.html" frameborder="0"></iframe>
+  <!-- iframe の読み込みは上の miniWindow 内の iframe を JS で行います -->
   <!-- script はここに1つだけ置く -->
   <script src="../js/index.js"></script>
 </body>
