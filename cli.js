@@ -4,6 +4,45 @@
 
 const readline = require("readline");
 
+// --- Optional AI client (Gemini via @google/genai) ---
+let ai = null;
+let aiAvailable = false;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || null;
+try {
+    if (GEMINI_API_KEY) {
+        const { GoogleGenAI } = require("@google/genai");
+        ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+        aiAvailable = true;
+        console.log("[SYSTEM]: AIクライアントが有効です。");
+    } else {
+        console.log("[SYSTEM]: GEMINI_API_KEY が未設定のため AI は無効です。");
+    }
+} catch (err) {
+    // package not installed or other error — keep aiAvailable false and continue
+    console.log("[SYSTEM]: @google/genai が見つからないか初期化に失敗しました。AIは無効です。", err.message ? ` (${err.message})` : "");
+    aiAvailable = false;
+}
+
+async function aiReply(prompt) {
+    if (!aiAvailable) return null;
+    try {
+        // create a chat session per request (lightweight); you can persist if needed
+        const chat = ai.chats.create({ model: "gemini-2.5-flash" });
+        const res = await chat.sendMessage({ message: prompt });
+        // best-effort extraction of text
+        if (!res) return null;
+        if (typeof res.text === "string" && res.text.length) return res.text;
+        // fallback: check nested output structure
+        if (res.output && Array.isArray(res.output) && res.output[0]?.content) {
+            const content = res.output[0].content;
+            if (Array.isArray(content) && content[0]?.text) return content[0].text;
+        }
+        return null;
+    } catch (e) {
+        throw e;
+    }
+}
+
 const storyData = {
     phase0: {
         intro: [
@@ -117,8 +156,8 @@ async function showCommands() {
         `${COLORS.cyan}[SYSTEM]: 利用可能なコマンド一覧${COLORS.reset}`,
         "",
         "─── 基本コマンド ───",
-        "help         : コマンド一覧を表示",
-        "status       : 現在の状態を確認",,
+    "help         : コマンド一覧を表示",
+    "status       : 現在の状態を確認",
         "",
         "─── 探索コマンド ───",
         "scan         : システムをスキャン",
@@ -232,8 +271,26 @@ async function handleInput(command) {
         return;
     }
 
-    // デフォルト応答
-    await slowPrintLine("[EVE]: その質問には答えられません。", 30);
+    // デフォルト応答: AIが利用可能なら問い合わせて応答を表示する
+    if (aiAvailable) {
+        await slowPrintLine("[SYSTEM]: AIに問い合わせます...", 20);
+        try {
+            const resp = await aiReply(command);
+            if (resp) {
+                // 応答を行ごとに分割して表示すると見やすい
+                const lines = String(resp).split(/\r?\n/);
+                for (const l of lines) {
+                    await slowPrintLine(`[AI]: ${l}`, 20);
+                }
+            } else {
+                await slowPrintLine("[EVE]: AIからの応答が得られませんでした。", 30);
+            }
+        } catch (err) {
+            await slowPrintLine(`[SYSTEM]: AI呼び出しエラー: ${err.message || err}`, 30);
+        }
+    } else {
+        await slowPrintLine("[EVE]: その質問には答えられません。", 30);
+    }
 }
 
 async function startCli() {
