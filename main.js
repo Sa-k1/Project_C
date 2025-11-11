@@ -13,6 +13,30 @@ function createWindow() {
   });
   win.loadFile(path.join(__dirname, 'src', 'html', 'index.html'));
 }
-// 追記、アプリから開く形式に変えてください
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  const splashScreen = new BrowserWindow({
+    width: 800, // 新しい幅
+    height: 600, // 新しい高さ
+    // fullscreen: true,
+    frame: false,
+    alwaysOnTop: true,
+    transparent: true
+  });
+
+  console.log('start');
+  splashScreen.webContents.on('did-finish-load', () => {
+    console.log('load');
+  });
+
+  splashScreen.on('closed', () => {
+    console.log('end');
+  });
+
+  splashScreen.loadFile(path.join(__dirname, 'src', 'html', 'splash.html'));
+
+  setTimeout(() => {
+    splashScreen.close();
+    createWindow();
+  }, 2500);
+});

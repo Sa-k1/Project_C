@@ -2,6 +2,7 @@ APIKEYを使用するために必要なもの
 npm install dotenv
 npm install @google/genai
 npm install xterm xterm-addon-fit --save
+npm install mo-js
 
 バージョンに関しては、
 package.json
@@ -13,3 +14,6 @@ APIKEYに関しては、
 electron.env
 
 中身は後で渡します。
+
+
+何かわからないことがある時は誰かに必ず相談しましょう

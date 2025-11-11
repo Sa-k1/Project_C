@@ -172,4 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleElement(mini);
     });
     }
+
+
 });
