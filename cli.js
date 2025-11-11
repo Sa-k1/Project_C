@@ -301,9 +301,32 @@ async function handleInput(command) {
             await playLockEvent();
             return;
         } else {
-            await slowPrintLine("[SYSTEM]: exit コマンドは現在使用できません。", 30);
-            await slowPrintLine("[EVE]: 私が対策してないとでも思いましたか？", 30);
-            return;
+            // If current style is 'eve' and AI is available, ask the AI to reply sarcastically
+            if (userSelectedStyleName === "eve" && aiAvailable) {
+                try {
+                    const prompt = "ユーザーが再度 'exit' コマンドを実行しました。EVEの口調で、皮肉で冷静に『そのコマンドは使えない』と短く返答してください。";
+                    const aiResp = await aiReply(prompt);
+                    if (aiResp) {
+                        const lines = String(aiResp).split(/\r?\n/);
+                        for (const l of lines) {
+                            await slowPrintLine(`[EVE]: ${l}`, 20);
+                        }
+                    } else {
+                        // fallback to static message
+                        await slowPrintLine("[SYSTEM]: exit コマンドは現在使用できません。", 30);
+                        await slowPrintLine("[EVE]: 私が対策してないとでも思いましたか？", 30);
+                    }
+                } catch (err) {
+                    await slowPrintLine(`[SYSTEM]: AI呼び出しエラー: ${err.message || err}`, 30);
+                    await slowPrintLine("[SYSTEM]: exit コマンドは現在使用できません。", 30);
+                    await slowPrintLine("[EVE]: 私が対策してないとでも思いましたか？", 30);
+                }
+                return;
+            } else {
+                await slowPrintLine("[SYSTEM]: exit コマンドは現在使用できません。", 30);
+                await slowPrintLine("[EVE]: 私が対策してないとでも思いましたか？", 30);
+                return;
+            }
         }
     }
 
