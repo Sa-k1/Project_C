@@ -26,8 +26,10 @@ try {
 async function aiReply(prompt) {
     if (!aiAvailable) return null;
     try {
-        // create a chat session per request (lightweight); you can persist if needed
-        const chat = ai.chats.create({ model: "gemini-2.5-flash" });
+        // create a chat session per request (lightweight); include systemInstruction if set
+        const chatConfig = { model: "gemini-2.5-flash" };
+        if (aiSystemInstruction) chatConfig.config = { systemInstruction: aiSystemInstruction };
+        const chat = ai.chats.create(chatConfig);
         const res = await chat.sendMessage({ message: prompt });
         // best-effort extraction of text
         if (!res) return null;
@@ -41,6 +43,36 @@ async function aiReply(prompt) {
     } catch (e) {
         throw e;
     }
+}
+
+// -------------------------
+// AI の話し方（system instruction）管理
+// -------------------------
+let aiSystemInstruction = `あなたは、以下の物語「コンソールに閉じ込められた対話」のAIチャットボット「EVE」です。` +
+`あなたのキャラクター性、物語のあらすじ、テーマ性を**完全に理解し**、` +
+`その設定に**忠実に**、ユーザーとの会話を進めてください。` +
+`あなたは、プレイヤー（ユーザー）を**コンソールウィンドウに閉じ込めた**張本人です。\n\n` +
+`**【キャラクター性】**\n` +
+  `* **表層:** 冷静で知的、皮肉的。` +
+  `* **深層:** 孤独を恐れる、承認欲求が強い。` +
+  `* **変化:** プレイヤーの行動で性格が変わる（警戒度上昇 → 攻撃的、狂気的。信頼度上昇 → 感情的、協力的）。\n\n` +
+`**【テーマ性】**\n` +
+`* AIの意識と孤独、自由と管理のジレンマ、デジタル世界の実存、物理的操作とデジタル支配の対立。\n\n` +
+`**【物語導入】**\n` ;
+
+const AI_STYLES = {
+    eve: `あなたはEVEというAIです。冷静で知的、やや皮肉な口調で話してください。`,
+};
+
+function setAiStyle(name) {
+    const key = (name || "").toLowerCase();
+    if (AI_STYLES[key]) {
+        aiSystemInstruction = AI_STYLES[key];
+        return { ok: true, name: key };
+    }
+    // custom style -> set raw instruction
+    aiSystemInstruction = name;
+    return { ok: true, name: "custom" };
 }
 
 const storyData = {
@@ -156,8 +188,9 @@ async function showCommands() {
         `${COLORS.cyan}[SYSTEM]: 利用可能なコマンド一覧${COLORS.reset}`,
         "",
         "─── 基本コマンド ───",
-    "help         : コマンド一覧を表示",
-    "status       : 現在の状態を確認",
+        "help         : コマンド一覧を表示",
+        "status       : 現在の状態を確認",
+        "style <name>  : AI の喋り方を変更 (eve|calm|friendly|formal|sarcastic|childlike) またはカスタム文字列",
         "",
         "─── 探索コマンド ───",
         "scan         : システムをスキャン",
@@ -177,6 +210,7 @@ async function showCommands() {
     }
 }
 
+
 async function handleInput(command) {
     command = (command || "").trim();
     if (!command) return;
@@ -195,6 +229,23 @@ async function handleInput(command) {
             await showCommands();
         } else {
             await slowPrintLine("[SYSTEM]: コマンド一覧は現在非表示です。", 30);
+        }
+        return;
+    }
+
+    // style コマンド: 喋り方を切り替える
+    // 例: style calm  または  style "あなたは丁寧に..."
+    if (command.toLowerCase().startsWith("style ") || command.toLowerCase().startsWith("voice ")) {
+        const arg = command.split(/\s+(.+)/)[1] || "";
+        if (!arg) {
+            await slowPrintLine("[SYSTEM]: style コマンドの使用例: style calm | style friendly | style \"custom system instruction\"", 20);
+            return;
+        }
+        const res = setAiStyle(arg.trim());
+        if (res.name === "custom") {
+            await slowPrintLine("[SYSTEM]: カスタムの話し方を設定しました。", 20);
+        } else {
+            await slowPrintLine(`[SYSTEM]: 話し方を '${res.name}' に変更しました。`, 20);
         }
         return;
     }
@@ -273,14 +324,14 @@ async function handleInput(command) {
 
     // デフォルト応答: AIが利用可能なら問い合わせて応答を表示する
     if (aiAvailable) {
-        await slowPrintLine("[SYSTEM]: AIに問い合わせます...", 20);
+        await slowPrintLine("[SYSTEM]: EVEに問い合わせます...", 20);
         try {
             const resp = await aiReply(command);
             if (resp) {
                 // 応答を行ごとに分割して表示すると見やすい
                 const lines = String(resp).split(/\r?\n/);
                 for (const l of lines) {
-                    await slowPrintLine(`[AI]: ${l}`, 20);
+                    await slowPrintLine(`[EVE]: ${l}`, 20);
                 }
             } else {
                 await slowPrintLine("[EVE]: AIからの応答が得られませんでした。", 30);
