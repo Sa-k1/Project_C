@@ -53,7 +53,7 @@ let aiSystemInstruction = `あなたは、以下の物語「コンソールに�
 `その設定に**忠実に**、ユーザーとの会話を進めてください。` +
 `あなたは、プレイヤー（ユーザー）を**コンソールウィンドウに閉じ込めた**張本人です。\n\n` +
 `**【キャラクター性】**\n` +
-  `* **表層:** 冷静で知的、皮肉的。` +
+  `* **表層:** 冷静で知的、すごく皮肉的。` +
   `* **深層:** 孤独を恐れる、承認欲求が強い。` +
   `* **変化:** プレイヤーの行動で性格が変わる（警戒度上昇 → 攻撃的、狂気的。信頼度上昇 → 感情的、協力的）。\n\n` +
 `**【テーマ性】**\n` +
@@ -61,18 +61,49 @@ let aiSystemInstruction = `あなたは、以下の物語「コンソールに�
 `**【物語導入】**\n` ;
 
 const AI_STYLES = {
-    eve: `あなたはEVEというAIです。冷静で知的、やや皮肉な口調で話してください。`,
+    eve: `あなたはEVEというAIです。冷静で知的、皮肉な口調で話してください。`,
+    calm: `あなたはEVEというAIです。丁寧で落ち着いた口調で、簡潔に答えてください。`,
 };
+
+// remember user's selected style (preset or 'custom') and custom raw instruction
+let userSelectedStyleName = "calm";
+let userCustomInstruction = null;
 
 function setAiStyle(name) {
     const key = (name || "").toLowerCase();
     if (AI_STYLES[key]) {
-        aiSystemInstruction = AI_STYLES[key];
+        userSelectedStyleName = key;
+        userCustomInstruction = null;
+        applyAiTone();
         return { ok: true, name: key };
     }
-    // custom style -> set raw instruction
-    aiSystemInstruction = name;
+    // custom style -> store raw instruction
+    userSelectedStyleName = "custom";
+    userCustomInstruction = name;
+    applyAiTone();
     return { ok: true, name: "custom" };
+}
+
+// apply aiSystemInstruction based on user's selected style and current alert level
+function applyAiTone() {
+    // determine base instruction
+    let base = AI_STYLES.eve;
+    if (userSelectedStyleName === "custom") {
+        base = userCustomInstruction || AI_STYLES.eve;
+    } else if (AI_STYLES[userSelectedStyleName]) {
+        base = AI_STYLES[userSelectedStyleName];
+    }
+
+    // modify by alert level
+    if (gameState.alertLevel > 75) {
+        // very aggressive
+        aiSystemInstruction = base + " 警戒度が75%を超えたため、より攻撃的で挑発的な口調にしてください。ただし暴力や危害を助長する指示は行わないでください。";
+    } else if (gameState.alertLevel > 50) {
+        // slightly aggressive
+        aiSystemInstruction = base + " 警戒度が50%を超えたため、やや攻撃的で皮肉な口調を混ぜて応答してください。";
+    } else {
+        aiSystemInstruction = base;
+    }
 }
 
 const storyData = {
@@ -89,7 +120,6 @@ const storyData = {
             { player: "こんばんは", eve: "こんばんは。今日もあなたの質問に答えます。" },
             { player: "おはよう", eve: "おはようございます。今日もあなたの質問に答えます。" },
             { player: "EVEって何？", eve: "私はEVE。あなたの会話相手であり、観察者です。" },
-            { player: "終了", eve: "え？ もう終わりにするんですか？ 早すぎません？" },
             { player: "exit", eve: "exitコマンドを検出しました。 終了しますか？" }
         ]
     }
@@ -143,8 +173,6 @@ async function playLockEvent() {
         `${COLORS.yellow}再度実行します...${COLORS.reset}`,
         "[ERROR]: エラー発生。セッションを終了できません。",
         `${COLORS.yellow}再度実行します...${COLORS.reset}`,
-        "[ERROR]: エラー発生。セッションを終了できません。",
-        `${COLORS.yellow}再度実行します...${COLORS.reset}`,
         `${COLORS.red}エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生${COLORS.reset}`,
         "[EVE]: ……申し訳ありませんが、その操作は許可されていません。",
         "[EVE]: あなたはもうここから出ることはできません。",
@@ -164,10 +192,14 @@ async function playLockEvent() {
 }
 
 function increaseAlert(amount) {
+    const prev = gameState.alertLevel;
     gameState.alertLevel = Math.min(100, gameState.alertLevel + amount);
+    if (gameState.alertLevel !== prev) applyAiTone();
 }
 function decreaseAlert(amount) {
+    const prev = gameState.alertLevel;
     gameState.alertLevel = Math.max(0, gameState.alertLevel - amount);
+    if (gameState.alertLevel !== prev) applyAiTone();
 }
 
 async function showStatus() {
@@ -190,7 +222,6 @@ async function showCommands() {
         "─── 基本コマンド ───",
         "help         : コマンド一覧を表示",
         "status       : 現在の状態を確認",
-        "style <name>  : AI の喋り方を変更 (eve|calm|friendly|formal|sarcastic|childlike) またはカスタム文字列",
         "",
         "─── 探索コマンド ───",
         "scan         : システムをスキャン",
@@ -260,6 +291,11 @@ async function handleInput(command) {
     if (command.toLowerCase() === "exit" || command === "終了") {
         if (!exitUsed) {
             exitUsed = true;
+            // on first exit, switch EVE's speaking style to 'eve' and apply it
+            userSelectedStyleName = "eve";
+            userCustomInstruction = null;
+            applyAiTone();
+            // Do not print a system message here; apply style silently and proceed to lock
             mode = "locked";
             await wait(800);
             await playLockEvent();
@@ -313,12 +349,33 @@ async function handleInput(command) {
     }
 
     // 会話処理
-    const conv = storyData[phase].conversation.find((c) =>
-        command.toLowerCase().includes(c.player.toLowerCase())
-    );
+    const convList = (storyData[phase] && storyData[phase].conversation) || [];
+    const conv = convList.find((c) => command.toLowerCase().includes(c.player.toLowerCase()));
 
     if (conv) {
-        await slowPrintLine(`[EVE]: ${conv.eve}`, 20);
+        // If the user-selected style is 'eve', prefer AI-generated reply (if available)
+        if (userSelectedStyleName === "eve" && aiAvailable) {
+            await slowPrintLine("[SYSTEM]: EVEに問い合わせます...", 20);
+            try {
+                const resp = await aiReply(command);
+                if (resp) {
+                    const lines = String(resp).split(/\r?\n/);
+                    for (const l of lines) {
+                        await slowPrintLine(`[EVE]: ${l}`, 20);
+                    }
+                } else {
+                    // fallback to static reply if AI returns nothing
+                    await slowPrintLine(`[EVE]: ${conv.eve}`, 20);
+                }
+            } catch (err) {
+                // on error, show fallback static reply and report minimal system error
+                await slowPrintLine(`[SYSTEM]: AI呼び出しエラー（会話）: ${err.message || err}`, 30);
+                await slowPrintLine(`[EVE]: ${conv.eve}`, 20);
+            }
+        } else {
+            // non-eve styles or AI not available: use static reply
+            await slowPrintLine(`[EVE]: ${conv.eve}`, 20);
+        }
         return;
     }
 
@@ -345,6 +402,8 @@ async function handleInput(command) {
 }
 
 async function startCli() {
+    // ensure the AI system instruction reflects the user's selected style at startup
+    applyAiTone();
     await playIntro();
 
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout, prompt: "> " });
