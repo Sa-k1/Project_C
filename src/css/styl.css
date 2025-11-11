@@ -185,7 +185,7 @@ body {
     top: 20px; /* 初期位置 */
     right: 20px; /* 初期位置 */
     
-    width: 80px  /* コンパクトなサイズ */
+    width: 80px;  /* コンパクトなサイズ */
     height: 80px; /* コンパクトなサイズ */
     
     display: flex; /* 画像を中央に配置 */
@@ -200,6 +200,7 @@ body {
     cursor: grab; /* ゴミ箱自体もドラッグできるように */
     box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* 少し影をつけて立体感を出す */
     transition: all 0.2s ease-in-out; /* ホバーやドラッグ時の変化を滑らかに */
+    z-index: -100;
 }
 
 /* ゴミ箱にファイルがドラッグされてきた時のスタイル */

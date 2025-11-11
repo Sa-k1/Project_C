@@ -7,7 +7,8 @@ function createWindow() {
     width: 800,
     height: 600,
     autoHideMenuBar: true,
-    fullscreen: true, 
+    // フルスクリーン表示にする場合は下のコメントアウトを外してください
+    // fullscreen: true, 
     title: ''
   });
   win.loadFile(path.join(__dirname, 'src', 'html', 'index.html'));
