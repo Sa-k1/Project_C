@@ -173,5 +173,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     }
 
+const overlay = document.querySelector('.fade');
+overlay.addEventListener('animationend', () => {
+  overlay.remove();
+});
 
 });
