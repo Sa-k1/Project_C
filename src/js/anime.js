@@ -35,8 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       @keyframes colorChange {
         0% { border-top-color: #61dafb; }
-        25% { border-top-color: #ff6f61; }
-        50% { border-top-color: #61ff61; }
+        25% { border-top-color: #6161ff; }
+        50% { border-top-color: #e0ffff; }
         75% { border-top-color: #6161ff; }
         100% { border-top-color: #61dafb; }
       }
