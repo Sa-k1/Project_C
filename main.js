@@ -8,7 +8,7 @@ function createWindow() {
     height: 600,
     autoHideMenuBar: true,
     // フルスクリーン表示にする場合は下のコメントアウトを外してください
-    // fullscreen: true, 
+    fullscreen: true, 
     title: ''
   });
   win.loadFile(path.join(__dirname, 'src', 'html', 'index.html'));
@@ -18,7 +18,7 @@ app.whenReady().then(() => {
   const splashScreen = new BrowserWindow({
     width: 800, // 新しい幅
     height: 600, // 新しい高さ
-    // fullscreen: true,
+    fullscreen: true,
     frame: false,
     alwaysOnTop: true,
     transparent: true
