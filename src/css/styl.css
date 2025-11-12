@@ -164,8 +164,8 @@ body {
 
 /*     icon     */
 
-.icon {
-    margin: 25px;
+#eve-image {
+    margin: 1% 2%;
 }
 
 /* ドラッグ可能なアイテムのスタイル */
@@ -296,6 +296,20 @@ body {
     height: 20px;
     margin-right: 10px;
 }
+
+.icon_taskb_all {
+    padding-left: 1%;
+    margin-top: auto;
+    display: flex;
+}
+
+.i_task_bar {
+    padding-left: 1%;
+    width: 32px;
+    margin: 1px 0 8px 15px;;
+}
+
+
 
 .fade {
     position: absolute;
