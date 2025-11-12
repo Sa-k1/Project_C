@@ -1,6 +1,8 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+const { spawn } = require('child_process');
 
+let cliProcess;
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -38,5 +40,15 @@ app.whenReady().then(() => {
   setTimeout(() => {
     splashScreen.close();
     createWindow();
-  }, 2500);
+   }, 0);
+   //　アニメーションをみたい方は上の0の部分を2500にしてください
+});
+
+app.on('window-all-closed', () => {
+  if (cliProcess) {
+    cliProcess.kill();
+  }
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
