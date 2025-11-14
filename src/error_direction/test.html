@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ウイルス感染演出 - デモ</title>
+    <link rel="stylesheet" href="./virus.css">
+    <style>
+        body {
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: sans-serif;
+        }
+        .demo-controls {
+            background: rgba(255,255,255,0.1);
+            padding: 20px 30px;
+            border-radius: 10px;
+            text-align: center;
+            color: #fff;
+        }
+        .demo-controls h2 {
+            margin-top: 0;
+        }
+        .demo-controls button {
+            padding: 10px 16px;
+            margin: 6px;
+            background: #ff6b6b;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .demo-controls button:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-controls">
+        <h2>⚠️ ウイルス感染演出デモ</h2>
+        <button id="start-virus">演出を開始</button>
+        <button id="clear-virus">全クリア</button>
+        <p style="margin-top: 12px; font-size: 12px; opacity: 0.8;">
+            ポップアップをドラッグして移動できます
+        </p>
+    </div>
+
+    <script type="module">
+        import { VirusPopupSimulator } from './virus.js';
+
+        const simulator = new VirusPopupSimulator({
+            count: 100,
+            interval: 10,
+            maxOnScreen: 100,
+            enableGlitch: true,
+            messages: [
+                'ウイルス検出！',
+                'システムスキャン実行中',
+                'ファイルが破損しています',
+                '緊急アップデート推奨',
+                'データを復旧してください',
+                'クリックして続行',
+                'セキュリティエラー'
+            ]
+        });
+
+        document.getElementById('start-virus').addEventListener('click', () => {
+            simulator.clear();
+            simulator.start();
+        });
+
+        document.getElementById('clear-virus').addEventListener('click', () => {
+            simulator.clear();
+        });
+    </script>
+</body>
+</html>
