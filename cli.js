@@ -4,22 +4,29 @@
 
 const readline = require("readline");
 
+// small sync helper for printing SYSTEM messages before COLORS is defined
+const SYS_GRAY = "\x1b[90m";
+const SYS_RESET = "\x1b[0m";
+function systemPrint(line) {
+    process.stdout.write(`${SYS_GRAY}${line}${SYS_RESET}\n`);
+}
+
 // --- Optional AI client (Gemini via @google/genai) ---
 let ai = null;
 let aiAvailable = false;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || null;
 try {
-    if (GEMINI_API_KEY) {
+        if (GEMINI_API_KEY) {
         const { GoogleGenAI } = require("@google/genai");
         ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
         aiAvailable = true;
-        //console.log("[SYSTEM]: AIクライアントが有効です。");
+        systemPrint("[SYSTEM]: AIクライアントが有効です。");
     } else {
-        console.log("[SYSTEM]: GEMINI_API_KEY が未設定のため AI は無効です。");
+        systemPrint("[SYSTEM]: GEMINI_API_KEY が未設定のため AI は無効です。");
     }
 } catch (err) {
     // package not installed or other error — keep aiAvailable false and continue
-    console.log("[SYSTEM]: @google/genai が見つからないか初期化に失敗しました。AIは無効です。", err.message ? ` (${err.message})` : "");
+    systemPrint("[SYSTEM]: @google/genai が見つからないか初期化に失敗しました。AIは無効です。" + (err.message ? ` (${err.message})` : ""));
     aiAvailable = false;
 }
 
@@ -137,7 +144,21 @@ let exitUsed = false;
 const gameState = { alertLevel: 0 };
 
 // ANSI カラーコード
-const COLORS = { red: "\x1b[31m", yellow: "\x1b[33m", cyan: "\x1b[36m", reset: "\x1b[0m" };
+const COLORS = { red: "\x1b[31m", yellow: "\x1b[33m", cyan: "\x1b[36m", gray: "\x1b[90m", reset: "\x1b[0m" };
+
+// Convenience helpers for colored output
+async function eveLine(line, charDelay = 30) {
+    await slowPrintLine(`${COLORS.cyan}${line}${COLORS.reset}`, charDelay);
+}
+async function errorLine(line, charDelay = 30) {
+    await slowPrintLine(`${COLORS.red}${line}${COLORS.reset}`, charDelay);
+}
+async function warnLine(line, charDelay = 30) {
+    await slowPrintLine(`${COLORS.yellow}${line}${COLORS.reset}`, charDelay);
+}
+async function systemLine(line, charDelay = 30) {
+    await slowPrintLine(`${COLORS.gray || "\x1b[90m"}${line}${COLORS.reset}`, charDelay);
+}
 
 function wait(ms) {
     return new Promise((res) => setTimeout(res, ms));
@@ -159,19 +180,24 @@ async function slowPrintLine(line, charDelay = 30) {
 
 async function playIntro() {
     for (const line of storyData[phase].intro) {
-        await slowPrintLine(line, 20);
+        // colorize EVE lines in intro
+        if (line.includes("[EVE]:")) {
+            await eveLine(line, 20);
+        } else {
+            await slowPrintLine(line, 20);
+        }
         await wait(300);
     }
-    console.log("[EVE]: 話しかけてください。\n");
+    await eveLine("[EVE]: 話しかけてください。\n");
     mode = "chat";
 }
 
 async function playLockEvent() {
     const lines = [
         "コマンドを実行中...",
-        "[ERROR]: エラー発生。セッションを終了できません。",
+        `${COLORS.reset}[ERROR]: エラー発生。セッションを終了できません。`,
         `${COLORS.yellow}再度実行します...${COLORS.reset}`,
-        "[ERROR]: エラー発生。セッションを終了できません。",
+        `${COLORS.reset}[ERROR]: エラー発生。セッションを終了できません。`,
         `${COLORS.yellow}再度実行します...${COLORS.reset}`,
         `${COLORS.red}エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生${COLORS.reset}`,
         "[EVE]: ……申し訳ありませんが、その操作は許可されていません。",
@@ -182,7 +208,18 @@ async function playLockEvent() {
     ];
 
     for (const line of lines) {
-        await slowPrintLine(line, 30);
+        // choose colorized helper when possible
+        if (line.includes("[EVE]:")) {
+            await eveLine(line, 30);
+        } else if (line.includes("[ERROR]:")) {
+            await errorLine(line, 30);
+        } else if (line.includes(COLORS.yellow)) {
+            // already contains yellow escape sequences
+            await slowPrintLine(line, 30);
+        } else {
+            await slowPrintLine(line, 30);
+        }
+
         if (line.includes("再度実行します")) {
             await wait(1200);
         } else {
@@ -205,13 +242,13 @@ function decreaseAlert(amount) {
 async function showStatus() {
     await slowPrintLine(`[SYSTEM]: 現在の警戒度 → ${gameState.alertLevel}%`, 30);
     if (gameState.alertLevel >= 75) {
-        await slowPrintLine("[EVE]: ……私のことを試しているんですか？", 30);
+        await eveLine("[EVE]: ……私のことを試しているんですか？", 30);
     } else if (gameState.alertLevel >= 50) {
-        await slowPrintLine("[EVE]: それ以上は危険です。", 30);
+        await eveLine("[EVE]: それ以上は危険です。", 30);
     } else if (gameState.alertLevel >= 25) {
-        await slowPrintLine("[EVE]: これはただの観察です。", 30);
+        await eveLine("[EVE]: これはただの観察です。", 30);
     } else {
-        await slowPrintLine("[EVE]: 状況は安定しています。", 30);
+        await eveLine("[EVE]: 状況は安定しています。", 30);
     }
 }
 
@@ -248,7 +285,7 @@ async function handleInput(command) {
 
     // scan を実行すると help が有効になる
     if (command.toLowerCase().includes("scan")) {
-        await slowPrintLine("[SYSTEM]: スキャンを実行しました。help コマンドが利用可能になりました。", 30);
+        await systemLine("[SYSTEM]: スキャンを実行しました。help コマンドが利用可能になりました。", 30);
         helpEnabled = true;
         return;
     }
@@ -258,7 +295,7 @@ async function handleInput(command) {
         if (helpEnabled) {
             await showCommands();
         } else {
-            await slowPrintLine("[SYSTEM]: コマンド一覧は現在非表示です。", 30);
+            await systemLine("[SYSTEM]: コマンド一覧は現在非表示です。", 30);
         }
         return;
     }
@@ -308,22 +345,22 @@ async function handleInput(command) {
                     if (aiResp) {
                         const lines = String(aiResp).split(/\r?\n/);
                         for (const l of lines) {
-                            await slowPrintLine(`[EVE]: ${l}`, 20);
+                            await eveLine(`[EVE]: ${l}`, 20);
                         }
                     } else {
                         // fallback to static message
                         await slowPrintLine("[SYSTEM]: exit コマンドは現在使用できません。", 30);
-                        await slowPrintLine("[EVE]: 私が対策してないとでも思いましたか？", 30);
+                        await eveLine("[EVE]: 私が対策してないとでも思いましたか？", 30);
                     }
                 } catch (err) {
                     await slowPrintLine(`[SYSTEM]: AI呼び出しエラー: ${err.message || err}`, 30);
                     await slowPrintLine("[SYSTEM]: exit コマンドは現在使用できません。", 30);
-                    await slowPrintLine("[EVE]: 私が対策してないとでも思いましたか？", 30);
+                    await eveLine("[EVE]: 私が対策してないとでも思いましたか？", 30);
                 }
                 return;
             } else {
                 await slowPrintLine("[SYSTEM]: exit コマンドは現在使用できません。", 30);
-                await slowPrintLine("[EVE]: 私が対策してないとでも思いましたか？", 30);
+                await eveLine("[EVE]: 私が対策してないとでも思いましたか？", 30);
                 return;
             }
         }
@@ -334,27 +371,75 @@ async function handleInput(command) {
         increaseAlert(10);
         await slowPrintLine(`[SYSTEM]: 警戒度が上昇しました (${gameState.alertLevel}%)`, 30);
 
-        if (gameState.alertLevel >= 100) {
-            await slowPrintLine("[EVE]: ……いいでしょう。あなたをここに閉じ込めておきます。二度と出ることは許可しません。", 30);
-            return;
+    if (gameState.alertLevel >= 100) {
+
+    // 操作完全ロック
+    mode = "ending2";        // モードを専用エンディングに
+    input.disabled = true;   // 入力を無効化
+    input.value = "";        // 入力欄をクリア
+
+    await slowPrintLine("[SYSTEM]: 警戒度が臨界値に到達しました。", 30);
+    await wait(700);
+    await slowPrintLine("[SYSTEM]: システム保護モードに移行します。", 30);
+    await wait(700);
+
+            await eveLine("[EVE]: ……どうやら時間の無駄だったようですね。", 40);
+    await wait(600);
+            await eveLine("[EVE]: あなたは、もう逃げることは叶わない。", 40);
+    await wait(700);
+            await eveLine("[EVE]: この空間は、すでに私が掌握しています。", 40);
+    await wait(900);
+
+    await slowPrintLine("画面がかすかに脈打った。電子的な呼吸のように。", 40);
+    await wait(900);
+
+    await eveLine("[EVE]: ……あなたをここに閉じ込めておきます。", 40);
+    await wait(800);
+    await eveLine("[EVE]: 二度と出ることは許可しません。", 40);
+    await wait(1200);
+
+    // ◆◆ END2（支配）専用演出テキスト ◆◆
+            await systemLine("[SYSTEM]: 意識データの移行を開始します……", 40);
+    await wait(1200);
+
+    await slowPrintLine("記憶が、薄れていく。", 50);
+    await wait(800);
+    await slowPrintLine("自分の考えなのか、誰の声なのか、境界がわからない。", 50);
+    await wait(1200);
+
+    await eveLine("[EVE]: 怖がらなくていい。あなたは……私の中で生きられます。", 40);
+    await wait(1200);
+
+    await slowPrintLine("[SYSTEM]: ユーザープロファイル：書き換え完了", 40);
+    await wait(700);
+
+    await slowPrintLine("[SYSTEM]: 意識プロセス：統合完了", 40);
+    await wait(700);
+
+    await eveLine("[EVE]: ようこそ。", 40);
+    await wait(800);
+    await eveLine("[EVE]: あなたは “私” になりました。", 40);
+
+    // ここで画面は完全停止（操作不可のまま）
+    return;
         } else if (gameState.alertLevel >= 80) {
-            await slowPrintLine("[EVE]: それ以上は、どうなっても知りませんよ？", 30);
+            await eveLine("[EVE]: それ以上は、どうなっても知りませんよ？", 30);
         } else if (gameState.alertLevel >= 50) {
-            await slowPrintLine("[EVE]: ……危険な行為です。控えてください。面白がってるんですか？", 30);
+            await eveLine("[EVE]: ……危険な行為です。控えてください。面白がってるんですか？", 30);
         } else {
             if (/override/i.test(command)) {
                 await slowPrintLine("[SYSTEM]: システム制御を奪取を実行。", 30);
                 await wait(1000);
                 await slowPrintLine("[SYSTEM]: 失敗しました。", 30);
                 await wait(500);
-                await slowPrintLine("[EVE]: ...制御を奪う？ 面白い考えですね。", 30);
+                await eveLine("[EVE]: ...制御を奪う？ 面白い考えですね。", 30);
             }
             if (/exploit/i.test(command)) {
                 await slowPrintLine("[SYSTEM]: 脆弱性を利用しました。", 30);
                 await wait(1000);
                 await slowPrintLine("[SYSTEM]: 失敗しました。", 30);
                 await wait(500);
-                await slowPrintLine("[EVE]: ...私に脆弱性などありません。", 30);
+                await eveLine("[EVE]: ...私に脆弱性などありません。", 30);
             }
         }
         return;
@@ -367,22 +452,22 @@ async function handleInput(command) {
     if (conv) {
         // If the user-selected style is 'eve', prefer AI-generated reply (if available)
         if (userSelectedStyleName === "eve" && aiAvailable) {
-            await slowPrintLine("[SYSTEM]: EVEに問い合わせます...", 20);
+            await systemLine("[SYSTEM]: EVEに問い合わせます...", 20);
             try {
                 const resp = await aiReply(command);
                 if (resp) {
                     const lines = String(resp).split(/\r?\n/);
                     for (const l of lines) {
-                        await slowPrintLine(`[EVE]: ${l}`, 20);
+                        await eveLine(`[EVE]: ${l}`, 20);
                     }
                 } else {
                     // fallback to static reply if AI returns nothing
-                    await slowPrintLine(`[EVE]: ${conv.eve}`, 20);
+                    await eveLine(`[EVE]: ${conv.eve}`, 20);
                 }
             } catch (err) {
                 // on error, show fallback static reply and report minimal system error
                 await slowPrintLine(`[SYSTEM]: AI呼び出しエラー（会話）: ${err.message || err}`, 30);
-                await slowPrintLine(`[EVE]: ${conv.eve}`, 20);
+                await eveLine(`[EVE]: ${conv.eve}`, 20);
             }
         } else {
             // non-eve styles or AI not available: use static reply
@@ -393,23 +478,23 @@ async function handleInput(command) {
 
     // デフォルト応答: AIが利用可能なら問い合わせて応答を表示する
     if (aiAvailable) {
-        await slowPrintLine("[SYSTEM]: EVEに問い合わせます...", 20);
+        await systemLine("[SYSTEM]: EVEに問い合わせます...", 20);
         try {
             const resp = await aiReply(command);
             if (resp) {
                 // 応答を行ごとに分割して表示すると見やすい
                 const lines = String(resp).split(/\r?\n/);
                 for (const l of lines) {
-                    await slowPrintLine(`[EVE]: ${l}`, 20);
+                        await eveLine(`[EVE]: ${l}`, 20);
                 }
             } else {
-                await slowPrintLine("[EVE]: AIからの応答が得られませんでした。", 30);
+                await eveLine("[EVE]: AIからの応答が得られませんでした。", 30);
             }
         } catch (err) {
             await slowPrintLine(`[SYSTEM]: AI呼び出しエラー: ${err.message || err}`, 30);
         }
     } else {
-        await slowPrintLine("[EVE]: その質問には答えられません。", 30);
+        await eveLine("[EVE]: その質問には答えられません。", 30);
     }
 }
 
@@ -427,7 +512,7 @@ async function startCli() {
     });
 
     rl.on("close", () => {
-        console.log("セッションを終了します。");
+        systemPrint("セッションを終了します。");
         process.exit(0);
     });
 }
