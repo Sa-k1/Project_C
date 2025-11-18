@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>E.V.E</title>
   <link rel="stylesheet" href="../css/styl.css">
+  <link rel="stylesheet" href="../error_direction/virus.css">
 </head>
 <body>
   <div class="fade"></div>
@@ -46,9 +47,14 @@
   <div class="draggable-item" draggable="true" id="file1">重要なデータ.txt</div>
   <div class="draggable-item" draggable="true" id="file2">古いメモ.doc</div>
   <div class="draggable-item" draggable="true" id="file3">不要な写真.jpg</div>
-
+      <div style="position:fixed; right:16px; bottom:20px; z-index:6000;">
+        <button id="start-virus" style="padding:8px 12px; margin-right:6px;">演出を開始</button>
+        <button id="clear-virus"  style="padding:8px 12px;">全クリア</button>
+    </div>
   <!-- iframe の読み込みは上の miniWindow 内の iframe を JS で行います -->
   <!-- script はここに1つだけ置く -->
+  <script src="../error_direction/virus-config.js"></script>
+  <script src="../error_direction/virus.js"></script>
   <script src="../js/index.js"></script>
 </body>
 

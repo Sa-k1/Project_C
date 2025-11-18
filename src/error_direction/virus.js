@@ -1,10 +1,13 @@
-export class VirusPopupSimulator {
+/* ウイルス演出：VirusPopupSimulator クラス */
+/* virus-config.js で設定管理 */
+
+class VirusPopupSimulator {
     constructor(options = {}) {
         this.options = {
-            count: 100,                    // ポップアップ生成数
-            interval: 10,               // 生成間隔（ms）
-            maxOnScreen: 100,             // 画面上の最大数
-            enableGlitch: true,          // 画面チラつき有効
+            count: 40,
+            interval: 120,
+            maxOnScreen: 60,
+            enableGlitch: true,
             messages: [
                 'ウイルス検出！',
                 'システムが危険です',
@@ -17,27 +20,23 @@ export class VirusPopupSimulator {
         };
         this.popups = [];
         this.glitchInterval = null;
+        this.timerInterval = null;
     }
 
-    /**
-     * ポップアップを 1 つ生成
-     */
     createPopup(message) {
-        // 画面上限チェック
-        if (this.popups.length >= this.options.maxOnScreen) {
-            return;
-        }
+        if (this.popups.length >= this.options.maxOnScreen) return;
 
         const popup = document.createElement('div');
         popup.className = 'virus-popup';
-        
-        // ランダム位置（画面内）
-        const x = Math.random() * (window.innerWidth - 300);
-        const y = Math.random() * (window.innerHeight - 180);
+
+        const w = Math.min(300, Math.max(240, window.innerWidth * 0.18));
+        const h = 140;
+        const x = Math.random() * (window.innerWidth - w);
+        const y = Math.random() * (window.innerHeight - h);
         popup.style.left = `${x}px`;
         popup.style.top = `${y}px`;
+        popup.style.minWidth = `${w}px`;
 
-        // コンテンツ
         popup.innerHTML = `
             <div class="virus-popup-handle">⚠️</div>
             <div class="virus-popup-title">警告</div>
@@ -48,7 +47,6 @@ export class VirusPopupSimulator {
             </div>
         `;
 
-        // ボタン動作
         const btnOk = popup.querySelector('.btn-ok');
         const btnClose = popup.querySelector('.btn-close');
 
@@ -63,24 +61,19 @@ export class VirusPopupSimulator {
             this.popups = this.popups.filter(p => p !== popup);
         });
 
-        // ドラッグ可能にする（移動の楽しさ）
         this.makeDraggable(popup);
 
         document.body.appendChild(popup);
         this.popups.push(popup);
 
-        // 自動クローズ（7秒後）
-        setTimeout(() => {
-            if (popup.parentElement) {
-                popup.remove();
-                this.popups = this.popups.filter(p => p !== popup);
-            }
-        }, 7000);
+        // setTimeout(() => {
+        //     if (popup.parentElement) {
+        //         popup.remove();
+        //         this.popups = this.popups.filter(p => p !== popup);
+        //     }
+        // }, 7000);
     }
 
-    /**
-     * ドラッグ機能
-     */
     makeDraggable(popup) {
         let offsetX = 0, offsetY = 0;
         const handle = popup.querySelector('.virus-popup-handle');
@@ -105,39 +98,23 @@ export class VirusPopupSimulator {
         });
     }
 
-    /**
-     * チラつき効果を開始
-     */
     startGlitch() {
         if (!this.options.enableGlitch) return;
+        if (document.getElementById('virus-glitch')) return;
 
         const glitch = document.createElement('div');
         glitch.className = 'virus-screen-glitch';
         glitch.id = 'virus-glitch';
         document.body.appendChild(glitch);
-
-        this.glitchInterval = setInterval(() => {
-            if (!document.getElementById('virus-glitch')) {
-                clearInterval(this.glitchInterval);
-            }
-        }, 150);
     }
 
-    /**
-     * チラつき効果を終了
-     */
     stopGlitch() {
         const glitch = document.getElementById('virus-glitch');
         if (glitch) glitch.remove();
-        if (this.glitchInterval) clearInterval(this.glitchInterval);
     }
 
-    /**
-     * メイン実行
-     */
     async start() {
         this.startGlitch();
-
         for (let i = 0; i < this.options.count; i++) {
             const msg = this.options.messages[
                 Math.floor(Math.random() * this.options.messages.length)
@@ -147,9 +124,6 @@ export class VirusPopupSimulator {
         }
     }
 
-    /**
-     * 全クリア
-     */
     clear() {
         this.popups.forEach(p => p.remove());
         this.popups = [];
@@ -157,5 +131,49 @@ export class VirusPopupSimulator {
     }
 }
 
-// グローバルで使う場合は以下をアンコメント
-// window.VirusPopupSimulator = VirusPopupSimulator;
+/* グローバルに公開 */
+window.VirusPopupSimulator = VirusPopupSimulator;
+
+/* 自動バインド */
+(function autoBind() {
+    function setup() {
+        if (window.__virusSimulatorBound) return;
+
+        // virus-config.js から設定を取得
+        const opts = window.VIRUS_SIM_OPTIONS || {
+            count: 40,
+            interval: 120,
+            maxOnScreen: 60,
+            enableGlitch: true
+        };
+
+        const simulator = new VirusPopupSimulator(opts);
+        window.simulator = simulator;
+
+        function tryBind() {
+            const startBtn = document.getElementById('start-virus');
+            const clearBtn = document.getElementById('clear-virus');
+            if (!startBtn || !clearBtn) return false;
+
+            startBtn.addEventListener('click', () => {
+                simulator.clear();
+                simulator.start();
+            });
+            clearBtn.addEventListener('click', () => simulator.clear());
+            window.__virusSimulatorBound = true;
+            return true;
+        }
+
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            tryBind();
+        } else {
+            document.addEventListener('DOMContentLoaded', tryBind);
+        }
+    }
+
+    try {
+        setup();
+    } catch (e) {
+        console.error('virus.js autoBind failed', e);
+    }
+})();
