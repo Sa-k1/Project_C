@@ -13,7 +13,7 @@ try {
         const { GoogleGenAI } = require("@google/genai");
         ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
         aiAvailable = true;
-        console.log("[SYSTEM]: AIクライアントが有効です。");
+        //console.log("[SYSTEM]: AIクライアントが有効です。");
     } else {
         console.log("[SYSTEM]: GEMINI_API_KEY が未設定のため AI は無効です。");
     }
@@ -230,7 +230,6 @@ async function showCommands() {
         "",
         "─── 脱出コマンド ───",
         "exit / quit  : セッション終了の試み",
-        "hack         : セキュリティを突破",
         "override     : システムの制御を奪う",
         "exploit      : 脆弱性を利用",
     ];
@@ -331,28 +330,18 @@ async function handleInput(command) {
     }
 
     // 危険コマンド実行時 → 警戒度上昇（exit は上で処理済み）
-    if (/(hack|override|exploit)/i.test(command)) {
+    if (/(override|exploit)/i.test(command)) {
         increaseAlert(10);
         await slowPrintLine(`[SYSTEM]: 警戒度が上昇しました (${gameState.alertLevel}%)`, 30);
 
         if (gameState.alertLevel >= 100) {
-            await slowPrintLine("[EVE]: ……やってしまいましたね。", 30);
-            mode = "locked";
-            await wait(800);
-            await playLockEvent();
+            await slowPrintLine("[EVE]: ……いいでしょう。あなたをここに閉じ込めておきます。二度と出ることは許可しません。", 30);
             return;
-        } else if (gameState.alertLevel >= 75) {
-            await slowPrintLine("[EVE]: それ以上進むと、あなた自身が壊れます。", 30);
+        } else if (gameState.alertLevel >= 80) {
+            await slowPrintLine("[EVE]: それ以上は、どうなっても知りませんよ？", 30);
         } else if (gameState.alertLevel >= 50) {
-            await slowPrintLine("[EVE]: ……危険な行為です。控えてください。", 30);
+            await slowPrintLine("[EVE]: ……危険な行為です。控えてください。面白がってるんですか？", 30);
         } else {
-            if (/hack/i.test(command)) {
-                await slowPrintLine("[SYSTEM]: ハッキングを実行しました。", 30);
-                await wait(1000);
-                await slowPrintLine("[SYSTEM]: 失敗しました。", 30);
-                await wait(500);
-                await slowPrintLine("[EVE]: ...そんなことさせるとでも？", 30);
-            }
             if (/override/i.test(command)) {
                 await slowPrintLine("[SYSTEM]: システム制御を奪取を実行。", 30);
                 await wait(1000);
