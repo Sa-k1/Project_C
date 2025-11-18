@@ -2,7 +2,6 @@
 // ターミナル向けの簡易 CLI ランナー
 // 使用法: node cli.js
 
-const readline = require("readline");
 
 // small sync helper for printing SYSTEM messages before COLORS is defined
 const SYS_GRAY = "\x1b[90m";
@@ -15,20 +14,41 @@ function systemPrint(line) {
 let ai = null;
 let aiAvailable = false;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || null;
-try {
-        if (GEMINI_API_KEY) {
-        const { GoogleGenAI } = require("@google/genai");
+
+// Initialize AI client in a way that works in both CommonJS (require)
+// and ESM (dynamic import) environments. This avoids "require is not defined" errors.
+async function initAiClient() {
+    if (!GEMINI_API_KEY) {
+        systemPrint("[SYSTEM]: GEMINI_API_KEY が未設定のため AI は無効です。");
+        return;
+    }
+
+    try {
+        let mod;
+        if (typeof require === "function") {
+            // CommonJS
+            mod = require("@google/genai");
+        } else {
+            // ESM or environments without global require
+            const imported = await import("@google/genai");
+            // imported may contain the module under default or directly
+            mod = imported && (imported.default || imported);
+        }
+
+        // Try to find the GoogleGenAI constructor in the loaded module
+        const GoogleGenAI = mod && (mod.GoogleGenAI || mod.default?.GoogleGenAI || mod);
+        if (!GoogleGenAI) throw new Error("@google/genai モジュールのエクスポートが不明です");
+
         ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
         aiAvailable = true;
-        systemPrint("[SYSTEM]: AIクライアントが有効です。");
-    } else {
-        systemPrint("[SYSTEM]: GEMINI_API_KEY が未設定のため AI は無効です。");
+    } catch (err) {
+        systemPrint("[SYSTEM]: @google/genai が見つからないか初期化に失敗しました。AIは無効です。" + (err && err.message ? ` (${err.message})` : ""));
+        aiAvailable = false;
     }
-} catch (err) {
-    // package not installed or other error — keep aiAvailable false and continue
-    systemPrint("[SYSTEM]: @google/genai が見つからないか初期化に失敗しました。AIは無効です。" + (err.message ? ` (${err.message})` : ""));
-    aiAvailable = false;
 }
+
+// start initialization asynchronously (no top-level await required)
+initAiClient();
 
 async function aiReply(prompt) {
     if (!aiAvailable) return null;
@@ -122,13 +142,7 @@ const storyData = {
             "接続完了。",
             "[EVE]: こんにちは。あなたと話すのは久しぶりですね。"
         ],
-        conversation: [
-            { player: "こんにちは", eve: "こんにちは。今日もあなたの質問に答えます。" },
-            { player: "こんばんは", eve: "こんばんは。今日もあなたの質問に答えます。" },
-            { player: "おはよう", eve: "おはようございます。今日もあなたの質問に答えます。" },
-            { player: "EVEって何？", eve: "私はEVE。あなたの会話相手であり、観察者です。" },
-            { player: "exit", eve: "exitコマンドを検出しました。 終了しますか？" }
-        ]
+
     }
 };
 
@@ -409,7 +423,7 @@ async function handleInput(command) {
 
 
 
-    
+
 
     await slowPrintLine("[SYSTEM]: ユーザープロファイル：書き換え完了", 40);
     await wait(700);
@@ -504,7 +518,18 @@ async function startCli() {
     applyAiTone();
     await playIntro();
 
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout, prompt: "> " });
+    // dynamically obtain readline module so this works in CommonJS and ESM
+    let rlModule;
+    try {
+        // in CommonJS this will work
+        rlModule = require("readline");
+    } catch (e) {
+        // in ESM environments, use dynamic import
+        const imported = await import("readline");
+        rlModule = imported.default || imported;
+    }
+
+    const rl = rlModule.createInterface({ input: process.stdin, output: process.stdout, prompt: "> " });
     rl.prompt();
 
     rl.on("line", async (line) => {
