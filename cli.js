@@ -402,13 +402,14 @@ async function handleInput(command) {
             await systemLine("[SYSTEM]: 意識データの移行を開始します……", 40);
     await wait(1200);
 
-    await slowPrintLine("記憶が、薄れていく。", 50);
-    await wait(800);
-    await slowPrintLine("自分の考えなのか、誰の声なのか、境界がわからない。", 50);
-    await wait(1200);
 
-    await eveLine("[EVE]: 怖がらなくていい。あなたは……私の中で生きられます。", 40);
-    await wait(1200);
+
+
+
+
+
+
+    
 
     await slowPrintLine("[SYSTEM]: ユーザープロファイル：書き換え完了", 40);
     await wait(700);
