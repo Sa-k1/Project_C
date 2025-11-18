@@ -391,7 +391,7 @@ async function handleInput(command) {
         const response = await callAI(command);
         
         if (response) {
-            const lines = String(response).split(/\r/);
+            const lines = String(response).split(/\r?\n/);
             for (const l of lines) {
                 await slowPrintLine(`[EVE]: ${l}`, 20);
             }
