@@ -12,6 +12,8 @@ package-look.json
 APIKEYに関しては、
 各々ファイルを作ってください。
 electron.env
+名前を変えてください
+.env
 
 中身は後で渡します。
 

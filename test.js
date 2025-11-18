@@ -1,11 +1,11 @@
 // test.js
 
-// CommonJS形式でパッケージを読み込み
-const { GoogleGenAI } = require("@google/genai"); 
-const readline = require('readline'); // 標準入出力を扱うモジュールを追加
+// ES Module 形式でパッケージを読み込み
+import { GoogleGenAI } from '@google/genai';
+import * as readline from 'readline'; // 標準入出力を扱うモジュールを追加
 
 // 🚨 【重要】APIキーをここに貼り付けてください
-const GEMINI_API_KEY = "APIkey"; 
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY; 
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
 // ----------------------------------------------------------------------

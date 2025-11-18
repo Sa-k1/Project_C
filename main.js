@@ -1,6 +1,10 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
-const { spawn } = require('child_process');
+import { app, BrowserWindow } from 'electron';
+import path from 'path';
+import { spawn } from 'child_process';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 let cliProcess;
 
@@ -11,8 +15,11 @@ function createWindow() {
     autoHideMenuBar: true,
     // フルスクリーン表示にする場合は下のコメントアウトを外してください
     // fullscreen: true, 
+    nodeIntegration: true, // これを有効にする
+    contextIsolation: false, // 必要に応じて無効化
     title: ''
   });
+  
   win.loadFile(path.join(__dirname, 'src', 'html', 'index.html'));
 }
 
@@ -41,7 +48,7 @@ app.whenReady().then(() => {
     splashScreen.close();
     createWindow();
    }, 0);
-   //　アニメーションをみたい方は上の0の部分を2500にしてください
+   //　アニメーションを見たい方は上の0の部分を2500にしてください
 });
 
 app.on('window-all-closed', () => {

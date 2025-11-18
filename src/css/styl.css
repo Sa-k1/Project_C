@@ -139,14 +139,13 @@ body {
 
 .window-controls {
     display: flex;
-    gap: 6px;
+    gap: 0px;
     margin-right: 6px; /* 右端から少し内側に移動 */
 }
 
 .window-controls .ctrl {
-    width: 28px;
-    height: 26px;
-    border-radius: 6px;
+    width: 50px;
+    height: 50px;
     border: none;
     background: transparent;
     cursor: pointer;
@@ -155,11 +154,11 @@ body {
 }
 
 .window-controls .ctrl:hover {
-    background: rgba(0,0,0,0.06);
+    background: rgba(255, 255, 255, 0.39);
 }
 
 .window-controls .ctrl.close:hover{
-    background: rgba(255,0,0,0.12);
+    background: rgba(255, 0, 0, 0.489);
 }
 
 /*     icon     */
@@ -287,7 +286,7 @@ body {
     width: 190px;
     height: 25px;
     margin: auto 0;
-    margin-left: 18%;
+    margin-left: 1%;
     border: solid 1px #000 ;
 }
 
