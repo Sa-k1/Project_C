@@ -53,11 +53,14 @@ initAiClient();
 async function aiReply(prompt) {
     if (!aiAvailable) return null;
     try {
+        // Ensure AI responses are returned in Japanese regardless of input language
+        const userPrompt = (prompt == null) ? "" : String(prompt);
+        const finalPrompt = userPrompt + "\n\n（注意：以下の応答は必ず日本語で行ってください。）";
         // create a chat session per request (lightweight); include systemInstruction if set
         const chatConfig = { model: "gemini-2.5-flash" };
         if (aiSystemInstruction) chatConfig.config = { systemInstruction: aiSystemInstruction };
         const chat = ai.chats.create(chatConfig);
-        const res = await chat.sendMessage({ message: prompt });
+        const res = await chat.sendMessage({ message: finalPrompt });
         // best-effort extraction of text
         if (!res) return null;
         if (typeof res.text === "string" && res.text.length) return res.text;
