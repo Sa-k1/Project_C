@@ -18,11 +18,6 @@ html, body {
     scrollbar-color: rgba(200,200,200,0.6) rgba(0,0,0,0.15);
 }
 
-/* WebKit ブラウザ用のスクロールバースタイル */
-.xterm-viewport::-webkit-scrollbar, .xterm-screen::-webkit-scrollbar, .xterm-scroll-area::-webkit-scrollbar {
-    width: 8px; /* 棒の太さ（画像参照） */
-}
-
 .xterm-viewport::-webkit-scrollbar-track, .xterm-screen::-webkit-scrollbar-track, .xterm-scroll-area::-webkit-scrollbar-track {
     background: rgba(0,0,0,0.12);
     border-radius: 8px;

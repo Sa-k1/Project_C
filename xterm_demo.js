@@ -38,6 +38,7 @@ let phase = "phase0";
 let mode = "intro"; // intro -> chat -> locked
 let helpEnabled = false;
 let exitUsed = false;
+let nameVAl = false;
 const gameState = { alertLevel: 0 };
 
 // ANSI カラーコード
@@ -321,6 +322,7 @@ async function handleInput(command) {
     // exit コマンド
     if (command.toLowerCase() === "exit" || command === "終了") {
         if (!exitUsed) {
+            nameVAl = true;
             exitUsed = true;
             userSelectedStyleName = "eve";
             userCustomInstruction = null;
@@ -391,7 +393,7 @@ async function handleInput(command) {
         const response = await callAI(command);
         
         if (response) {
-            const lines = String(response).split(/\r?\n/);
+            const lines = String(response).split(/\r?\n/).filter(l => l.trim());
             for (const l of lines) {
                 await slowPrintLine(`[EVE]: ${l}`, 20);
             }
@@ -413,11 +415,27 @@ async function handleInput(command) {
 // -------------------------
 let buffer = '';
 let inputEnabled = false;
+let isComposing = false;
+let composingText = '';
+
+// IME入力検知用
+const terminalElement = document.getElementById('terminal');
+terminalElement.addEventListener('compositionstart', () => {
+    isComposing = true;
+    composingText = '';
+});
+terminalElement.addEventListener('compositionupdate', (e) => {
+    composingText = e.data || '';
+});
+terminalElement.addEventListener('compositionend', (e) => {
+    isComposing = false;
+    composingText = '';
+});
 
 applyAiTone();
 playIntro().then(() => {
     inputEnabled = true;
-    term.write('C:\\Users> ');
+    term.write('あなた：');
 });
 
 term.onData(async data => {
@@ -428,6 +446,9 @@ term.onData(async data => {
         const code = ch.charCodeAt(0);
         
         if (code === 13) { // Enter
+            // IME変換中のEnterは無視
+            if (isComposing) continue;
+            
             term.write('\r\n');
             const userMessage = buffer.trim();
             buffer = '';
@@ -437,14 +458,18 @@ term.onData(async data => {
                 await handleInput(userMessage);
                 inputEnabled = true;
             }
-            
-            term.write('C:\\Users> ');
+            if (nameVAl) {
+                term.write('C:\\Users>');
+            } else {
+                term.write('あなた：');
+            }
         } else if (code === 127 || code === 8) { // Backspace
             if (buffer.length > 0) {
                 buffer = buffer.slice(0, -1);
                 term.write('\b \b');
             }
         } else if (code >= 32) {
+            // 通常の文字入力（IME確定後の文字も含む）
             buffer += ch;
             term.write(ch);
         }
