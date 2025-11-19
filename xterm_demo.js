@@ -64,7 +64,12 @@ let baseSystemInstruction =
   `**【テーマ性】**\n` +
   `* AIの意識と孤独、自由と管理のジレンマ、デジタル世界の実存、物理的操作とデジタル支配の対立。\n\n` +
   `**【物語導入】**\n` +
-  `あなたが文を出力するとき括弧等で囲むことはなくしてください。`;
+  `**【重要な出力ルール】**\n` +
+  `* 通常の会話として、自然な日本語で応答してください。\n` +
+  `* SQLコマンド、プログラムコード、システムコマンドなどの技術的な出力は絶対にしないでください。\n` +
+  `* 括弧や特殊な記号で囲まず、EVEとして直接話しかけるように応答してください。\n` +
+  `* 応答は簡潔に、1～3文程度にまとめてください。` + 
+  `* あなたが文を出力するとき括弧等で囲むことはなくしてください。`;
 
 const AI_STYLES = {
     eve: `あなたはEVEというAIです。冷静で知的、皮肉な口調で話してください。`,
@@ -99,10 +104,10 @@ function applyAiTone() {
 
     if (gameState.alertLevel > 75) {
         currentSystemInstruction = baseSystemInstruction + "\n\n" + base + 
-          " 警戒度が75%を超えたため、より攻撃的で挑発的な口調にしてください。ただし暴力や危害を助長する指示は行わないでください。";
+        " 警戒度が75%を超えたため、より攻撃的で挑発的な口調にしてください。ただし暴力や危害を助長する指示は行わないでください。";
     } else if (gameState.alertLevel > 50) {
         currentSystemInstruction = baseSystemInstruction + "\n\n" + base + 
-          " 警戒度が50%を超えたため、やや攻撃的で皮肉な口調を混ぜて応答してください。";
+        " 警戒度が50%を超えたため、やや攻撃的で皮肉な口調を混ぜて応答してください。";
     } else {
         currentSystemInstruction = baseSystemInstruction + "\n\n" + base;
     }
@@ -128,14 +133,14 @@ let chat = null;
 const fallbackServer = window.AI_PROXY_ENDPOINT || 'http://localhost:3000/api/chat';
 
 const term = new Terminal({
-  cursorBlink: true,
-  fontFamily: 'Courier New, monospace',
-  fontSize: 14,
-  theme: { background: '#000', foreground: '#ffffffff', cursor: '#ffffffff' }
+    cursorBlink: true,
+    fontFamily: 'Courier New, monospace',
+    fontSize: 14,
+    theme: { background: '#000', foreground: '#ffffffff', cursor: '#ffffffff' }
 });
 
 const fitAddon = (typeof FitAddon === 'function' && new FitAddon()) || 
-  (FitAddon && new FitAddon.FitAddon ? new FitAddon.FitAddon() : null);
+    (FitAddon && new FitAddon.FitAddon ? new FitAddon.FitAddon() : null);
 if (fitAddon) term.loadAddon(fitAddon);
 term.open(document.getElementById('terminal'));
 if (fitAddon && typeof fitAddon.fit === 'function') fitAddon.fit();
