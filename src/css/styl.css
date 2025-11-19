@@ -4,6 +4,7 @@
 
 body {
     margin: 0;
+    padding: 0;
     background-image: url(../pic/test.jpg);
     /*background-color: rgba(255, 0, 0, 0.5);*/
     background-blend-mode: multiply;
@@ -76,6 +77,8 @@ body {
 }
 
 .icon_ALL {
+    user-select: none;
+    pointer-events: none;
     text-align: right;
     position: absolute;
     top: 2%;
@@ -162,20 +165,26 @@ body {
 }
 
 /*     icon     */
-
-#eve-image {
-    margin: 1% 2%;
+.eve {
+    cursor: grab;
+    width: 100px;
+    text-align: center;
 }
 
 /* ドラッグ可能なアイテムのスタイル */
 .draggable-item {
-    padding: 10px;
     margin: 10px;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
     cursor: grab; /* マウスカーソルをドラッグ用に変更 */
-    width: 200px;
+    width: 100px;
     text-align: center;
+}
+
+.word {
+    font-size: 12px;
+    text-align: center;
+    padding-left: 10px;
+    width: 100%;
+    margin-top: 0;
 }
 /* ゴミ箱エリアのスタイル */
 #trash-can {

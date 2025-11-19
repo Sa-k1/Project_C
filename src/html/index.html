@@ -36,17 +36,29 @@
   </div>
 
   <!-- ここを追加/確認: EVE アイコン（クリックで子ウィンドウを開閉） -->
-  <div id="eve">
+  <div class="eve">
     <img src="../pic/icon_E.png" alt="EVE" id="eve-image">
+    <h1 class="word">E.V.E</h1>
   </div>
   
   <div id="trash-content" style="display: none;">
     <h3>🗑️ ゴミ箱の中身 (移動済み要素)</h3>
   </div>
     
-  <div class="draggable-item" draggable="true" id="file1">重要なデータ.txt</div>
-  <div class="draggable-item" draggable="true" id="file2">古いメモ.doc</div>
-  <div class="draggable-item" draggable="true" id="file3">不要な写真.jpg</div>
+  <div class="draggable-item" draggable="true" id="file1">
+    <img src="../pic/file.png" alt="">  
+    <h1 class="word">重要なデータ.txt</h1>
+  </div>
+
+  <div class="draggable-item" draggable="true" id="file2">
+    <img src="../pic/file.png" alt="">  
+    <h1 class="word">古いメモ.doc</h1>
+  </div>
+  
+  <div class="draggable-item" draggable="true" id="file3">
+    <img src="../pic/file.png" alt="">  
+    <h1 class="word">不要な写真.jpg</h1>
+  </div>
       <div style="position:fixed; right:16px; bottom:20px; z-index:6000;">
         <button id="start-virus" style="padding:8px 12px; margin-right:6px;">演出を開始</button>
         <button id="clear-virus"  style="padding:8px 12px;">全クリア</button>
