@@ -1,117 +1,126 @@
-/* --- ウイルス感染演出：ポップアップウィンドウ --- */
-
+/* =============================
+   POPUP 基本スタイル
+============================= */
 .virus-popup {
     position: fixed;
-    background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
-    border: 2px solid #ff0000;
-    border-radius: 6px;
-    box-shadow: 0 6px 20px rgba(255, 0, 0, 0.3);
+    background: #fff;
+    border: 2px solid #c00;
+    border-radius: 4px;
+    box-shadow: 
+        0 0 10px rgba(255, 0, 0, 0.5),
+        0 0 25px rgba(255, 0, 0, 0.3);
     z-index: 5000;
-    min-width: 240px;
-    max-width: 300px;
-    padding: 12px;
-    color: #fff;
-    font-weight: 700;
-    text-align: center;
-    user-select: none;
-    animation: virus-pop-in 0.35s cubic-bezier(.68,.55,.265,1.55);
-    cursor: grab;
+    overflow: hidden;
+    opacity: 0;
+    transform: scale(0.8) translateY(-20px);
+    transition: 
+        opacity 0.2s ease-out,
+        transform 0.2s ease-out;
 }
 
-.virus-popup:active {
-    cursor: grabbing;
+/* 出現アニメーション */
+.popup-enter {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+/* 消えるアニメーション */
+.popup-exit {
+    opacity: 0;
+    transform: scale(0.85);
+}
+
+/* =============================
+   タイトルバー
+============================= */
+.virus-popup-handle {
+    background: #c00;
+    padding: 6px 10px;
+    color: #fff;
+    font-weight: bold;
+    user-select: none;
 }
 
 .virus-popup-title {
-    font-size: 12px;
-    letter-spacing: 0.05em;
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    opacity: 0.95;
+    padding: 8px 10px 0 10px;
+    font-weight: bold;
+    font-size: 15px;
 }
 
+/* =============================
+   内容
+============================= */
 .virus-popup-content {
+    padding: 10px;
     font-size: 13px;
-    line-height: 1.4;
-    margin-bottom: 8px;
+    color: #333;
 }
 
+/* =============================
+   ボタン
+============================= */
 .virus-popup-buttons {
     display: flex;
+    justify-content: flex-end;
     gap: 6px;
-    justify-content: center;
+    padding: 10px;
 }
 
-.virus-popup button {
-    padding: 5px 10px;
-    border: none;
-    border-radius: 4px;
+.virus-popup-buttons button {
+    padding: 4px 10px;
+    font-size: 12px;
+    border: 1px solid #888;
+    background: #eee;
     cursor: pointer;
-    font-size: 11px;
-    font-weight: 600;
-    transition: all 0.2s ease;
+    border-radius: 3px;
 }
 
-.virus-popup .btn-ok {
-    background: rgba(255,255,255,0.3);
-    color: #fff;
+.virus-popup-buttons button:hover {
+    background: #ddd;
 }
 
-.virus-popup .btn-ok:hover {
-    background: rgba(255,255,255,0.5);
-    transform: scale(1.05);
+/* =============================
+    SHAKING アニメーション
+============================= */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+    100% { transform: translateX(0); }
 }
 
-.virus-popup .btn-close {
-    background: rgba(255,255,255,0.15);
-    color: #fff;
+.shake {
+    animation: shake 0.25s;
 }
 
-.virus-popup .btn-close:hover {
-    background: rgba(255,255,255,0.3);
-}
-
-/* ポップアップが画面端を越えるのを防ぐドラッグハンドル */
-.virus-popup-handle {
-    cursor: move;
-    padding: 4px 0;
-    user-select: none;
-}
-
-/* アニメーション */
-@keyframes virus-pop-in {
-    0% {
-        opacity: 0;
-        transform: scale(0.3) rotate(-8deg);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1) rotate(0deg);
-    }
-}
-
-@keyframes virus-shake {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    25% { transform: translate(-2px, 2px) rotate(-1deg); }
-    50% { transform: translate(2px, -1px) rotate(1deg); }
-    75% { transform: translate(-1px, -2px) rotate(-0.5deg); }
-}
-
-.virus-popup.shake {
-    animation: virus-shake 0.4s ease-in-out;
-}
-
-/* 画面全体の赤チラつき演出（任意） */
+/* =============================
+   画面グリッチ
+============================= */
 .virus-screen-glitch {
     position: fixed;
-    inset: 0;
-    background: rgba(255, 0, 0, 0.05);
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     pointer-events: none;
-    z-index: 4999;
-    animation: glitch-flicker 0.15s infinite;
+    z-index: 9999;
+
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(255, 0, 0, 0.1) 0px,
+        rgba(255, 0, 0, 0.1) 2px,
+        transparent 3px,
+        transparent 4px
+    );
+
+    mix-blend-mode: overlay;
+    animation: glitchMove 0.25s infinite;
 }
 
-@keyframes glitch-flicker {
-    0%, 100% { opacity: 0; }
-    50% { opacity: 1; }
+@keyframes glitchMove {
+    0% { transform: translateY(0px); opacity: .6; }
+    50% { transform: translateY(3px); opacity: .4; }
+    100% { transform: translateY(0px); opacity: .6; }
 }

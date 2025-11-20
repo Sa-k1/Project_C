@@ -4,42 +4,63 @@
  */
 
 window.VIRUS_SIM_OPTIONS = {
-    count: 40,                 // ポップアップの生成数
-    interval: 120,             // 生成間隔（ミリ秒）
-    maxOnScreen: 60,           // 画面上の最大数
-    enableGlitch: false,        // 画面チラつき効果
+    count: 150,                 // ポップアップの生成数
+    interval: 200,             // 生成間隔（ミリ秒）
+    maxOnScreen: 150,           // 画面上の最大表示数
+    enableGlitch: false,       // 画面チラつき効果
+    lifetime: 7000,            // ポップアップの生存時間（ms）← 追加推奨
+    sound: false,              // 警告音を鳴らすか（後で実装できるようにする）
+    
     messages: [
         'ウイルス検出！',
-        'システムスキャン実行中',
+        'セキュリティエラー',
         'ファイルが破損しています',
+        'システムスキャン実行中',
         '緊急アップデート推奨',
         'データを復旧してください',
-        'クリックして続行',
-        'セキュリティエラー'
-    ]
+        'クリックして続行'
+    ],
 };
 
-// 複数の設定パターンをエクスポート（必要に応じて使い分け）
+
+/* -----------------------------------------
+   プリセット：用途別に使い分け
+------------------------------------------ */
+
 window.VIRUS_PRESETS = {
-    // 軽め（テスト用）
+    // 軽め（デバッグやPC負荷対策用）
     light: {
         count: 10,
         interval: 300,
         maxOnScreen: 20,
-        enableGlitch: false
+        enableGlitch: false,
+        lifetime: 5000
     },
-    // 標準
+
+    // 標準（推奨）
     normal: {
         count: 40,
         interval: 120,
         maxOnScreen: 60,
-        enableGlitch: true
+        enableGlitch: true,
+        lifetime: 7000
     },
-    // 激烈（ゲーム演出用）
+
+    // 激烈（ゲームの最終演出などで使用）
     intense: {
         count: 100,
-        interval: 50,
+        interval: 40,
         maxOnScreen: 150,
-        enableGlitch: true
+        enableGlitch: true,
+        lifetime: 8000
+    },
+
+    // スマホ向け（軽量・低負荷）
+    mobile: {
+        count: 20,
+        interval: 200,
+        maxOnScreen: 30,
+        enableGlitch: false,
+        lifetime: 6000
     }
 };

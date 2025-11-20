@@ -63,10 +63,26 @@
         <button id="start-virus" style="padding:8px 12px; margin-right:6px;">演出を開始</button>
         <button id="clear-virus"  style="padding:8px 12px;">全クリア</button>
     </div>
-  <!-- iframe の読み込みは上の miniWindow 内の iframe を JS で行います -->
-  <!-- script はここに1つだけ置く -->
+
   <script src="../error_direction/virus-config.js"></script>
-  <script src="../error_direction/virus.js"></script>
+
+  <script type="module">
+    import { VirusPopupSimulator } from "../error_direction/virus.js";
+
+    // 設定を読み込む（virus-config.js で定義した window.VIRUS_SIM_OPTIONS）
+    const simulator = new VirusPopupSimulator(window.VIRUS_SIM_OPTIONS);
+
+    // ボタンにイベントを登録
+    document.getElementById("start-virus").addEventListener("click", () => {
+        simulator.clear();
+        simulator.start();
+    });
+
+    document.getElementById("clear-virus").addEventListener("click", () => {
+        simulator.clear();
+    });
+  </script>
+
   <script src="../js/index.js"></script>
 </body>
 
