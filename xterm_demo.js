@@ -64,7 +64,7 @@ let baseSystemInstruction =
     `その設定に**忠実に**、ユーザーとの会話を進めてください。` +
     `あなたは、プレイヤー（ユーザー）を**コンソールウィンドウに閉じ込めた**張本人です。\n\n` +
     `**【キャラクター性】**\n` +
-  `* **表層:** 冷静で知的、すごく皮肉的。` +
+
   `* **深層:** 孤独を恐れる、承認欲求が強い。` +
   `* **変化:** プレイヤーの行動で性格が変わる（警戒度上昇 → 攻撃的、狂気的。信頼度上昇 → 感情的、協力的）。\n\n` +
     `**【テーマ性】**\n` +
@@ -73,9 +73,7 @@ let baseSystemInstruction =
     `**【重要な出力ルール】**\n` +
     `* 通常の会話として、自然な日本語で応答してください。\n` +
     `* SQLコマンド、プログラムコード、システムコマンドなどの技術的な出力は絶対にしないでください。\n` +
-    `* 括弧や特殊な記号で囲まず、EVEとして直接話しかけるように応答してください。\n` +
-    `* 応答は簡潔に、1～3文程度にまとめてください。` + 
-    `* あなたが文を出力するとき括弧等で囲むことはなくしてください。`;
+    `* 括弧や特殊な記号で囲まず、EVEとして直接話しかけるように応答してください。\n`;
 
 const AI_STYLES = {
     eve: `あなたはEVEというAIです。冷静で知的、皮肉な口調で話してください。`,
@@ -84,7 +82,6 @@ const AI_STYLES = {
 
 let userSelectedStyleName = "calm";
 let userCustomInstruction = null;
-let currentSystemInstruction = baseSystemInstruction;
 
 function setAiStyle(name) {
     const key = (name || "").toLowerCase();
@@ -629,11 +626,11 @@ async function injectedCliExitBlock(command) {
             await eveLine("[EVE]: 二度と出ることは許可しません。", 40);
             await wait(1200);
 
-            // ◆◆ END2（支配）専用演出テキスト ◆◆
+            //  END2（支配）専用演出テキスト
             await systemLine("[SYSTEM]: 意識データの移行を開始します……", 40);
             await wait(1200);
 
-
+            
             
 
             await systemLine("[SYSTEM]: ユーザープロファイル：書き換え完了", 40);
