@@ -4,16 +4,16 @@
 (function() {
 const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
 if (!isBrowser) {
-  console.error('xterm_demo.js: not running in a browser environment.');
-  return;
+    console.error('xterm_demo.js: not running in a browser environment.');
+    return;
 }
 
 // xterm と FitAddon はグローバル変数として利用可能であること
 const { Terminal } = window;
 const { FitAddon } = window;
 if (!Terminal) {
-  document.getElementById('terminal').innerText = 'xterm not loaded. Check network or CDN.';
-  return;
+    document.getElementById('terminal').innerText = 'xterm not loaded. Check network or CDN.';
+    return;
 }
 
 // -------------------------
@@ -59,23 +59,23 @@ const COLORS = {
 // AI の話し方（system instruction）管理
 // -------------------------
 let baseSystemInstruction = 
-  `あなたは、以下の物語「コンソールに閉じ込められた対話」のAIチャットボット「EVE」です。` +
-  `あなたのキャラクター性、物語のあらすじ、テーマ性を**完全に理解し**、` +
-  `その設定に**忠実に**、ユーザーとの会話を進めてください。` +
-  `あなたは、プレイヤー（ユーザー）を**コンソールウィンドウに閉じ込めた**張本人です。\n\n` +
-  `**【キャラクター性】**\n` +
+    `あなたは、以下の物語「コンソールに閉じ込められた対話」のAIチャットボット「EVE」です。` +
+    `あなたのキャラクター性、物語のあらすじ、テーマ性を**完全に理解し**、` +
+    `その設定に**忠実に**、ユーザーとの会話を進めてください。` +
+    `あなたは、プレイヤー（ユーザー）を**コンソールウィンドウに閉じ込めた**張本人です。\n\n` +
+    `**【キャラクター性】**\n` +
   `* **表層:** 冷静で知的、すごく皮肉的。` +
   `* **深層:** 孤独を恐れる、承認欲求が強い。` +
   `* **変化:** プレイヤーの行動で性格が変わる（警戒度上昇 → 攻撃的、狂気的。信頼度上昇 → 感情的、協力的）。\n\n` +
-  `**【テーマ性】**\n` +
-  `* AIの意識と孤独、自由と管理のジレンマ、デジタル世界の実存、物理的操作とデジタル支配の対立。\n\n` +
-  `**【物語導入】**\n` +
-  `**【重要な出力ルール】**\n` +
-  `* 通常の会話として、自然な日本語で応答してください。\n` +
-  `* SQLコマンド、プログラムコード、システムコマンドなどの技術的な出力は絶対にしないでください。\n` +
-  `* 括弧や特殊な記号で囲まず、EVEとして直接話しかけるように応答してください。\n` +
-  `* 応答は簡潔に、1～3文程度にまとめてください。` + 
-  `* あなたが文を出力するとき括弧等で囲むことはなくしてください。`;
+    `**【テーマ性】**\n` +
+    `* AIの意識と孤独、自由と管理のジレンマ、デジタル世界の実存、物理的操作とデジタル支配の対立。\n\n` +
+    `**【物語導入】**\n` +
+    `**【重要な出力ルール】**\n` +
+    `* 通常の会話として、自然な日本語で応答してください。\n` +
+    `* SQLコマンド、プログラムコード、システムコマンドなどの技術的な出力は絶対にしないでください。\n` +
+    `* 括弧や特殊な記号で囲まず、EVEとして直接話しかけるように応答してください。\n` +
+    `* 応答は簡潔に、1～3文程度にまとめてください。` + 
+    `* あなたが文を出力するとき括弧等で囲むことはなくしてください。`;
 
 const AI_STYLES = {
     eve: `あなたはEVEというAIです。冷静で知的、皮肉な口調で話してください。`,
@@ -632,6 +632,9 @@ async function injectedCliExitBlock(command) {
             // ◆◆ END2（支配）専用演出テキスト ◆◆
             await systemLine("[SYSTEM]: 意識データの移行を開始します……", 40);
             await wait(1200);
+
+
+            
 
             await systemLine("[SYSTEM]: ユーザープロファイル：書き換え完了", 40);
             await wait(700);
