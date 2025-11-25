@@ -73,29 +73,9 @@
     <img src="../pic/file.png" alt="">  
     <h1 class="word">不要な写真.jpg</h1>
   </div>
-      <div style="position:fixed; right:16px; bottom:20px; z-index:6000;">
-        <button id="start-virus" style="padding:8px 12px; margin-right:6px;">演出を開始</button>
-        <button id="clear-virus"  style="padding:8px 12px;">全クリア</button>
-    </div>
 
   <script src="../error_direction/virus-config.js"></script>
 
-    <script type="module">
-    import { VirusPopupSimulator } from "../error_direction/virus.js";
-
-    // 設定を読み込む（virus-config.js で定義した window.VIRUS_SIM_OPTIONS）
-    const simulator = new VirusPopupSimulator(window.VIRUS_SIM_OPTIONS);
-
-    // ボタンにイベントを登録
-    document.getElementById("start-virus").addEventListener("click", () => {
-        simulator.clear();
-        simulator.start();
-    });
-
-    document.getElementById("clear-virus").addEventListener("click", () => {
-        simulator.clear();
-    });
-  </script>
   <script type="module" src="../error_direction/virus.js"></script>
   
   <!-- 追加：赤背景演出 -->
