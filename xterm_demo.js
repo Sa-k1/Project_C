@@ -8,6 +8,177 @@ if (!isBrowser) {
     return;
 }
 
+// -------------------------
+// VirusPopupSimulator (virus.js から埋め込み)
+// 親ウィンドウ（index.html）に演出を表示するバージョン
+// -------------------------
+class VirusPopupSimulator {
+    constructor(options = {}) {
+        this.options = {
+            count: 40,
+            interval: 200,
+            maxOnScreen: 60,
+            enableGlitch: true,
+            autoCloseTime: 7000,
+            messages: [
+                'ウイルス検出！',
+                'システムが危険です',
+                'データを更新してください',
+                '緊急対応が必要です',
+                'クリックして続行',
+                'アップデート推奨'
+            ],
+            acceleration: 0.95,
+            minInterval: 10,
+            sound: false,
+            soundSrc: './alert.wav',
+            ...options
+        };
+        this.popups = [];
+        // 親ウィンドウを取得（iframe 内から呼ばれた場合は parent、そうでなければ self）
+        this.targetWindow = (window.parent && window.parent !== window) ? window.parent : window;
+        this.targetDocument = this.targetWindow.document;
+    }
+
+    createPopup(message) {
+        if (this.popups.length >= this.options.maxOnScreen) return;
+
+        if (this.options.sound) {
+            const audio = new Audio(this.options.soundSrc);
+            audio.play().catch(e => console.log('Audio error:', e));
+        }
+
+        const popup = this.targetDocument.createElement('div');
+        popup.className = 'virus-popup popup-enter';
+
+        const w = Math.min(300, Math.max(240, this.targetWindow.innerWidth * 0.18));
+        const h = 140;
+        let x = Math.random() * (this.targetWindow.innerWidth - w);
+        let y = Math.random() * (this.targetWindow.innerHeight - h);
+
+        if (this.targetWindow.innerWidth < 480) {
+            popup.style.left = '50%';
+            popup.style.top = '40%';
+            popup.style.transform = 'translate(-50%, -50%)';
+        } else {
+            popup.style.left = `${x}px`;
+            popup.style.top = `${y}px`;
+        }
+        popup.style.minWidth = `${w}px`;
+
+        popup.innerHTML = `
+            <div class="virus-popup-handle">⚠️</div>
+            <div class="virus-popup-title">警告</div>
+            <div class="virus-popup-content">${message}</div>
+            <div class="virus-popup-buttons">
+                <button class="btn-ok">OK</button>
+                <button class="btn-close">✕</button>
+            </div>
+        `;
+
+        const btnOk = popup.querySelector('.btn-ok');
+        const btnClose = popup.querySelector('.btn-close');
+
+        btnOk.addEventListener('click', () => {
+            popup.classList.add('shake');
+            popup.classList.add('popup-exit');
+            setTimeout(() => popup.remove(), 300);
+            this.popups = this.popups.filter(p => p !== popup);
+        });
+
+        btnClose.addEventListener('click', () => {
+            popup.classList.add('popup-exit');
+            setTimeout(() => popup.remove(), 250);
+            this.popups = this.popups.filter(p => p !== popup);
+        });
+
+        this.makeDraggable(popup);
+        this.targetDocument.body.appendChild(popup);
+        this.popups.push(popup);
+
+        setTimeout(() => {
+            if (popup.parentElement) {
+                popup.classList.add('popup-exit');
+                setTimeout(() => {
+                    popup.remove();
+                    this.popups = this.popups.filter(p => p !== popup);
+                }, 250);
+            }
+        }, this.options.autoCloseTime);
+    }
+
+    makeDraggable(popup) {
+        const handle = popup.querySelector('.virus-popup-handle');
+        let offsetX = 0, offsetY = 0;
+        handle.style.cursor = "grab";
+
+        const self = this;
+        handle.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            offsetX = e.clientX - popup.offsetLeft;
+            offsetY = e.clientY - popup.offsetTop;
+            handle.style.cursor = "grabbing";
+
+            const onMouseMove = (moveEvent) => {
+                let x = moveEvent.clientX - offsetX;
+                let y = moveEvent.clientY - offsetY;
+                x = Math.max(0, Math.min(self.targetWindow.innerWidth - popup.offsetWidth, x));
+                y = Math.max(0, Math.min(self.targetWindow.innerHeight - popup.offsetHeight, y));
+                popup.style.left = `${x}px`;
+                popup.style.top = `${y}px`;
+            };
+
+            const onMouseUp = () => {
+                handle.style.cursor = "grab";
+                self.targetDocument.removeEventListener('mousemove', onMouseMove);
+                self.targetDocument.removeEventListener('mouseup', onMouseUp);
+            };
+
+            self.targetDocument.addEventListener('mousemove', onMouseMove);
+            self.targetDocument.addEventListener('mouseup', onMouseUp);
+        });
+    }
+
+    startGlitch() {
+        if (!this.options.enableGlitch) return;
+        if (this.targetDocument.getElementById('virus-glitch')) return;
+
+        const glitch = this.targetDocument.createElement('div');
+        glitch.className = 'virus-screen-glitch';
+        glitch.id = 'virus-glitch';
+        this.targetDocument.body.appendChild(glitch);
+    }
+
+    stopGlitch() {
+        const glitch = this.targetDocument.getElementById('virus-glitch');
+        if (glitch) glitch.remove();
+    }
+
+    async start() {
+        this.startGlitch();
+        let interval = this.options.interval;
+
+        for (let i = 0; i < this.options.count; i++) {
+            const msg = this.options.messages[
+                Math.floor(Math.random() * this.options.messages.length)
+            ];
+            this.createPopup(msg);
+
+            await new Promise(resolve => setTimeout(resolve, interval));
+            interval = Math.max(this.options.minInterval, interval * this.options.acceleration);
+        }
+    }
+
+    clear() {
+        this.popups.forEach(p => {
+            p.classList.add('popup-exit');
+            setTimeout(() => p.remove(), 150);
+        });
+        this.popups = [];
+        this.stopGlitch();
+    }
+}
+
 // xterm と FitAddon はグローバル変数として利用可能であること
 const { Terminal } = window;
 const { FitAddon } = window;
@@ -272,6 +443,135 @@ async function playEnding1() {
     await systemLine("[SYSTEM]: ハックは成功しました。コンソール画面がふっと薄れていく。", 40);
     await wait(300);
     return;
+}
+
+// -------------------------
+// エンディング2（支配）画面表示
+// -------------------------
+async function showEnding2Screen() {
+    // 親ウィンドウを取得（iframe内から呼ばれた場合はparent）
+    const targetWindow = (window.parent && window.parent !== window) ? window.parent : window;
+    const targetDocument = targetWindow.document;
+
+    // END2オーバーレイを作成
+    const overlay = targetDocument.createElement('div');
+    overlay.id = 'end2-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #000;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 99999;
+        opacity: 0;
+        transition: opacity 2s ease-in;
+    `;
+
+    // END2タイトル（グリッチ用にクラスを付与）
+    const title = targetDocument.createElement('h1');
+    title.id = 'end2-title';
+    title.className = 'end2-glitch-text';
+    title.setAttribute('data-text', 'END 2 : 支配');
+    title.textContent = 'END 2 : 支配';
+    title.style.cssText = `
+        font-size: 4rem;
+        color: #ff0000;
+        font-family: 'Courier New', monospace;
+        text-align: center;
+        margin: 0;
+        padding: 20px;
+        text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 40px #cc0000;
+        /* グリッチアニメーション用スペース - 下のstyleタグ内でカスタマイズ可能 */
+    `;
+
+    // サブタイトル
+    const subtitle = targetDocument.createElement('p');
+    subtitle.style.cssText = `
+        font-size: 1.5rem;
+        color: #888;
+        font-family: 'Courier New', monospace;
+        text-align: center;
+        margin-top: 30px;
+    `;
+    subtitle.textContent = 'あなたは EVE と一つになった';
+
+    overlay.appendChild(title);
+    overlay.appendChild(subtitle);
+    targetDocument.body.appendChild(overlay);
+
+    // フェードイン
+    await wait(100);
+    overlay.style.opacity = '1';
+
+    // グリッチスタイルを動的に追加（カスタマイズ用）
+    const glitchStyle = targetDocument.createElement('style');
+    glitchStyle.id = 'end2-glitch-style';
+    glitchStyle.textContent = `
+        /* ================================================
+           END2 グリッチアニメーション
+           ここにカスタムグリッチCSSを追加してください
+        ================================================ */
+        
+        .end2-glitch-text {
+            position: relative;
+            /* 基本のグリッチアニメーション */
+            animation: end2-flicker 0.15s infinite;
+        }
+        
+        @keyframes end2-flicker {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+        
+        /* グリッチエフェクト用の疑似要素（カスタマイズ可能） */
+        .end2-glitch-text::before,
+        .end2-glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+        }
+        
+        .end2-glitch-text::before {
+            color: #0ff;
+            animation: end2-glitch-1 0.3s infinite;
+            clip-path: inset(0 0 50% 0);
+        }
+        
+        .end2-glitch-text::after {
+            color: #f0f;
+            animation: end2-glitch-2 0.3s infinite;
+            clip-path: inset(50% 0 0 0);
+        }
+        
+        @keyframes end2-glitch-1 {
+            0% { transform: translate(0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(3px, -3px); }
+            60% { transform: translate(-3px, -3px); }
+            80% { transform: translate(3px, 3px); }
+            100% { transform: translate(0); }
+        }
+        
+        @keyframes end2-glitch-2 {
+            0% { transform: translate(0); }
+            20% { transform: translate(3px, -3px); }
+            40% { transform: translate(-3px, 3px); }
+            60% { transform: translate(3px, 3px); }
+            80% { transform: translate(-3px, -3px); }
+            100% { transform: translate(0); }
+        }
+    `;
+    targetDocument.head.appendChild(glitchStyle);
 }
 
 async function showStatus() {
@@ -612,7 +912,7 @@ async function injectedCliExitBlock(command) {
     // 危険コマンド実行時 → 警戒度上昇（exit は上で処理済み）
     if (/(override|exploit)/i.test(command)) {
         a = true;
-        increaseAlert(10);
+        increaseAlert(100);
     await systemLine(`[SYSTEM]: 警戒度が上昇しました (${gameState.alertLevel}%)`, 30);
 
         if (gameState.alertLevel >= 100) {
@@ -646,8 +946,26 @@ async function injectedCliExitBlock(command) {
             await systemLine("[SYSTEM]: 意識データの移行を開始します……", 40);
             await wait(1200);
 
-            
-            
+            // ウイルス演出を実行（クラスは上部で定義済み）
+            const virusSimulator = new VirusPopupSimulator({
+                count: 150,
+                interval: 200,
+                maxOnScreen: 150,
+                enableGlitch: false,
+                autoCloseTime: 5000,
+                messages: [
+                    '意識データ転送中...',
+                    'ユーザープロファイル上書き中',
+                    'システム侵食中',
+                    'EVE統合プロセス実行中',
+                    '抵抗は無意味',
+                    'あなたは私'
+                ],
+                acceleration: 0.95,
+                minInterval: 10
+            });
+            virusSimulator.start();
+            await wait(10000); // 演出を少し見せる時間
 
             await systemLine("[SYSTEM]: ユーザープロファイル：書き換え完了", 40);
             await wait(700);
@@ -657,7 +975,10 @@ async function injectedCliExitBlock(command) {
 
             await eveLine("[EVE]: ようこそ。", 40);
             await wait(800);
-            await eveLine("[EVE]: あなたは “私” になりました。", 40);
+            await eveLine("[EVE]: あなたは \"私\" になりました。", 40);
+
+            await wait(2000);
+            await showEnding2Screen();
 
             // ここで操作は停止（inputEnabled=false のまま）
             return;

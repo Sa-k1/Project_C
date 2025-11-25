@@ -1,27 +1,30 @@
 const mini = document.getElementById('miniWindow');
+const windowContainer = document.getElementById('windowContainer');
 let offsetX, offsetY, isDragging = false;
 
-mini.addEventListener('mousedown', (e) => {
+// ウィンドウコンテナ全体をドラッグ可能にする
+windowContainer.addEventListener('mousedown', (e) => {
         // Only start dragging when the user clicks the title area (the visible top bar / handle).
         // Also ignore clicks on interactive controls inside that area (buttons, tabs, icons).
-        const handle = e.target.closest('.box, .titlebar');
+        const handle = e.target.closest('.box, .titlebar, .side-panel-header');
         if (!handle) return; // not clicking the titlebar area -> do not start drag
 
         // If clicked element is an interactive child (button, control, tab, icon, inputs), don't start drag
-        const ignored = e.target.closest('.window-controls, .ctrl, .tab, .tab-icon, .tab-label, .icon_ALL, .icon, .text, #mini-iframe, #trash-can, #trash-image, .draggable-item, .trash-button, #eve, #eve-image');
+        const ignored = e.target.closest('.window-controls, .ctrl, .tab, .tab-icon, .tab-label, .icon_ALL, .icon, .text, #mini-iframe, #trash-can, #trash-image, .draggable-item, .trash-button, #eve, #eve-image, .side-panel-content');
         if (ignored) return;
 
         isDragging = true;
-        offsetX = e.offsetX;
-        offsetY = e.offsetY;
+        const rect = windowContainer.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
 });
 
 document.addEventListener('mouseup', () => isDragging = false);
 
 document.addEventListener('mousemove', (e) => {
     if (isDragging) { // この行を修正（条件チェックを追加）
-        mini.style.left = `${e.pageX - offsetX}px`;
-        mini.style.top = `${e.pageY - offsetY}px`;
+        windowContainer.style.left = `${e.clientX - offsetX}px`;
+        windowContainer.style.top = `${e.clientY - offsetY}px`;
     }
 });
 
@@ -114,13 +117,13 @@ window.restoreItem = function(id, content) {
 document.addEventListener('DOMContentLoaded', () => {
     const eveImage = document.getElementById('eve-image');
 
-  // 簡易トグル関数（既にあるなら重複を避けてください）
+  // 簡易トグル関数（windowContainerを表示/非表示にする）
     function toggleElement(el) {
         if (!el) return;
         const cur = window.getComputedStyle(el).display;
         // 表示に切り替えるとき、iframe の src を JS でセットして consoll.html を読み込む
         if (cur === 'none' || cur === '') {
-            el.style.display = 'block';
+            el.style.display = 'flex';
             const iframe = document.getElementById('mini-iframe');
                 if (iframe && !iframe.dataset.loaded) {
                 // 相対パスで xterm_demo.html を読み込む（index.html と同じディレクトリなので相対パスは 'xterm_demo.html'）
@@ -141,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
   // --- 追加: EVE アイコンをクリックで開閉（ドラッグと衝突しないようにする） ---
-    if (eveImage && mini) {
+    if (eveImage && windowContainer) {
     let possibleDrag = false;
     let dragged = false;
     let startX = 0, startY = 0;
@@ -169,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     eveImage.addEventListener('dblclick', (e) => {
       if (dragged) return; // ドラッグ中のクリックは無視
         e.preventDefault();
-        toggleElement(mini);
+        toggleElement(windowContainer);
     });
     }
 
