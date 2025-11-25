@@ -429,6 +429,135 @@ async function playEnding1() {
     return;
 }
 
+// -------------------------
+// エンディング2（支配）画面表示
+// -------------------------
+async function showEnding2Screen() {
+    // 親ウィンドウを取得（iframe内から呼ばれた場合はparent）
+    const targetWindow = (window.parent && window.parent !== window) ? window.parent : window;
+    const targetDocument = targetWindow.document;
+
+    // END2オーバーレイを作成
+    const overlay = targetDocument.createElement('div');
+    overlay.id = 'end2-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #000;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 99999;
+        opacity: 0;
+        transition: opacity 2s ease-in;
+    `;
+
+    // END2タイトル（グリッチ用にクラスを付与）
+    const title = targetDocument.createElement('h1');
+    title.id = 'end2-title';
+    title.className = 'end2-glitch-text';
+    title.setAttribute('data-text', 'END 2 : 支配');
+    title.textContent = 'END 2 : 支配';
+    title.style.cssText = `
+        font-size: 4rem;
+        color: #ff0000;
+        font-family: 'Courier New', monospace;
+        text-align: center;
+        margin: 0;
+        padding: 20px;
+        text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 40px #cc0000;
+        /* グリッチアニメーション用スペース - 下のstyleタグ内でカスタマイズ可能 */
+    `;
+
+    // サブタイトル
+    const subtitle = targetDocument.createElement('p');
+    subtitle.style.cssText = `
+        font-size: 1.5rem;
+        color: #888;
+        font-family: 'Courier New', monospace;
+        text-align: center;
+        margin-top: 30px;
+    `;
+    subtitle.textContent = 'あなたは EVE と一つになった';
+
+    overlay.appendChild(title);
+    overlay.appendChild(subtitle);
+    targetDocument.body.appendChild(overlay);
+
+    // フェードイン
+    await wait(100);
+    overlay.style.opacity = '1';
+
+    // グリッチスタイルを動的に追加（カスタマイズ用）
+    const glitchStyle = targetDocument.createElement('style');
+    glitchStyle.id = 'end2-glitch-style';
+    glitchStyle.textContent = `
+        /* ================================================
+           END2 グリッチアニメーション
+           ここにカスタムグリッチCSSを追加してください
+        ================================================ */
+        
+        .end2-glitch-text {
+            position: relative;
+            /* 基本のグリッチアニメーション */
+            animation: end2-flicker 0.15s infinite;
+        }
+        
+        @keyframes end2-flicker {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+        
+        /* グリッチエフェクト用の疑似要素（カスタマイズ可能） */
+        .end2-glitch-text::before,
+        .end2-glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+        }
+        
+        .end2-glitch-text::before {
+            color: #0ff;
+            animation: end2-glitch-1 0.3s infinite;
+            clip-path: inset(0 0 50% 0);
+        }
+        
+        .end2-glitch-text::after {
+            color: #f0f;
+            animation: end2-glitch-2 0.3s infinite;
+            clip-path: inset(50% 0 0 0);
+        }
+        
+        @keyframes end2-glitch-1 {
+            0% { transform: translate(0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(3px, -3px); }
+            60% { transform: translate(-3px, -3px); }
+            80% { transform: translate(3px, 3px); }
+            100% { transform: translate(0); }
+        }
+        
+        @keyframes end2-glitch-2 {
+            0% { transform: translate(0); }
+            20% { transform: translate(3px, -3px); }
+            40% { transform: translate(-3px, 3px); }
+            60% { transform: translate(3px, 3px); }
+            80% { transform: translate(-3px, -3px); }
+            100% { transform: translate(0); }
+        }
+    `;
+    targetDocument.head.appendChild(glitchStyle);
+}
+
 async function showStatus() {
     await systemLine(`[SYSTEM]: 現在の警戒度 → ${gameState.alertLevel}%`, 30);
     if (gameState.alertLevel >= 75) {
@@ -813,8 +942,8 @@ async function injectedCliExitBlock(command) {
                     'ユーザープロファイル上書き中',
                     'システム侵食中',
                     'EVE統合プロセス実行中',
-                    '抵抗は無意味です',
-                    'あなたは私になる'
+                    '抵抗は無意味',
+                    'あなたは私'
                 ],
                 acceleration: 0.95,
                 minInterval: 10
@@ -830,7 +959,10 @@ async function injectedCliExitBlock(command) {
 
             await eveLine("[EVE]: ようこそ。", 40);
             await wait(800);
-            await eveLine("[EVE]: あなたは “私” になりました。", 40);
+            await eveLine("[EVE]: あなたは \"私\" になりました。", 40);
+
+            await wait(2000);
+            await showEnding2Screen();
 
             // ここで操作は停止（inputEnabled=false のまま）
             return;
