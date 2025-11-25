@@ -179,3 +179,16 @@ overlay.addEventListener('animationend', () => {
 });
 
 });
+
+function processCommand(command) {
+    const cmd = command.trim().toLowerCase();
+    
+    // ...existing code...
+    
+    // exit コマンドでびっくり演出
+    if (cmd === 'exit') {
+        window.redScreen.options.message = '逃げられると思った？';
+        window.redScreen.shock();
+        return;
+    }
+}

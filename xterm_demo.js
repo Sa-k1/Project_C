@@ -236,6 +236,22 @@ async function playLockEvent() {
             await errorLine(line, 30);
         } else if (line.includes(COLORS.yellow)) {
             await slowPrintLine(line, 30);
+        } else if (line.includes("エラー発生エラー発生")) {
+            // ★ エラー連打で揺れ + 赤フラッシュ同時 ★
+            if (window.parent && window.parent.redScreen) {
+                window.parent.redScreen.errorFlash();
+            } else if (window.redScreen) {
+                window.redScreen.errorFlash();
+            }
+            
+            await slowPrintLine(line, 3);
+            
+            // 揺れだけ停止、赤はそのまま残す
+            if (window.parent && window.parent.redScreen) {
+                window.parent.redScreen.stopShakeOnly();
+            } else if (window.redScreen) {
+                window.redScreen.stopShakeOnly();
+            }
         } else {
             await slowPrintLine(line, 30);
         }

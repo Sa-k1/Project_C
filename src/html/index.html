@@ -5,6 +5,8 @@
   <title>E.V.E</title>
   <link rel="stylesheet" href="../css/styl.css">
   <link rel="stylesheet" href="../error_direction/virus.css">
+  <!-- 追加：赤背景演出 -->
+  <link rel="stylesheet" href="../error_direction/red-screen.css">
 </head>
 <body>
   <div class="fade"></div>
@@ -66,7 +68,7 @@
 
   <script src="../error_direction/virus-config.js"></script>
 
-  <script type="module">
+    <script type="module">
     import { VirusPopupSimulator } from "../error_direction/virus.js";
 
     // 設定を読み込む（virus-config.js で定義した window.VIRUS_SIM_OPTIONS）
@@ -82,7 +84,10 @@
         simulator.clear();
     });
   </script>
-
+  
+  <!-- 追加：赤背景演出 -->
+  <script src="../error_direction/red-screen.js"></script>
+  
   <script src="../js/index.js"></script>
 </body>
 

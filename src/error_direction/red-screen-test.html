@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>赤背景演出 - びっくりテスト</title>
+    <link rel="stylesheet" href="./red-screen.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0a0a0a;
+            color: #0f0;
+            font-family: 'Consolas', monospace;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #ff3333;
+        }
+
+        .terminal {
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 700px;
+            margin: 20px 0;
+        }
+
+        .terminal .line {
+            margin-bottom: 8px;
+        }
+
+        .terminal input {
+            background: transparent;
+            border: none;
+            color: #0f0;
+            font-family: inherit;
+            font-size: 16px;
+            width: 85%;
+            outline: none;
+        }
+
+        .prompt { color: #0f0; }
+
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #8b0000;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #a00000;
+        }
+
+        .warning {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔴 びっくり赤背景テスト</h1>
+    
+    <p class="warning">⚠️ 注意：フラッシュ演出があります</p>
+
+    <div class="controls">
+        <button onclick="triggerShock()">💥 びっくり演出を発動</button>
+        <button onclick="clearEffect()">クリア</button>
+    </div>
+
+    <h2>🖥️ ターミナル</h2>
+    <div class="terminal">
+        <div class="line">E.V.E System v1.0</div>
+        <div class="line">Type 'exit' to escape... or try to.</div>
+        <div class="line">
+            <span class="prompt">user@eve:~$ </span>
+            <input type="text" id="cmd" placeholder="exit と入力...">
+        </div>
+    </div>
+
+    <script src="./red-screen.js"></script>
+    <script>
+        function triggerShock() {
+            window.redScreen.options.message = '逃げられない';
+            window.redScreen.shock();
+        }
+
+        function clearEffect() {
+            window.redScreen.clear();
+        }
+
+        // ターミナル入力
+        const cmd = document.getElementById('cmd');
+        cmd.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const val = cmd.value.trim().toLowerCase();
+                
+                if (val === 'exit') {
+                    window.redScreen.shock();
+                } else if (val === 'clear') {
+                    clearEffect();
+                }
+                
+                cmd.value = '';
+            }
+        });
+
+        cmd.focus();
+    </script>
+</body>
+</html>
