@@ -13,18 +13,76 @@ body {
 
 /*     terminal and chatarea     */
 
-.mini-window {
+/* ターミナルと小窓をまとめるコンテナ */
+.window-container {
     position: absolute;
+    top: 160px;
+    left: 100px;
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    z-index: 100;
+}
+
+/* ターミナルに隣接する小窓（イラスト用）- 左側に配置 */
+.side-panel {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    background-color: #1a1a1a;
+    border: 2px solid #555;
+    border-right: none; /* ターミナルとの境界を繋げる */
+    border-radius: 10px 0 0 10px;
+    box-shadow: 2px 2px 18px rgba(0,0,0,0.25);
+    box-sizing: border-box;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.mini-window {
+    position: relative;
     width: 800px;
     height: 400px;
     background-color: #000000;
     border: 2px solid #555;
-    border-radius: 10px;
+    border-radius: 0 10px 10px 0;
     box-shadow: 2px 2px 18px rgba(0,0,0,0.25);
-    top: 160px;
-    left: 100px;
     box-sizing: border-box;
     overflow: hidden; /* 縦スクロールを防ぐ */
+}
+
+.side-panel-header {
+    height: 48px;
+    background-color: #2e2e2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #444;
+}
+
+.side-panel-title {
+    color: #ddd;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.side-panel-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+}
+
+.side-panel-content img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    /* イラストにグロー効果を追加（オプション） */
+    filter: drop-shadow(0 0 10px rgba(0, 200, 255, 0.3));
 }
 
 .terminal {
