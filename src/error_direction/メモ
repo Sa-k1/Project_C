@@ -1,0 +1,27 @@
+pulseEffect
+// 1回だけドクン（ホラー版）
+window.pulseEffect.single();
+
+// メッセージ付き
+window.pulseEffect.single('...見ている');
+
+// 心臓の鼓動（ループ）
+window.pulseEffect.startHeartbeat();
+
+// 電子的な呼吸（ループ）
+window.pulseEffect.startDigitalBreath();
+
+// 幽霊のような残像
+window.pulseEffect.ghostAppear();
+
+// 一瞬のちらつき
+window.pulseEffect.flicker();
+
+// グリッチ攻撃
+window.pulseEffect.glitchAttack(2000);
+
+// ★ 最恐演出（全部乗せ）★
+window.pulseEffect.nightmare('逃げられない');
+
+// 停止
+window.pulseEffect.stop();

@@ -1,32 +1,99 @@
-/* --- 脈動演出（心臓の鼓動風） --- */
+/* --- 脈動演出（電子的な呼吸・心理ホラー） --- */
 
-/* 脈動オーバーレイ */
+/* ========================================
+   基本の脈動オーバーレイ
+======================================== */
 .pulse-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(80, 0, 0, 0);
+    background: rgba(0, 0, 0, 0);
     pointer-events: none;
     z-index: 50;
 }
 
-/* 脈動アニメーション（心臓のリズム） */
-.pulse-overlay.active {
-    animation: heartbeat-pulse 1.2s ease-in-out infinite;
+/* ========================================
+   心臓の鼓動（ドクン...ドクン...）
+======================================== */
+.pulse-overlay.heartbeat {
+    animation: heartbeat-horror 1.5s ease-in-out infinite;
 }
 
-@keyframes heartbeat-pulse {
-    0%   { background: rgba(80, 0, 0, 0); }
-    15%  { background: rgba(120, 0, 0, 0.4); }
-    30%  { background: rgba(80, 0, 0, 0.1); }
-    45%  { background: rgba(100, 0, 0, 0.3); }
-    60%  { background: rgba(80, 0, 0, 0.05); }
-    100% { background: rgba(80, 0, 0, 0); }
+@keyframes heartbeat-horror {
+    0%   { background: rgba(20, 0, 0, 0); }
+    8%   { background: rgba(80, 0, 0, 0.6); }   /* ドクン */
+    15%  { background: rgba(30, 0, 0, 0.2); }
+    23%  { background: rgba(60, 0, 0, 0.4); }   /* ドクン */
+    35%  { background: rgba(20, 0, 0, 0.1); }
+    100% { background: rgba(10, 0, 0, 0); }
 }
 
-/* 画面端が暗くなるビネット */
+/* ========================================
+   電子的な呼吸（不規則なグリッチ）
+======================================== */
+.pulse-overlay.digital-breath {
+    animation: digital-breath 2s steps(1) infinite;
+    background: linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(30, 0, 0, 0.3) 50%,
+        rgba(0, 0, 0, 0) 100%
+    );
+}
+
+@keyframes digital-breath {
+    0%   { opacity: 0; filter: none; }
+    10%  { opacity: 1; filter: blur(2px); }
+    15%  { opacity: 0.3; filter: none; }
+    20%  { opacity: 0.8; filter: blur(1px); }
+    25%  { opacity: 0; }
+    50%  { opacity: 0.5; filter: blur(3px); }
+    55%  { opacity: 0; filter: none; }
+    70%  { opacity: 0.2; }
+    85%  { opacity: 0.7; filter: blur(2px); }
+    90%  { opacity: 0; filter: none; }
+    100% { opacity: 0; }
+}
+
+/* ========================================
+   単発の激しい脈動（ドクン！）
+======================================== */
+.pulse-overlay.single-horror {
+    animation: single-horror-pulse 1s ease-out forwards;
+}
+
+@keyframes single-horror-pulse {
+    0%   { 
+        background: rgba(0, 0, 0, 0);
+        filter: none;
+    }
+    10%  { 
+        background: rgba(100, 0, 0, 0.7);
+        filter: blur(0px);
+    }
+    20%  { 
+        background: rgba(150, 0, 0, 0.5);
+        filter: blur(2px);
+    }
+    30%  { 
+        background: rgba(80, 0, 0, 0.3);
+        filter: none;
+    }
+    50%  {
+        background: rgba(60, 0, 0, 0.4);
+        filter: blur(1px);
+    }
+    100% { 
+        background: rgba(20, 0, 0, 0.15);
+        filter: none;
+    }
+}
+
+/* ========================================
+   不気味なビネット（画面端の闇）
+======================================== */
 .pulse-vignette {
     position: fixed;
     top: 0;
@@ -38,86 +105,223 @@
     opacity: 0;
 }
 
-.pulse-vignette.active {
-    animation: vignette-pulse 1.2s ease-in-out infinite;
+.pulse-vignette.horror {
+    animation: vignette-horror 1.5s ease-in-out infinite;
 }
 
-@keyframes vignette-pulse {
+@keyframes vignette-horror {
     0%   { 
-        opacity: 0.3;
-        background: radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(50,0,0,0.5) 100%);
-    }
-    15%  { 
-        opacity: 1;
-        background: radial-gradient(ellipse at center, rgba(0,0,0,0) 20%, rgba(80,0,0,0.7) 100%);
-    }
-    30%  { 
         opacity: 0.5;
-        background: radial-gradient(ellipse at center, rgba(0,0,0,0) 35%, rgba(50,0,0,0.5) 100%);
+        background: radial-gradient(ellipse at center, 
+            rgba(0,0,0,0) 30%, 
+            rgba(20,0,0,0.7) 70%,
+            rgba(0,0,0,0.9) 100%);
     }
-    45%  { 
+    8%  { 
+        opacity: 1;
+        background: radial-gradient(ellipse at center, 
+            rgba(0,0,0,0) 10%, 
+            rgba(60,0,0,0.8) 50%,
+            rgba(0,0,0,1) 100%);
+    }
+    23%  { 
         opacity: 0.9;
-        background: radial-gradient(ellipse at center, rgba(0,0,0,0) 25%, rgba(70,0,0,0.6) 100%);
-    }
-    60%  { 
-        opacity: 0.4;
-        background: radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(50,0,0,0.5) 100%);
+        background: radial-gradient(ellipse at center, 
+            rgba(0,0,0,0) 15%, 
+            rgba(40,0,0,0.7) 60%,
+            rgba(0,0,0,0.95) 100%);
     }
     100% { 
-        opacity: 0.3;
-        background: radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(50,0,0,0.5) 100%);
+        opacity: 0.5;
+        background: radial-gradient(ellipse at center, 
+            rgba(0,0,0,0) 30%, 
+            rgba(20,0,0,0.7) 70%,
+            rgba(0,0,0,0.9) 100%);
     }
 }
 
-/* 画面全体が少し拡大縮小（心臓の収縮風） */
-html.pulse-zoom,
-body.pulse-zoom {
-    animation: zoom-pulse 1.2s ease-in-out infinite;
+/* ========================================
+   画面のズーム（息をするように）
+======================================== */
+html.pulse-zoom-horror,
+body.pulse-zoom-horror {
+    animation: zoom-horror 1.5s ease-in-out infinite;
 }
 
-@keyframes zoom-pulse {
+@keyframes zoom-horror {
     0%   { transform: scale(1); }
-    15%  { transform: scale(1.008); }
-    30%  { transform: scale(1); }
-    45%  { transform: scale(1.005); }
-    60%  { transform: scale(1); }
+    8%   { transform: scale(1.015); }  /* 膨らむ */
+    15%  { transform: scale(1.005); }
+    23%  { transform: scale(1.01); }   /* もう一度 */
+    35%  { transform: scale(1); }
     100% { transform: scale(1); }
 }
 
-/* 単発の脈動（1回だけドクン） */
-.pulse-overlay.single {
-    animation: heartbeat-single 0.8s ease-out forwards;
+/* ========================================
+   走査線ノイズ（古いモニター風）
+======================================== */
+.scanline-noise {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 51;
+    opacity: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1) 0px,
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    animation: scanline-flicker 0.1s steps(2) infinite;
 }
 
-@keyframes heartbeat-single {
-    0%   { background: rgba(80, 0, 0, 0); }
-    20%  { background: rgba(150, 0, 0, 0.5); }
-    40%  { background: rgba(100, 0, 0, 0.2); }
-    100% { background: rgba(60, 0, 0, 0.1); }
+.scanline-noise.active {
+    opacity: 0.4;
 }
 
-/* 不気味なメッセージ */
+@keyframes scanline-flicker {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(3px); }
+}
+
+/* ========================================
+   グリッチ歪み（画面が壊れる）
+======================================== */
+.glitch-distort {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 52;
+    opacity: 0;
+}
+
+.glitch-distort.active {
+    animation: glitch-distort 0.3s steps(1) infinite;
+    opacity: 1;
+}
+
+@keyframes glitch-distort {
+    0%   { 
+        clip-path: inset(10% 0 80% 0);
+        transform: translate(-5px, 0);
+        background: rgba(255, 0, 0, 0.1);
+    }
+    10%  { 
+        clip-path: inset(50% 0 30% 0);
+        transform: translate(5px, 0);
+        background: rgba(0, 255, 255, 0.1);
+    }
+    20%  { 
+        clip-path: inset(20% 0 60% 0);
+        transform: translate(-3px, 0);
+        background: rgba(255, 0, 0, 0.1);
+    }
+    30%  { 
+        clip-path: inset(70% 0 10% 0);
+        transform: translate(3px, 0);
+        background: rgba(0, 255, 255, 0.1);
+    }
+    40%  { clip-path: inset(0); transform: translate(0); background: transparent; }
+    100% { clip-path: inset(0); transform: translate(0); background: transparent; }
+}
+
+/* ========================================
+   不気味なメッセージ（じわじわ表示）
+======================================== */
 .pulse-message {
     position: fixed;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    color: #aa0000;
-    font-size: 24px;
-    font-weight: 700;
+    color: #660000;
+    font-size: 64px;           /* ← 28px から 64px に変更（大きく） */
+    font-weight: 900;          /* ← より太く */
+    font-family: 'MS Gothic', 'メイリオ', monospace;
     text-shadow: 
-        0 0 20px rgba(150, 0, 0, 0.8),
-        0 0 40px rgba(100, 0, 0, 0.5);
+        0 0 20px rgba(150, 0, 0, 0.9),
+        0 0 40px rgba(100, 0, 0, 0.7),
+        0 0 80px rgba(80, 0, 0, 0.5),   /* ← 追加：より広い影 */
+        4px 4px 0 rgba(0, 0, 0, 0.9);   /* ← 追加：立体感 */
     z-index: 10000;
     pointer-events: none;
     opacity: 0;
-    animation: pulse-msg-in 2s ease-in-out forwards;
+    animation: horror-msg-in 3s ease-in-out forwards;
+    letter-spacing: 10px;      /* ← 5px から 10px に変更（文字間広く） */
 }
 
-@keyframes pulse-msg-in {
-    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
-    30%  { opacity: 0.8; transform: translate(-50%, -50%) scale(1.02); }
-    50%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    80%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+@keyframes horror-msg-in {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.98); filter: blur(3px); }
+    20%  { opacity: 0.3; transform: translate(-50%, -50%) scale(1); filter: blur(1px); }
+    40%  { opacity: 0.6; filter: blur(0); }
+    50%  { opacity: 0.9; transform: translate(-52%, -50%); }  /* 微妙にズレる */
+    55%  { opacity: 0.7; transform: translate(-48%, -50%); }
+    60%  { opacity: 1; transform: translate(-50%, -50%); }
+    80%  { opacity: 1; }
+    100% { opacity: 0; filter: blur(2px); }
+}
+
+/* ========================================
+   幽霊のような残像
+======================================== */
+.ghost-afterimage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 48;
+    opacity: 0;
+    background: radial-gradient(
+        ellipse at 30% 40%,
+        rgba(100, 100, 100, 0.05) 0%,
+        transparent 50%
+    );
+}
+
+.ghost-afterimage.active {
+    animation: ghost-appear 4s ease-in-out forwards;
+}
+
+@keyframes ghost-appear {
+    0%   { opacity: 0; }
+    30%  { opacity: 0.3; transform: translate(0, 0); }
+    50%  { opacity: 0.5; transform: translate(5px, -3px); }
+    70%  { opacity: 0.2; transform: translate(-3px, 2px); }
+    100% { opacity: 0; }
+}
+
+/* ========================================
+   ちらつき効果（一瞬だけ見える何か）
+======================================== */
+.horror-flicker {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 53;
+    opacity: 0;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.horror-flicker.active {
+    animation: horror-flicker 0.15s steps(1) forwards;
+}
+
+@keyframes horror-flicker {
+    0%   { opacity: 0; }
+    20%  { opacity: 0.8; }
+    25%  { opacity: 0; }
+    40%  { opacity: 0.5; }
+    45%  { opacity: 0; }
+    100% { opacity: 0; }
 }

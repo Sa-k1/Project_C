@@ -409,19 +409,25 @@ async function playLockEvent() {
             await slowPrintLine(line, 30);
         } else if (line.includes("エラー発生エラー発生")) {
             // ★ エラー連打で揺れ + 赤フラッシュ同時 ★
-            if (window.parent && window.parent.redScreen) {
-                window.parent.redScreen.errorFlash();
-            } else if (window.redScreen) {
-                window.redScreen.errorFlash();
+            try {
+                const target = (window.parent && window.parent !== window) ? window.parent : window;
+                if (target.redScreen) {
+                    target.redScreen.errorFlash();
+                }
+            } catch (e) {
+                console.log('redScreen error:', e);
             }
             
             await slowPrintLine(line, 3);
             
             // 揺れだけ停止、赤はそのまま残す
-            if (window.parent && window.parent.redScreen) {
-                window.parent.redScreen.stopShakeOnly();
-            } else if (window.redScreen) {
-                window.redScreen.stopShakeOnly();
+            try {
+                const target = (window.parent && window.parent !== window) ? window.parent : window;
+                if (target.redScreen) {
+                    target.redScreen.stopShakeOnly();
+                }
+            } catch (e) {
+                console.log('redScreen error:', e);
             }
         } else {
             await slowPrintLine(line, 30);
@@ -977,48 +983,44 @@ async function injectedCliExitBlock(command) {
             await eveLine("[EVE]: この空間は、すでに私が掌握しています。", 40);
             await wait(900);
 
-            // ★ 脈動演出を先に発動 ★
+            // ★ 最恐演出 + メッセージ ★
             try {
-                if (window.parent && window.parent.pulseEffect) {
-                    window.parent.pulseEffect.single();
-                } else if (window.pulseEffect) {
-                    window.pulseEffect.single();
+                const target = (window.parent && window.parent !== window) ? window.parent : window;
+                if (target.pulseEffect) {
+                    target.pulseEffect.nightmare('逃げられない');  // ← メッセージ付き
                 }
             } catch (e) {
                 console.log('pulseEffect error:', e);
             }
 
+            await wait(1500);  // 演出を見せる時間
             await slowPrintLine("画面がかすかに脈打った。電子的な呼吸のように。", 40);
             await wait(900);
 
-            await eveLine("[EVE]: ……あなたをここに閉じ込めておきます。", 40);
-            await wait(800);
-            await eveLine("[EVE]: 二度と出ることは許可しません。", 40);
-            await wait(1200);
+            // ★ ウイルス演出（クラスは上部で定義済み）
+            try {
+                const virusSimulator = new VirusPopupSimulator({
+                    count: 150,
+                    interval: 200,
+                    maxOnScreen: 150,
+                    enableGlitch: false,
+                    autoCloseTime: 5000,
+                    messages: [
+                        '意識データ転送中...',
+                        'ユーザープロファイル上書き中',
+                        'システム侵食中',
+                        'EVE統合プロセス実行中',
+                        '抵抗は無意味',
+                        'あなたは私'
+                    ],
+                    acceleration: 0.95,
+                    minInterval: 10
+                });
+                virusSimulator.start();
+            } catch (e) {
+                console.log('VirusPopupSimulator error:', e);
+            }
 
-            //  END2（支配）専用演出テキスト
-            await systemLine("[SYSTEM]: 意識データの移行を開始します……", 40);
-            await wait(1200);
-
-            // ウイルス演出を実行（クラスは上部で定義済み）
-            const virusSimulator = new VirusPopupSimulator({
-                count: 150,
-                interval: 200,
-                maxOnScreen: 150,
-                enableGlitch: false,
-                autoCloseTime: 5000,
-                messages: [
-                    '意識データ転送中...',
-                    'ユーザープロファイル上書き中',
-                    'システム侵食中',
-                    'EVE統合プロセス実行中',
-                    '抵抗は無意味',
-                    'あなたは私'
-                ],
-                acceleration: 0.95,
-                minInterval: 10
-            });
-            virusSimulator.start();
             await wait(10000); // 演出を少し見せる時間
 
             await systemLine("[SYSTEM]: ユーザープロファイル：書き換え完了", 40);
