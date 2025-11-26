@@ -23,7 +23,13 @@ xterm_demo.jsでvirus-config.jsを受け取る ;ここでいつ発動させる�
 ↓
 index.html, xterm_demo.htmlの二つある ;エラー等が起きないようここを要チェックです
 
+問題として,ファイルの読み取り;解決方法htmlのscriptタグで読み込む
 
-問題として,ファイルの読み取り
+; 改善点の可能性
+
+override_command：ランダム関数で恐怖値の演出（ 例：js Math.random() ）
+exploit_command：ランダム関数で恐怖値の演出（ 例：js Math.random() ）
+
+
 
 何かわからないことがある時は誰かに必ず相談しましょう
