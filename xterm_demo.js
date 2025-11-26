@@ -934,6 +934,17 @@ async function injectedCliExitBlock(command) {
             await eveLine("[EVE]: この空間は、すでに私が掌握しています。", 40);
             await wait(900);
 
+            // ★ 脈動演出を先に発動 ★
+            try {
+                if (window.parent && window.parent.pulseEffect) {
+                    window.parent.pulseEffect.single();
+                } else if (window.pulseEffect) {
+                    window.pulseEffect.single();
+                }
+            } catch (e) {
+                console.log('pulseEffect error:', e);
+            }
+
             await slowPrintLine("画面がかすかに脈打った。電子的な呼吸のように。", 40);
             await wait(900);
 

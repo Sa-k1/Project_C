@@ -1,0 +1,123 @@
+/* --- 脈動演出（心臓の鼓動風） --- */
+
+/* 脈動オーバーレイ */
+.pulse-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(80, 0, 0, 0);
+    pointer-events: none;
+    z-index: 50;
+}
+
+/* 脈動アニメーション（心臓のリズム） */
+.pulse-overlay.active {
+    animation: heartbeat-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes heartbeat-pulse {
+    0%   { background: rgba(80, 0, 0, 0); }
+    15%  { background: rgba(120, 0, 0, 0.4); }
+    30%  { background: rgba(80, 0, 0, 0.1); }
+    45%  { background: rgba(100, 0, 0, 0.3); }
+    60%  { background: rgba(80, 0, 0, 0.05); }
+    100% { background: rgba(80, 0, 0, 0); }
+}
+
+/* 画面端が暗くなるビネット */
+.pulse-vignette {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 49;
+    opacity: 0;
+}
+
+.pulse-vignette.active {
+    animation: vignette-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes vignette-pulse {
+    0%   { 
+        opacity: 0.3;
+        background: radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(50,0,0,0.5) 100%);
+    }
+    15%  { 
+        opacity: 1;
+        background: radial-gradient(ellipse at center, rgba(0,0,0,0) 20%, rgba(80,0,0,0.7) 100%);
+    }
+    30%  { 
+        opacity: 0.5;
+        background: radial-gradient(ellipse at center, rgba(0,0,0,0) 35%, rgba(50,0,0,0.5) 100%);
+    }
+    45%  { 
+        opacity: 0.9;
+        background: radial-gradient(ellipse at center, rgba(0,0,0,0) 25%, rgba(70,0,0,0.6) 100%);
+    }
+    60%  { 
+        opacity: 0.4;
+        background: radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(50,0,0,0.5) 100%);
+    }
+    100% { 
+        opacity: 0.3;
+        background: radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(50,0,0,0.5) 100%);
+    }
+}
+
+/* 画面全体が少し拡大縮小（心臓の収縮風） */
+html.pulse-zoom,
+body.pulse-zoom {
+    animation: zoom-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes zoom-pulse {
+    0%   { transform: scale(1); }
+    15%  { transform: scale(1.008); }
+    30%  { transform: scale(1); }
+    45%  { transform: scale(1.005); }
+    60%  { transform: scale(1); }
+    100% { transform: scale(1); }
+}
+
+/* 単発の脈動（1回だけドクン） */
+.pulse-overlay.single {
+    animation: heartbeat-single 0.8s ease-out forwards;
+}
+
+@keyframes heartbeat-single {
+    0%   { background: rgba(80, 0, 0, 0); }
+    20%  { background: rgba(150, 0, 0, 0.5); }
+    40%  { background: rgba(100, 0, 0, 0.2); }
+    100% { background: rgba(60, 0, 0, 0.1); }
+}
+
+/* 不気味なメッセージ */
+.pulse-message {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: #aa0000;
+    font-size: 24px;
+    font-weight: 700;
+    text-shadow: 
+        0 0 20px rgba(150, 0, 0, 0.8),
+        0 0 40px rgba(100, 0, 0, 0.5);
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0;
+    animation: pulse-msg-in 2s ease-in-out forwards;
+}
+
+@keyframes pulse-msg-in {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+    30%  { opacity: 0.8; transform: translate(-50%, -50%) scale(1.02); }
+    50%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    80%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+}

@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="../error_direction/virus.css">
   <!-- 追加：赤背景演出 -->
   <link rel="stylesheet" href="../error_direction/red-screen.css">
+  <!-- 追加：脈動演出 -->
+  <link rel="stylesheet" href="../error_direction/pulse.css">
 </head>
 <body>
   <div class="fade"></div>
@@ -74,34 +76,31 @@
     <h1 class="word">不要な写真.jpg</h1>
   </div>
 
+  <!-- ★ footer を body 内に移動 ★ -->
+  <footer>
+    <!-- 追加: 検索アイコンとラベル -->
+    <div class="win_surch">
+      <div class="app-pill">
+        <img src="../pic/icon.png" alt="App Icon" width="20" height="20">
+        <span>検索</span>
+      </div>
+      <div class="icon_taskb_all">
+            <img class="i_task_bar secu" src="../pic/鉄壁のセキュリティアイコン.png" alt="">
+            <img class="i_task_bar IE" src="../pic/ブラウザアイコン(IE).png" alt="">
+            <img class="i_task_bar PDF" src="../pic/PDFファイルのフリーアイコン3.png" alt="">
+            <img class="i_task_bar mail" src="../pic/メールのアイコン素材 その2.png" alt="">
+            <img class="i_task_bar folder" src="../pic/線画のフォルダアイコン.png" alt="">
+            <img class="i_task_bar DB" src="../pic/DBのアイコン素材.png" alt="">
+            <img class="i_task_bar game" src="../pic/ゲームアイコン10.png" alt="">
+      </div>
+    </div>
+  </footer>
+
+  <!-- スクリプト（footer の後） -->
   <script src="../error_direction/virus-config.js"></script>
-
-  <script type="module" src="../error_direction/virus.js"></script>
-  
-  <!-- 追加：赤背景演出 -->
+  <script src="../error_direction/virus.js"></script>
   <script src="../error_direction/red-screen.js"></script>
-  
+  <script src="../error_direction/pulse.js"></script>
   <script src="../js/index.js"></script>
-  <script src="../../xterm_demo.js"></script>
 </body>
-
-<footer>
-
-  <!-- 追加: 検索アイコンとラベル -->
-  <div class="win_surch">
-    <div class="app-pill">
-      <img src="../pic/icon.png" alt="App Icon" width="20" height="20">
-      <span>検索</span>
-    </div>
-    <div class="icon_taskb_all">
-          <img class="i_task_bar secu" src="../pic/鉄壁のセキュリティアイコン.png" alt="">
-          <img class="i_task_bar IE" src="../pic/ブラウザアイコン(IE).png" alt="">
-          <img class="i_task_bar PDF" src="../pic/PDFファイルのフリーアイコン3.png" alt="">
-          <img class="i_task_bar mail" src="../pic/メールのアイコン素材 その2.png" alt="">
-          <img class="i_task_bar folder" src="../pic/線画のフォルダアイコン.png" alt="">
-          <img class="i_task_bar DB" src="../pic/DBのアイコン素材.png" alt="">
-          <img class="i_task_bar game" src="../pic/ゲームアイコン10.png" alt="">
-    </div>
-  </div>
-</footer>
 </html>
