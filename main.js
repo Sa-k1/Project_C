@@ -47,7 +47,7 @@ app.whenReady().then(() => {
   setTimeout(() => {
     splashScreen.close();
     createWindow();
-  }, 0);
+  }, 2500);
    //　アニメーションを見たい方は上の0の部分を2500にしてください
 });
 

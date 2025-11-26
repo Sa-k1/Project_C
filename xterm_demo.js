@@ -500,8 +500,40 @@ async function showEnding2Screen() {
     `;
     subtitle.textContent = 'あなたは EVE と一つになった';
 
+    // リセットボタン（親ウィンドウにのみ表示）
+    const resetButton = targetDocument.createElement('button');
+    resetButton.id = 'end2-reset-button';
+    resetButton.textContent = 'Reset System';
+    resetButton.style.cssText = `
+        margin-top: 50px;
+        padding: 15px 40px;
+        font-size: 1.2rem;
+        font-family: 'Courier New', monospace;
+        background: transparent;
+        color: #ff0000;
+        border: 2px solid #ff0000;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        opacity: 0;
+        animation: fadeInButton 2s ease-in-out 3s forwards;
+    `;
+    resetButton.addEventListener('mouseenter', () => {
+        resetButton.style.background = '#ff0000';
+        resetButton.style.color = '#000';
+        resetButton.style.boxShadow = '0 0 20px #ff0000';
+    });
+    resetButton.addEventListener('mouseleave', () => {
+        resetButton.style.background = 'transparent';
+        resetButton.style.color = '#ff0000';
+        resetButton.style.boxShadow = 'none';
+    });
+    resetButton.addEventListener('click', () => {
+        targetWindow.location.reload();
+    });
+
     overlay.appendChild(title);
     overlay.appendChild(subtitle);
+    overlay.appendChild(resetButton);
     targetDocument.body.appendChild(overlay);
 
     // フェードイン
@@ -569,6 +601,17 @@ async function showEnding2Screen() {
             60% { transform: translate(3px, 3px); }
             80% { transform: translate(-3px, -3px); }
             100% { transform: translate(0); }
+        }
+        
+        /* リセットボタンのフェードインアニメーション */
+        @keyframes fadeInButton {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        #end2-reset-button:focus {
+            outline: none;
+            box-shadow: 0 0 20px #ff0000;
         }
     `;
     targetDocument.head.appendChild(glitchStyle);
@@ -981,6 +1024,7 @@ async function injectedCliExitBlock(command) {
             await showEnding2Screen();
 
             // ここで操作は停止（inputEnabled=false のまま）
+            // リセットボタンがクリックされるまで待機
             return;
         } else if (gameState.alertLevel >= 80) {
             a = true;
