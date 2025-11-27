@@ -38,6 +38,9 @@ Object.entries(fileViewerContainers).forEach(([id, container]) => {
     if (!container) return;
     
     container.addEventListener('mousedown', (e) => {
+        // まず前面に持ってくる
+        bringToFront(container);
+        
         const handle = e.target.closest('.box, .titlebar');
         if (!handle) return;
 
@@ -49,21 +52,40 @@ Object.entries(fileViewerContainers).forEach(([id, container]) => {
             offsetX: e.clientX - container.getBoundingClientRect().left,
             offsetY: e.clientY - container.getBoundingClientRect().top
         };
-        
-        // 前面に持ってくる
-        bringToFront(container);
-    });
-    
-    // ウィンドウ内のどこかをクリックしても前面に
-    container.addEventListener('click', () => {
-        bringToFront(container);
     });
 });
 
 // EVEウィンドウもクリックで前面に
-windowContainer.addEventListener('click', () => {
+windowContainer.addEventListener('mousedown', () => {
     bringToFront(windowContainer);
 });
+
+// iframeクリック検知：document.activeElementを監視
+let lastActiveElement = null;
+setInterval(() => {
+    const activeElement = document.activeElement;
+    
+    // アクティブな要素が変わった時だけ処理
+    if (activeElement !== lastActiveElement) {
+        lastActiveElement = activeElement;
+        
+        // EVEウィンドウのiframe
+        const eveIframe = document.getElementById('mini-iframe');
+        if (activeElement === eveIframe) {
+            bringToFront(windowContainer);
+            return;
+        }
+        
+        // ファイルビューアのiframe
+        Object.entries(fileViewerContainers).forEach(([id, container]) => {
+            if (!container) return;
+            const iframe = container.querySelector('iframe');
+            if (activeElement === iframe) {
+                bringToFront(container);
+            }
+        });
+    }
+}, 50);
 
 // ウィンドウを前面に持ってくる関数
 function bringToFront(element) {
@@ -95,7 +117,7 @@ document.addEventListener('mousemove', (e) => {
 // ファイルビューアの閉じるボタン（3つのウィンドウに対応）
 document.querySelectorAll('.file-viewer-container .ctrl.close').forEach(btn => {
     btn.addEventListener('click', (e) => {
-        const viewerId = e.target.dataset.viewer;
+        const viewerId = e.target.dataset.viewer;   
         const container = fileViewerContainers[viewerId];
         if (container) {
             container.style.display = 'none';
