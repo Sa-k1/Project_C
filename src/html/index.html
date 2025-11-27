@@ -19,7 +19,7 @@
     <div class="side-panel" id="sidePanel">
       <div class="side-panel-content">
         <!-- ここにイラストを入れる -->
-        <img id="side-panel-image" src="../pic/Kar1.png" alt="EVE イラスト">
+        <img id="side-panel-image" src="../pic/fotor-ai-2025112710534.gif" alt="EVE イラスト">
       </div>
     </div>
     
@@ -74,6 +74,27 @@
   <div class="draggable-item" draggable="true" id="file3">
     <img src="../pic/file.png" alt="">  
     <h1 class="word">不要な写真.jpg</h1>
+  </div>
+
+  <!-- ファイルビューア用ウィンドウコンテナ -->
+  <div class="file-viewer-container" id="fileViewerContainer" style="display: none;">
+    <div class="file-viewer-window" id="fileViewerWindow">
+      <div class="box">
+        <div class="titlebar">
+          <div class="tabs">
+            <div class="tab active">
+              <span class="tab-label" id="fileViewerTitle">ファイル</span>
+            </div>
+          </div>
+          <div class="window-controls">
+            <button class="ctrl minimize" title="最小化">一</button>
+            <button class="ctrl maximize" title="最大化">▢</button>
+            <button class="ctrl close" id="fileViewerClose" title="閉じる">✕</button>
+          </div>
+        </div>
+      </div>
+      <iframe id="file-viewer-iframe" frameborder="0"></iframe>
+    </div>
   </div>
 
   <!-- ★ footer を body 内に移動 ★ -->

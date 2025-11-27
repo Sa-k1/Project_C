@@ -551,8 +551,8 @@ async function showEnding2Screen() {
     glitchStyle.id = 'end2-glitch-style';
     glitchStyle.textContent = `
         /* ================================================
-           END2 グリッチアニメーション
-           ここにカスタムグリッチCSSを追加してください
+            END2 グリッチアニメーション
+            ここにカスタムグリッチCSSを追加してください
         ================================================ */
         
         .end2-glitch-text {
@@ -917,6 +917,7 @@ window.addEventListener('resize', () => {
 async function injectedCliExitBlock(command) {
     if (command.toLowerCase() === "exit" || command === "終了") {
         a = true;
+        nameVAl = true;  // exitを打ったらプロンプトを C:\Users> に変更
         if (!exitUsed) {
             exitUsed = true;
             // on first exit, switch EVE's speaking style to 'eve' and apply it
@@ -960,6 +961,7 @@ async function injectedCliExitBlock(command) {
 
     // 危険コマンド実行時 → 警戒度上昇（exit は上で処理済み）
     if (/(override|exploit)/i.test(command)) {
+        nameVAl = true;
         a = true;
         increaseAlert(100);
     await systemLine(`[SYSTEM]: 警戒度が上昇しました (${gameState.alertLevel}%)`, 30);
