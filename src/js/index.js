@@ -127,15 +127,6 @@ document.querySelectorAll('.file-viewer-container .ctrl.close').forEach(btn => {
     });
 });
 
-// EVEウィンドウ（windowContainer）の閉じるボタン
-const eveCloseBtn = document.querySelector('#miniWindow .ctrl.close');
-if (eveCloseBtn) {
-    eveCloseBtn.addEventListener('click', () => {
-        windowContainer.style.display = 'none';
-        const ta = document.querySelector('.text');
-        if (ta) ta.style.display = '';
-    });
-}
 
 // ドラッグ可能なアイテムの処理
 const items = document.querySelectorAll('.draggable-item');
