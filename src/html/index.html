@@ -76,24 +76,66 @@
     <h1 class="word">不要な写真.jpg</h1>
   </div>
 
-  <!-- ファイルビューア用ウィンドウコンテナ -->
-  <div class="file-viewer-container" id="fileViewerContainer" style="display: none;">
-    <div class="file-viewer-window" id="fileViewerWindow">
+  <!-- ファイルビューア用ウィンドウコンテナ（file1用） -->
+  <div class="file-viewer-container" id="fileViewerContainer1" style="display: none; top: 80px; right: 150px;">
+    <div class="file-viewer-window" id="fileViewerWindow1">
       <div class="box">
         <div class="titlebar">
           <div class="tabs">
             <div class="tab active">
-              <span class="tab-label" id="fileViewerTitle">ファイル</span>
+              <span class="tab-label" id="fileViewerTitle1">ファイル</span>
             </div>
           </div>
           <div class="window-controls">
             <button class="ctrl minimize" title="最小化">一</button>
             <button class="ctrl maximize" title="最大化">▢</button>
-            <button class="ctrl close" id="fileViewerClose" title="閉じる">✕</button>
+            <button class="ctrl close" data-viewer="1" title="閉じる">✕</button>
           </div>
         </div>
       </div>
-      <iframe id="file-viewer-iframe" frameborder="0"></iframe>
+      <iframe id="file-viewer-iframe1" frameborder="0"></iframe>
+    </div>
+  </div>
+
+  <!-- ファイルビューア用ウィンドウコンテナ（file2用） -->
+  <div class="file-viewer-container" id="fileViewerContainer2" style="display: none; top: 120px; right: 120px;">
+    <div class="file-viewer-window" id="fileViewerWindow2">
+      <div class="box">
+        <div class="titlebar">
+          <div class="tabs">
+            <div class="tab active">
+              <span class="tab-label" id="fileViewerTitle2">ファイル</span>
+            </div>
+          </div>
+          <div class="window-controls">
+            <button class="ctrl minimize" title="最小化">一</button>
+            <button class="ctrl maximize" title="最大化">▢</button>
+            <button class="ctrl close" data-viewer="2" title="閉じる">✕</button>
+          </div>
+        </div>
+      </div>
+      <iframe id="file-viewer-iframe2" frameborder="0"></iframe>
+    </div>
+  </div>
+
+  <!-- ファイルビューア用ウィンドウコンテナ（file3用） -->
+  <div class="file-viewer-container" id="fileViewerContainer3" style="display: none; top: 160px; right: 90px;">
+    <div class="file-viewer-window" id="fileViewerWindow3">
+      <div class="box">
+        <div class="titlebar">
+          <div class="tabs">
+            <div class="tab active">
+              <span class="tab-label" id="fileViewerTitle3">ファイル</span>
+            </div>
+          </div>
+          <div class="window-controls">
+            <button class="ctrl minimize" title="最小化">一</button>
+            <button class="ctrl maximize" title="最大化">▢</button>
+            <button class="ctrl close" data-viewer="3" title="閉じる">✕</button>
+          </div>
+        </div>
+      </div>
+      <iframe id="file-viewer-iframe3" frameborder="0"></iframe>
     </div>
   </div>
 

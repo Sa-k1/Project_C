@@ -6,7 +6,7 @@ html, body {
     overflow: hidden; /* ページ側のスクロールを消す */
 }
 #terminal {
-    width: 100%;
+    width: 101%;
     height: 100%;
     padding: 8px 8px 0px 8px;
     box-sizing: border-box;

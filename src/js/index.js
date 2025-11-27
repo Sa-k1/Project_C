@@ -2,9 +2,16 @@ const mini = document.getElementById('miniWindow');
 const windowContainer = document.getElementById('windowContainer');
 let offsetX, offsetY, isDragging = false;
 
-// ファイルビューア用の変数
-const fileViewerContainer = document.getElementById('fileViewerContainer');
-let fileViewerOffsetX, fileViewerOffsetY, isFileViewerDragging = false;
+// ファイルビューア用の変数（3つのウィンドウ）
+const fileViewerContainers = {
+    1: document.getElementById('fileViewerContainer1'),
+    2: document.getElementById('fileViewerContainer2'),
+    3: document.getElementById('fileViewerContainer3')
+};
+let fileViewerDragState = { id: null, offsetX: 0, offsetY: 0 };
+
+// z-indexの管理用（ウィンドウを前面に持ってくる機能）
+let topZIndex = 200;
 
 // ウィンドウコンテナ全体をドラッグ可能にする
 windowContainer.addEventListener('mousedown', (e) => {
@@ -21,25 +28,52 @@ windowContainer.addEventListener('mousedown', (e) => {
         const rect = windowContainer.getBoundingClientRect();
         offsetX = e.clientX - rect.left;
         offsetY = e.clientY - rect.top;
+        
+        // 前面に持ってくる
+        bringToFront(windowContainer);
 });
 
-// ファイルビューアのドラッグ処理
-fileViewerContainer.addEventListener('mousedown', (e) => {
+// ファイルビューアのドラッグ処理（3つのウィンドウに対応）
+Object.entries(fileViewerContainers).forEach(([id, container]) => {
+    if (!container) return;
+    
+    container.addEventListener('mousedown', (e) => {
         const handle = e.target.closest('.box, .titlebar');
         if (!handle) return;
 
-        const ignored = e.target.closest('.window-controls, .ctrl, .tab, .tab-label, #file-viewer-iframe');
+        const ignored = e.target.closest('.window-controls, .ctrl, .tab, .tab-label, iframe');
         if (ignored) return;
 
-        isFileViewerDragging = true;
-        const rect = fileViewerContainer.getBoundingClientRect();
-        fileViewerOffsetX = e.clientX - rect.left;
-        fileViewerOffsetY = e.clientY - rect.top;
+        fileViewerDragState = {
+            id: id,
+            offsetX: e.clientX - container.getBoundingClientRect().left,
+            offsetY: e.clientY - container.getBoundingClientRect().top
+        };
+        
+        // 前面に持ってくる
+        bringToFront(container);
+    });
+    
+    // ウィンドウ内のどこかをクリックしても前面に
+    container.addEventListener('click', () => {
+        bringToFront(container);
+    });
 });
+
+// EVEウィンドウもクリックで前面に
+windowContainer.addEventListener('click', () => {
+    bringToFront(windowContainer);
+});
+
+// ウィンドウを前面に持ってくる関数
+function bringToFront(element) {
+    topZIndex++;
+    element.style.zIndex = topZIndex;
+}
 
 document.addEventListener('mouseup', () => {
     isDragging = false;
-    isFileViewerDragging = false;
+    fileViewerDragState.id = null;
 });
 
 document.addEventListener('mousemove', (e) => {
@@ -47,28 +81,39 @@ document.addEventListener('mousemove', (e) => {
         windowContainer.style.left = `${e.clientX - offsetX}px`;
         windowContainer.style.top = `${e.clientY - offsetY}px`;
     }
-    if (isFileViewerDragging) {
-        fileViewerContainer.style.left = `${e.clientX - fileViewerOffsetX}px`;
-        fileViewerContainer.style.top = `${e.clientY - fileViewerOffsetY}px`;
-        fileViewerContainer.style.right = 'auto';
+    // ファイルビューアのドラッグ（3つのウィンドウに対応）
+    if (fileViewerDragState.id !== null) {
+        const container = fileViewerContainers[fileViewerDragState.id];
+        if (container) {
+            container.style.left = `${e.clientX - fileViewerDragState.offsetX}px`;
+            container.style.top = `${e.clientY - fileViewerDragState.offsetY}px`;
+            container.style.right = 'auto';
+        }
     }
 });
 
-// ファイルビューアの閉じるボタン
-document.getElementById('fileViewerClose').addEventListener('click', () => {
-    fileViewerContainer.style.display = 'none';
-    document.getElementById('file-viewer-iframe').src = '';
+// ファイルビューアの閉じるボタン（3つのウィンドウに対応）
+document.querySelectorAll('.file-viewer-container .ctrl.close').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const viewerId = e.target.dataset.viewer;
+        const container = fileViewerContainers[viewerId];
+        if (container) {
+            container.style.display = 'none';
+            const iframe = container.querySelector('iframe');
+            if (iframe) iframe.src = '';
+        }
+    });
 });
 
 // ドラッグ可能なアイテムの処理
 const items = document.querySelectorAll('.draggable-item');
 const trashCan = document.getElementById('trash-can');
 
-// ファイルごとのページ設定
+// ファイルごとのページ設定（ファイルIDとウィンドウ番号のマッピング）
 const filePages = {
-    'file1': 'file1.html',  // 重要なデータ.txt
-    'file2': 'file2.html',  // 古いメモ.doc
-    'file3': 'file3.html'   // 不要な写真.jpg
+    'file1': { page: 'file1.html', viewerId: 1 },  // 重要なデータ.txt
+    'file2': { page: 'file2.html', viewerId: 2 },  // 古いメモ.doc
+    'file3': { page: 'file3.html', viewerId: 3 }   // 不要な写真.jpg
 };
 
 items.forEach(item => {
@@ -80,29 +125,30 @@ items.forEach(item => {
         trashCan.style.backgroundColor = 'transparent';
     });
 
-    // ダブルクリックでファイルを開く（ファイルビューアウィンドウで表示）
+    // ダブルクリックでファイルを開く（それぞれ別のウィンドウで表示）
     item.addEventListener('dblclick', (e) => {
         const fileId = item.id;
-        const pagePath = filePages[fileId];
-        if (pagePath) {
-            const fileViewerContainer = document.getElementById('fileViewerContainer');
-            const fileViewerIframe = document.getElementById('file-viewer-iframe');
-            const fileViewerTitle = document.getElementById('fileViewerTitle');
+        const fileConfig = filePages[fileId];
+        if (fileConfig) {
+            const container = fileViewerContainers[fileConfig.viewerId];
+            const iframe = document.getElementById(`file-viewer-iframe${fileConfig.viewerId}`);
+            const title = document.getElementById(`fileViewerTitle${fileConfig.viewerId}`);
             
             // ファイル名を取得してタイトルに設定
             const fileName = item.querySelector('.word')?.textContent || 'ファイル';
-            if (fileViewerTitle) {
-                fileViewerTitle.textContent = fileName;
+            if (title) {
+                title.textContent = fileName;
             }
             
             // iframeにファイルを読み込み
-            if (fileViewerIframe) {
-                fileViewerIframe.src = pagePath;
+            if (iframe) {
+                iframe.src = fileConfig.page;
             }
             
-            // ウィンドウを表示
-            if (fileViewerContainer) {
-                fileViewerContainer.style.display = 'block';
+            // ウィンドウを表示して前面に
+            if (container) {
+                container.style.display = 'block';
+                bringToFront(container);
             }
         }
     });
