@@ -124,3 +124,15 @@
     50% { transform: translateY(3px); opacity: .4; }
     100% { transform: translateY(0px); opacity: .6; }
 }
+
+/* 中央ポップアップ用のパルスアニメーション */
+@keyframes popup-pulse {
+    0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    50%  { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* 中央ポップアップ用のアニメーション */
+.popup-pulse {
+    animation: popup-pulse 0.5s ease-in-out;
+}

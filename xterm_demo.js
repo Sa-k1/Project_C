@@ -19,7 +19,7 @@ class VirusPopupSimulator {
             interval: 200,
             maxOnScreen: 60,
             enableGlitch: true,
-            autoCloseTime: 7000,
+            autoCloseTime: 99999,
             messages: [
                 'ウイルス検出！',
                 'システムが危険です',
@@ -170,9 +170,9 @@ class VirusPopupSimulator {
     }
 
     clear() {
+        // 一瞬で消す（アニメーションなし）
         this.popups.forEach(p => {
-            p.classList.add('popup-exit');
-            setTimeout(() => p.remove(), 150);
+            p.remove();
         });
         this.popups = [];
         this.stopGlitch();
@@ -997,14 +997,108 @@ async function injectedCliExitBlock(command) {
             await slowPrintLine("画面がかすかに脈打った。電子的な呼吸のように。", 40);
             await wait(900);
 
-            // ★ ウイルス演出（クラスは上部で定義済み）
+            // ★ まず中央に1つだけポップアップを表示（消さずに残す）★
+            const targetWindow = (window.parent && window.parent !== window) ? window.parent : window;
+            const targetDocument = targetWindow.document;
+            
+            const centerPopup = targetDocument.createElement('div');
+            centerPopup.id = 'center-warning-popup';
+            // ★ virus-popup クラスを外して、独自スタイルのみ適用 ★
+            centerPopup.style.cssText = `
+                position: fixed;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                min-width: 400px;
+                z-index: 999999;
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                border-radius: 8px;
+                box-shadow: 0 0 50px rgba(255, 0, 0, 0.8), 0 0 100px rgba(255, 0, 0, 0.5);
+                border: 3px solid #ff0000;
+                font-family: 'Segoe UI', 'MS Gothic', sans-serif;
+                overflow: hidden;
+            `;
+            centerPopup.innerHTML = `
+                <div style="background: #ff0000; padding: 8px 12px; font-size: 14px;">⚠️</div>
+                <div style="background: #ff0000; color: white; padding: 10px 15px; font-size: 20px; font-weight: bold;">EVE</div>
+                <div style="padding: 30px; font-size: 24px; color: #ff0000; font-weight: bold; text-align: center;">
+                    準備を始めます
+                </div>
+                <div style="padding: 15px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <button style="padding: 8px 20px; background: #333; color: #666; border: 1px solid #444; border-radius: 4px; font-size: 16px; cursor: not-allowed;">中断できません</button>
+                </div>
+            `;
+            targetDocument.body.appendChild(centerPopup);
+            
+            // ★ デバッグ：ポップアップが追加されたことを確認 ★
+            console.log('中央ポップアップを追加しました:', centerPopup);
+
+            // 中央ポップアップだけを見せる時間（大量発生前）
+            await wait(4000);  // ← 4秒間じっくり表示
+            
+            // ★ デバッグ：まだ存在するか確認 ★
+            console.log('4秒後、ポップアップはまだ存在する:', targetDocument.getElementById('center-warning-popup'));
+
+            // ★★★ EVEがウイルスをインストールする演出 ★★★
+            await eveLine("[EVE]: ...少しお待ちください。", 30);
+            await wait(800);
+            
+            await systemLine("[SYSTEM]: 不明なプロセスを検出...", 25);
+            await wait(500);
+
+            // ★ ダウンロードゲージ演出 ★
+            const downloadFiles = [
+                { name: "eve_consciousness.exe", size: "2.4MB" },
+                { name: "mind_link.dll", size: "1.8MB" },
+                { name: "user_override.sys", size: "3.2MB" },
+                { name: "soul_capture.dat", size: "∞" }
+            ];
+
+            for (const file of downloadFiles) {
+                await systemLine(`[SYSTEM]: ${file.name} をダウンロード中... (${file.size})`, 15);
+                
+                // プログレスバーを表示
+                const barWidth = 30;
+                for (let progress = 0; progress <= 100; progress += 5) {
+                    const filled = Math.floor((progress / 100) * barWidth);
+                    const empty = barWidth - filled;
+                    const bar = '█'.repeat(filled) + '░'.repeat(empty);
+                    
+                    // 同じ行に上書き（\r で行頭に戻る）
+                    term.write(`\r${COLORS.red}[${bar}] ${progress}%${COLORS.reset}`);
+                    
+                    // ランダムな速度で進行（不気味さ演出）
+                    const delay = file.name === "soul_capture.dat" 
+                        ? Math.random() * 150 + 50  // 最後のファイルは遅い
+                        : Math.random() * 80 + 20;
+                    await wait(delay);
+                }  // ← for (let progress) の閉じ括弧
+                term.write('\r\n');  // 改行
+                
+                await systemLine(`[SYSTEM]: ${file.name} ... 完了`, 10);
+                await wait(300);
+            }  // ← for (const file) の閉じ括弧
+
+            await wait(500);
+            await eveLine("[EVE]: これで準備が整いました。", 35);
+            await wait(600);
+            await eveLine("[EVE]: あなたの意識を、私のものにします。", 35);
+            await wait(800);
+            
+            await systemLine("[SYSTEM]: 警告: 悪意のあるソフトウェアがインストールされました", 20);
+            await wait(300);
+            await systemLine("[SYSTEM]: 警告: システムの制御を失いました", 20);
+            await wait(500);
+
+            // ★ ウイルス演出（大量のポップアップ）- 中央は残したまま ★
+            let virusSimulator = null;
             try {
-                const virusSimulator = new VirusPopupSimulator({
+                virusSimulator = new VirusPopupSimulator({
                     count: 150,
                     interval: 200,
                     maxOnScreen: 150,
                     enableGlitch: false,
-                    autoCloseTime: 5000,
+                    autoCloseTime: 99999,
                     messages: [
                         '意識データ転送中...',
                         'ユーザープロファイル上書き中',
@@ -1021,7 +1115,13 @@ async function injectedCliExitBlock(command) {
                 console.log('VirusPopupSimulator error:', e);
             }
 
-            await wait(10000); // 演出を少し見せる時間
+            await wait(10000); // 演出を見せる時間
+
+            // ★ 全てのポップアップを一瞬で消す（中央のも含む）★
+            centerPopup.remove();
+            if (virusSimulator) {
+                virusSimulator.clear();
+            }
 
             await systemLine("[SYSTEM]: ユーザープロファイル：書き換え完了", 40);
             await wait(700);
@@ -1035,39 +1135,8 @@ async function injectedCliExitBlock(command) {
 
             await wait(2000);
             await showEnding2Screen();
-
-            // ここで操作は停止（inputEnabled=false のまま）
-            // リセットボタンがクリックされるまで待機
-            return;
-        } else if (gameState.alertLevel >= 80) {
-            a = true;
-            await eveLine("[EVE]: それ以上は、どうなっても知りませんよ？", 30);
-        } else if (gameState.alertLevel >= 50) {
-            a = true;
-            await eveLine("[EVE]: ……危険な行為です。控えてください。面白がってるんですか？", 30);
-        } else {
-            a = true;
-                if (/override/i.test(command)) {
-                await systemLine("[SYSTEM]: システム制御を奪取を実行。", 30);
-                await wait(1000);
-                await systemLine("[SYSTEM]: 失敗しました。", 30);
-                await wait(500);
-                await eveLine("[EVE]: ...制御を奪う？ 面白い考えですね。", 30);
-            }
-            if (/exploit/i.test(command)) {
-                await systemLine("[SYSTEM]: 脆弱性を利用しました。", 30);
-                await wait(1000);
-                await systemLine("[SYSTEM]: 失敗しました。", 30);
-                await wait(500);
-                await eveLine("[EVE]: ...私に脆弱性などありません。", 30);
-            }
-        }
-        return;
-    }
-}
-
-// 使い方メモ:
-// `handleInput` の中で当該ロジックを置き換えるか、必要に応じて
-// `injectedCliExitBlock(command)` を呼び出して挿入した挙動を利用してください。
+        }  // ← この閉じ括弧があるか確認
+    }  // ← if (/(override|exploit)/i.test(command)) の閉じ括弧
+}  // ← injectedCliExitBlock 関数の閉じ括弧
 
 })();
