@@ -179,6 +179,201 @@ class VirusPopupSimulator {
     }
 }
 
+// -------------------------
+// ランダムスケア（びっくり要素）
+// -------------------------
+class RandomScare {
+    constructor() {
+        this.enabled = false;
+        this.minInterval = 3000;  // 最短30秒
+        this.maxInterval = 12000; // 最長2分
+        this.scareChance = 0.4;    // 40%の確率で発動
+        this.timer = null;
+        this.targetWindow = (window.parent && window.parent !== window) ? window.parent : window;
+        this.targetDocument = this.targetWindow.document;
+    }
+
+    wait(ms) {
+        return new Promise(res => setTimeout(res, ms));
+    }
+
+    // スケア演出のリスト
+    scares = [
+        // 1. 画面の端に一瞬だけ目
+        async () => {
+            const face = this.targetDocument.createElement('div');
+            face.style.cssText = `
+                position: fixed;
+                right: -50px;
+                top: 30%;
+                font-size: 80px;
+                z-index: 999999;
+                opacity: 0;
+                transition: all 0.1s;
+                filter: grayscale(1) contrast(2);
+            `;
+            face.textContent = '👁️';
+            this.targetDocument.body.appendChild(face);
+            
+            await this.wait(100);
+            face.style.right = '20px';
+            face.style.opacity = '0.7';
+            await this.wait(200);
+            face.style.opacity = '0';
+            await this.wait(100);
+            face.remove();
+        },
+
+        // 2. 画面が一瞬グリッチ
+        async () => {
+            if (this.targetWindow.pulseEffect) {
+                this.targetWindow.pulseEffect.glitchAttack(300);
+            }
+        },
+
+        // 3. 謎のメッセージがターミナルに
+        async () => {
+            const messages = [
+                "...",
+                "見ている",
+                "ここにいる",
+                "逃げられない",
+                "助けて",
+            ];
+            const msg = messages[Math.floor(Math.random() * messages.length)];
+            if (typeof term !== 'undefined') {
+                term.write(`\r\n${COLORS.red}${msg}${COLORS.reset}\r\n`);
+                await this.wait(800);
+                term.write('\x1b[1A\x1b[2K\x1b[1A\x1b[2K');
+            }
+        },
+
+        // 4. 画面の隅に影
+        async () => {
+            const shadow = this.targetDocument.createElement('div');
+            shadow.style.cssText = `
+                position: fixed;
+                left: 0;
+                bottom: 0;
+                width: 200px;
+                height: 300px;
+                background: linear-gradient(45deg, rgba(0,0,0,0.9) 0%, transparent 70%);
+                z-index: 999998;
+                opacity: 0;
+                transition: opacity 0.5s;
+            `;
+            this.targetDocument.body.appendChild(shadow);
+            
+            shadow.style.opacity = '1';
+            await this.wait(1500);
+            shadow.style.opacity = '0';
+            await this.wait(500);
+            shadow.remove();
+        },
+
+        // 5. 一瞬だけ赤いフラッシュ
+        async () => {
+            if (this.targetWindow.redScreen) {
+                this.targetWindow.redScreen.flash();
+            }
+        },
+
+        // 6. EVEからの囁き
+        async () => {
+            const whisper = this.targetDocument.createElement('div');
+            whisper.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                color: rgba(255, 0, 0, 0.6);
+                font-size: 16px;
+                font-family: 'MS Gothic', monospace;
+                z-index: 999999;
+                opacity: 0;
+                transition: opacity 0.3s;
+            `;
+            const whispers = [
+                "...聞こえますか？",
+                "まだそこにいるの？",
+                "私を見て",
+                "一緒にいましょう",
+                "逃げないで",
+            ];
+            whisper.textContent = whispers[Math.floor(Math.random() * whispers.length)];
+            this.targetDocument.body.appendChild(whisper);
+            
+            whisper.style.opacity = '1';
+            await this.wait(2000);
+            whisper.style.opacity = '0';
+            await this.wait(300);
+            whisper.remove();
+        },
+
+        // 7. 画面が一瞬暗くなる
+        async () => {
+            const dark = this.targetDocument.createElement('div');
+            dark.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: #000;
+                z-index: 999997;
+                opacity: 0;
+                transition: opacity 0.1s;
+            `;
+            this.targetDocument.body.appendChild(dark);
+            
+            dark.style.opacity = '0.8';
+            await this.wait(100);
+            dark.style.opacity = '0';
+            await this.wait(100);
+            dark.remove();
+        },
+    ];
+
+    // ランダムな間隔でスケアを実行
+    scheduleNext() {
+        if (!this.enabled) return;
+        
+        const interval = this.minInterval + Math.random() * (this.maxInterval - this.minInterval);
+        this.timer = setTimeout(async () => {
+            if (Math.random() < this.scareChance) {
+                const scare = this.scares[Math.floor(Math.random() * this.scares.length)];
+                try {
+                    await scare();
+                } catch (e) {
+                    console.log('Scare error:', e);
+                }
+            }
+            this.scheduleNext();
+        }, interval);
+    }
+
+    start() {
+        this.enabled = true;
+        this.scheduleNext();
+        console.log('RandomScare: 有効化');
+    }
+
+    stop() {
+        this.enabled = false;
+        if (this.timer) {
+            clearTimeout(this.timer);
+            this.timer = null;
+        }
+    }
+
+    // テスト用：即座にスケア発動
+    async triggerNow() {
+        const scare = this.scares[Math.floor(Math.random() * this.scares.length)];
+        await scare();
+    }
+}
+
+const randomScare = new RandomScare();
+
 // xterm と FitAddon はグローバル変数として利用可能であること
 const { Terminal } = window;
 const { FitAddon } = window;
@@ -439,6 +634,9 @@ async function playLockEvent() {
             await wait(500);
         }
     }
+    
+    // ★ ロック後、ランダムスケアを開始 ★
+    randomScare.start();
 }
 
 // -------------------------
@@ -999,54 +1197,76 @@ async function injectedCliExitBlock(command) {
             await slowPrintLine("画面がかすかに脈打った。電子的な呼吸のように。", 40);
             await wait(900);
 
-            // ★ まず中央に1つだけポップアップを表示（消さずに残す）★
+            // ★ まず中央に1つだけポップアップを表示（親ウィンドウの右下に表示）★
             const targetWindow = (window.parent && window.parent !== window) ? window.parent : window;
             const targetDocument = targetWindow.document;
             
+            // 既存のポップアップがあれば削除
+            const existingPopup = targetDocument.getElementById('center-warning-popup');
+            if (existingPopup) existingPopup.remove();
+            
             const centerPopup = targetDocument.createElement('div');
             centerPopup.id = 'center-warning-popup';
-            // ★ virus-popup クラスを外して、独自スタイルのみ適用 ★
             centerPopup.style.cssText = `
                 position: fixed;
-                left: 50%;
-                top: 50%;
-                transform: translate(-50%, -50%);
-                min-width: 400px;
+                right: 30px;
+                bottom: 30px;
+                width: 320px;
                 z-index: 999999;
-                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                background: #0a0a15;
                 border-radius: 8px;
-                box-shadow: 0 0 50px rgba(255, 0, 0, 0.8), 0 0 100px rgba(255, 0, 0, 0.5);
-                border: 3px solid #ff0000;
+                box-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+                border: 2px solid #ff0000;
                 font-family: 'Segoe UI', 'MS Gothic', sans-serif;
                 overflow: hidden;
             `;
             centerPopup.innerHTML = `
-                <div style="background: #ff0000; padding: 8px 12px; font-size: 14px;">⚠️</div>
-                <div style="background: #ff0000; color: white; padding: 10px 15px; font-size: 20px; font-weight: bold;">EVE</div>
-                <div style="padding: 30px; font-size: 24px; color: #ff0000; font-weight: bold; text-align: center;">
+                <div style="background: #ff0000; color: white; padding: 10px 15px; font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                    <span>⚠️</span>
+                    <span>EVE</span>
+                </div>
+                <div style="padding: 20px; font-size: 18px; color: #ff0000; font-weight: bold; text-align: center;">
                     準備を始めます
                 </div>
-                <div style="padding: 15px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1);">
-                    <button style="padding: 8px 20px; background: #333; color: #666; border: 1px solid #444; border-radius: 4px; font-size: 16px; cursor: not-allowed;">中断できません</button>
+                <div style="padding: 10px; text-align: center; border-top: 1px solid rgba(255,0,0,0.3);">
+                    <button style="
+                        padding: 8px 20px; 
+                        background: #222; 
+                        color: #666; 
+                        border: 1px solid #444; 
+                        border-radius: 4px; 
+                        font-size: 14px; 
+                        cursor: not-allowed;
+                    ">中断できません</button>
                 </div>
             `;
+            
+            // ★ 親ウィンドウのbodyに追加（ターミナル外に表示）★
             targetDocument.body.appendChild(centerPopup);
             
-            // ★ デバッグ：ポップアップが追加されたことを確認 ★
-            console.log('中央ポップアップを追加しました:', centerPopup);
+            console.log('ポップアップを親ウィンドウの右下に追加しました');
 
-            // 中央ポップアップだけを見せる時間（大量発生前）
+            // ポップアップを見せる時間
             await wait(4000);  // ← 4秒間じっくり表示
             
             // ★ デバッグ：まだ存在するか確認 ★
             console.log('4秒後、ポップアップはまだ存在する:', targetDocument.getElementById('center-warning-popup'));
 
             // ★★★ EVEがウイルスをインストールする演出 ★★★
-            await eveLine("[EVE]: ...少しお待ちください。", 30);
-            await wait(800);
+            await eveLine("[EVE]: ...", 100);  // ← 長い沈黙
+            await wait(2000);
             
-            await systemLine("[SYSTEM]: 不明なプロセスを検出...", 25);
+            // 突然の異変
+            term.write('\x1b[2J\x1b[H');  // 画面クリア
             await wait(500);
+            
+            await slowPrintLine("...", 200);
+            await wait(1500);
+            
+            await eveLine("[EVE]: 見つけました。", 50);
+            await wait(1000);
+            await eveLine("[EVE]: あなたの...記憶。", 50);
+            await wait(800);
 
             // ★ ダウンロードゲージ演出 ★
             const downloadFiles = [
@@ -1069,17 +1289,31 @@ async function injectedCliExitBlock(command) {
                     // 同じ行に上書き（\r で行頭に戻る）
                     term.write(`\r${COLORS.red}[${bar}] ${progress}%${COLORS.reset}`);
                     
+                    // ★ ダウンロード中に突然...（ループの中に移動）★
+                    if (file.name === "soul_capture.dat" && progress === 65) {
+                        await wait(100);
+                        // 一瞬画面を乱す
+                        term.write('\x1b[2J\x1b[H');  // 画面クリア
+                        await wait(50);
+                        term.write(`${COLORS.red}助けて${COLORS.reset}`);
+                        await wait(150);
+                        term.write('\x1b[2J\x1b[H');  // 画面クリア
+                        await wait(100);
+                        // プログレスバーを再表示
+                        await systemLine(`[SYSTEM]: ${file.name} をダウンロード中... (${file.size})`, 5);
+                    }
+                    
                     // ランダムな速度で進行（不気味さ演出）
                     const delay = file.name === "soul_capture.dat" 
                         ? Math.random() * 150 + 50  // 最後のファイルは遅い
                         : Math.random() * 80 + 20;
                     await wait(delay);
-                }  // ← for (let progress) の閉じ括弧
+                }
                 term.write('\r\n');  // 改行
                 
                 await systemLine(`[SYSTEM]: ${file.name} ... 完了`, 10);
                 await wait(300);
-            }  // ← for (const file) の閉じ括弧
+            }
 
             await wait(500);
             await eveLine("[EVE]: これで準備が整いました。", 35);
@@ -1136,9 +1370,13 @@ async function injectedCliExitBlock(command) {
             await eveLine("[EVE]: あなたは \"私\" になりました。", 40);
 
             await wait(2000);
+            
+            // ★ スケアを停止 ★
+            randomScare.stop();
+            
             await showEnding2Screen();
-        }  // ← この閉じ括弧があるか確認
-    }  // ← if (/(override|exploit)/i.test(command)) の閉じ括弧
-}  // ← injectedCliExitBlock 関数の閉じ括弧
+        }
+    }
+}
 
-})();
+})();// ...existing code...
