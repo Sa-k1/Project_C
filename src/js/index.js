@@ -2,6 +2,10 @@ const mini = document.getElementById('miniWindow');
 const windowContainer = document.getElementById('windowContainer');
 let offsetX, offsetY, isDragging = false;
 
+// ファイルビューア用の変数
+const fileViewerContainer = document.getElementById('fileViewerContainer');
+let fileViewerOffsetX, fileViewerOffsetY, isFileViewerDragging = false;
+
 // ウィンドウコンテナ全体をドラッグ可能にする
 windowContainer.addEventListener('mousedown', (e) => {
         // Only start dragging when the user clicks the title area (the visible top bar / handle).
@@ -19,18 +23,53 @@ windowContainer.addEventListener('mousedown', (e) => {
         offsetY = e.clientY - rect.top;
 });
 
-document.addEventListener('mouseup', () => isDragging = false);
+// ファイルビューアのドラッグ処理
+fileViewerContainer.addEventListener('mousedown', (e) => {
+        const handle = e.target.closest('.box, .titlebar');
+        if (!handle) return;
+
+        const ignored = e.target.closest('.window-controls, .ctrl, .tab, .tab-label, #file-viewer-iframe');
+        if (ignored) return;
+
+        isFileViewerDragging = true;
+        const rect = fileViewerContainer.getBoundingClientRect();
+        fileViewerOffsetX = e.clientX - rect.left;
+        fileViewerOffsetY = e.clientY - rect.top;
+});
+
+document.addEventListener('mouseup', () => {
+    isDragging = false;
+    isFileViewerDragging = false;
+});
 
 document.addEventListener('mousemove', (e) => {
-    if (isDragging) { // この行を修正（条件チェックを追加）
+    if (isDragging) {
         windowContainer.style.left = `${e.clientX - offsetX}px`;
         windowContainer.style.top = `${e.clientY - offsetY}px`;
     }
+    if (isFileViewerDragging) {
+        fileViewerContainer.style.left = `${e.clientX - fileViewerOffsetX}px`;
+        fileViewerContainer.style.top = `${e.clientY - fileViewerOffsetY}px`;
+        fileViewerContainer.style.right = 'auto';
+    }
+});
+
+// ファイルビューアの閉じるボタン
+document.getElementById('fileViewerClose').addEventListener('click', () => {
+    fileViewerContainer.style.display = 'none';
+    document.getElementById('file-viewer-iframe').src = '';
 });
 
 // ドラッグ可能なアイテムの処理
 const items = document.querySelectorAll('.draggable-item');
 const trashCan = document.getElementById('trash-can');
+
+// ファイルごとのページ設定
+const filePages = {
+    'file1': 'file1.html',  // 重要なデータ.txt
+    'file2': 'file2.html',  // 古いメモ.doc
+    'file3': 'file3.html'   // 不要な写真.jpg
+};
 
 items.forEach(item => {
     item.addEventListener('dragstart', (e) => {
@@ -39,6 +78,33 @@ items.forEach(item => {
 
     item.addEventListener('dragend', () => {
         trashCan.style.backgroundColor = 'transparent';
+    });
+
+    // ダブルクリックでファイルを開く（ファイルビューアウィンドウで表示）
+    item.addEventListener('dblclick', (e) => {
+        const fileId = item.id;
+        const pagePath = filePages[fileId];
+        if (pagePath) {
+            const fileViewerContainer = document.getElementById('fileViewerContainer');
+            const fileViewerIframe = document.getElementById('file-viewer-iframe');
+            const fileViewerTitle = document.getElementById('fileViewerTitle');
+            
+            // ファイル名を取得してタイトルに設定
+            const fileName = item.querySelector('.word')?.textContent || 'ファイル';
+            if (fileViewerTitle) {
+                fileViewerTitle.textContent = fileName;
+            }
+            
+            // iframeにファイルを読み込み
+            if (fileViewerIframe) {
+                fileViewerIframe.src = pagePath;
+            }
+            
+            // ウィンドウを表示
+            if (fileViewerContainer) {
+                fileViewerContainer.style.display = 'block';
+            }
+        }
     });
 });
 
