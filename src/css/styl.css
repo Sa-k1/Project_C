@@ -163,7 +163,7 @@ body {
     overflow: hidden;
 }
 
-#file-viewer-iframe {
+.file-viewer-window iframe {
     position: absolute;
     top: 48px;
     left: 0;
