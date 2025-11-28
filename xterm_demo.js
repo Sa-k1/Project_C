@@ -929,10 +929,10 @@ async function handleInput(command) {
                 await systemLine("[SYSTEM]: sleep モードは既に使用されました。", 20);
                 await eveLine("[EVE]: 二度同じ手など食らいません。浅はかですね。", 30);
                 return;
-            }
+            }   
             sleepUsed = true;
             sleepCounter = 3;
-            await systemLine("[SYSTEM]: sleep モードを開始しました（次の3つの発話は EVE の応答が '...' になります）。", 20);
+            await systemLine("[SYSTEM]: sleep モードを開始しました。", 20);
             return;
     }
 
