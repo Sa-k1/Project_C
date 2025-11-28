@@ -27,6 +27,9 @@ index.html, xterm_demo.htmlの二つある ;エラー等が起きないようこ
 
 ; 改善点の可能性
 
+没入感
+
+
 override_command：ランダム関数で恐怖値の演出（ 例：js Math.random() ）
 exploit_command：ランダム関数で恐怖値の演出（ 例：js Math.random() ）
 
