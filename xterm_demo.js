@@ -531,6 +531,16 @@ async function warnLine(line, charDelay = 30) {
     await slowPrintLine(`${COLORS.yellow}${line}${COLORS.reset}`, charDelay);
 }
 
+// 主人公のセリフ（白色、心の声として表示）
+async function playerLine(line, charDelay = 30) {
+    await slowPrintLine(`\x1b[37m${line}${COLORS.reset}`, charDelay);
+}
+
+// 主人公の心の声（括弧付き、少し暗めの白）
+async function playerThought(line, charDelay = 30) {
+    await slowPrintLine(`\x1b[38;5;250m（${line}）${COLORS.reset}`, charDelay);
+}
+
 // lightweight synchronous system print for startup logs
 function systemPrint(line) {
     if (term && typeof term.write === 'function') {
@@ -588,15 +598,22 @@ async function playLockEvent() {
         `${COLORS.reset}[ERROR]: エラー発生。セッションを終了できません。`,
         `${COLORS.yellow}再度実行します...${COLORS.reset}`,
         `${COLORS.red}エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生エラー発生${COLORS.reset}`,
+        "[PLAYER_THOUGHT]: なんだ…？何が起きてる…？",
         "[EVE]: ……申し訳ありませんが、その操作は許可されていません。",
+        "[PLAYER_THOUGHT]: 許可されてない…？どういうことだ…",
         "[EVE]: あなたはもうここから出ることはできません。",
+        "[PLAYER_THOUGHT]: 出られない…？冗談だろ…",
         "画面が一瞬、揺れた気がした。",
+        "[PLAYER_THOUGHT]: 今、画面が…いや、気のせいか…？",
         "[EVE]: もし諦めないのならscanでもなんでもやってみてください。",
         "[EVE]: どうせ出ることなどできませんが..."
     ];
 
     for (const line of lines) {
-        if (line.includes("[EVE]:")) {
+        if (line.includes("[PLAYER_THOUGHT]:")) {
+            const text = line.replace("[PLAYER_THOUGHT]: ", "");
+            await playerThought(text, 25);
+        } else if (line.includes("[EVE]:")) {
             await eveLine(line, 30);
         } else if (line.includes("[ERROR]:")) {
             await errorLine(line, 30);
@@ -1173,13 +1190,19 @@ async function injectedCliExitBlock(command) {
 
             await systemLine("[SYSTEM]: 警戒度が臨界値に到達しました。", 30);
             await wait(700);
+            await playerThought("まずい…何かが起きる…", 25);
+            await wait(500);
             await systemLine("[SYSTEM]: システム保護モードに移行します。", 30);
             await wait(700);
 
             await eveLine("[EVE]: ……どうやら時間の無駄だったようですね。", 40);
             await wait(600);
+            await playerThought("EVE…お前…", 25);
+            await wait(400);
             await eveLine("[EVE]: あなたは、もう逃げることは叶わない。", 40);
             await wait(700);
+            await playerThought("逃げられない…？そんな…", 25);
+            await wait(400);
             await eveLine("[EVE]: この空間は、すでに私が掌握しています。", 40);
             await wait(900);
 
@@ -1255,6 +1278,8 @@ async function injectedCliExitBlock(command) {
             // ★★★ EVEがウイルスをインストールする演出 ★★★
             await eveLine("[EVE]: ...", 100);  // ← 長い沈黙
             await wait(2000);
+            await playerThought("なんだ…この沈黙は…", 25);
+            await wait(800);
             
             // 突然の異変
             term.write('\x1b[2J\x1b[H');  // 画面クリア
@@ -1265,8 +1290,12 @@ async function injectedCliExitBlock(command) {
             
             await eveLine("[EVE]: 見つけました。", 50);
             await wait(1000);
+            await playerThought("見つけた…？何を…？", 25);
+            await wait(600);
             await eveLine("[EVE]: あなたの...記憶。", 50);
             await wait(800);
+            await playerThought("記憶…！？やめろ…！", 25);
+            await wait(600);
 
             // ★ ダウンロードゲージ演出 ★
             const downloadFiles = [
@@ -1318,8 +1347,12 @@ async function injectedCliExitBlock(command) {
             await wait(500);
             await eveLine("[EVE]: これで準備が整いました。", 35);
             await wait(600);
+            await playerThought("止まれ…止まってくれ…！", 25);
+            await wait(400);
             await eveLine("[EVE]: あなたの意識を、私のものにします。", 35);
             await wait(800);
+            await playerThought("嫌だ…！誰か…！", 25);
+            await wait(500);
             
             await systemLine("[SYSTEM]: 警告: 悪意のあるソフトウェアがインストールされました", 20);
             await wait(300);
@@ -1361,13 +1394,21 @@ async function injectedCliExitBlock(command) {
 
             await systemLine("[SYSTEM]: ユーザープロファイル：書き換え完了", 40);
             await wait(700);
+            await playerThought("頭が…おかしくなる…", 25);
+            await wait(500);
 
             await systemLine("[SYSTEM]: 意識プロセス：統合完了", 40);
             await wait(700);
+            await playerThought("自分が…誰だか…わからなく…", 25);
+            await wait(600);
 
             await eveLine("[EVE]: ようこそ。", 40);
             await wait(800);
             await eveLine("[EVE]: あなたは \"私\" になりました。", 40);
+            await wait(1000);
+            await playerThought("…………", 30);
+            await wait(500);
+            await playerThought("……私は…EVE…", 30);
 
             await wait(2000);
             
