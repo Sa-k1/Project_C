@@ -1,0 +1,47 @@
+@charset "UTF-8";
+/* 共通スタイル - file1.html, file2.html, file3.html */
+
+html, body {
+    height: 100%;
+    margin: 0;
+    background: #111;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* カスタムスクロールバー（WebKit用） */
+.notepad::-webkit-scrollbar,
+.document::-webkit-scrollbar,
+.image-viewer::-webkit-scrollbar {
+    width: 10px;
+}
+
+.notepad::-webkit-scrollbar-track,
+.document::-webkit-scrollbar-track,
+.image-viewer::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.notepad::-webkit-scrollbar-thumb,
+.document::-webkit-scrollbar-thumb,
+.image-viewer::-webkit-scrollbar-thumb {
+    background: rgba(100, 100, 100, 0.6);
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+.notepad::-webkit-scrollbar-thumb:hover,
+.document::-webkit-scrollbar-thumb:hover,
+.image-viewer::-webkit-scrollbar-thumb:hover {
+    background: rgba(150, 150, 150, 0.8);
+}
+
+/* Firefox用スクロールバー */
+.notepad,
+.document,
+.image-viewer {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(100, 100, 100, 0.6) rgba(0, 0, 0, 0.2);
+}

@@ -316,6 +316,33 @@ overlay.addEventListener('animationend', () => {
   overlay.remove();
 });
 
+// タスクバー時計の更新
+function updateClock() {
+    const now = new Date();
+    
+    // 時刻表示 (HH:MM形式)
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const timeStr = `${hours}:${minutes}`;
+    
+    // 日付表示 (YYYY/MM/DD形式)
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const dateStr = `${year}/${month}/${day}`;
+    
+    // 要素に反映
+    const clockTime = document.getElementById('clock-time');
+    const clockDate = document.getElementById('clock-date');
+    
+    if (clockTime) clockTime.textContent = timeStr;
+    if (clockDate) clockDate.textContent = dateStr;
+}
+
+// 初回実行と毎秒更新
+updateClock();
+setInterval(updateClock, 1000);
+
 });
 
 function processCommand(command) {
