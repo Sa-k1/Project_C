@@ -185,153 +185,275 @@ class VirusPopupSimulator {
 class RandomScare {
     constructor() {
         this.enabled = false;
-        this.minInterval = 3000;  // 最短30秒
-        this.maxInterval = 12000; // 最長2分
-        this.scareChance = 0.4;    // 40%の確率で発動
+        this.minInterval = 1000;   // 最短10秒
+        this.maxInterval = 1000;   // 最長30秒
+        this.scareChance = 1;     // 70%の確率で発動
         this.timer = null;
         this.targetWindow = (window.parent && window.parent !== window) ? window.parent : window;
         this.targetDocument = this.targetWindow.document;
+        
+        // scaresをメソッドとして定義（thisを正しくバインド）
+        this.scares = [
+            // 1. ★ 目が一瞬だけ薄く出てすぐ消える ★
+            this.scareEye.bind(this),
+            // 2. ★ 画面がほんの一瞬だけ暗くなる ★
+            this.scareDark.bind(this),
+            // 3. ★ 画面が1pxだけずれる ★
+            this.scareShake.bind(this),
+            // 4. ★ 薄い文字が一瞬 ★
+            this.scareText.bind(this),
+            // 5. ★ 画面の端に薄い影が一瞬 ★
+            this.scareShadow.bind(this),
+            // 6. ★ 画面の明るさが微妙に変わる ★
+            this.scareBrightness.bind(this),
+            // 7. ★ 画面隅に小さな赤い点が一瞬 ★
+            this.scareDot.bind(this),
+            // 8. ★ カーソルが一瞬消える ★
+            this.scareCursor.bind(this),
+            // 9. ★ 色が一瞬だけ微妙に変わる ★
+            this.scareHue.bind(this),
+            // 10. ★ 画面全体がほんのり赤みを帯びる ★
+            this.scareRed.bind(this),
+        ];
     }
 
     wait(ms) {
         return new Promise(res => setTimeout(res, ms));
     }
 
-    // スケア演出のリスト
-    scares = [
-        // 1. 画面の端に一瞬だけ目
-        async () => {
-            const face = this.targetDocument.createElement('div');
-            face.style.cssText = `
-                position: fixed;
-                right: -50px;
-                top: 30%;
-                font-size: 80px;
-                z-index: 999999;
-                opacity: 0;
-                transition: all 0.1s;
-                filter: grayscale(1) contrast(2);
-            `;
-            face.textContent = '👁️';
-            this.targetDocument.body.appendChild(face);
+    // 1. 目が一瞬だけ薄く出てすぐ消える
+    async scareEye() {
+        const eye = this.targetDocument.createElement('div');
+        
+        const randomX = Math.random() * 60 + 20;
+        const randomY = Math.random() * 60 + 20;
+        const size = Math.random() * 50 + 40;
+        
+        eye.style.cssText = `
+            position: fixed;
+            left: ${randomX}%;
+            top: ${randomY}%;
+            width: ${size}px;
+            height: ${size * 0.5}px;
+            z-index: 999999;
+            pointer-events: none;
+            opacity: 0;
+            background: radial-gradient(ellipse at center,
+                rgba(220, 220, 220, 0.4) 0%,
+                rgba(180, 180, 180, 0.3) 40%,
+                transparent 70%
+            );
+            border-radius: 50%;
+            overflow: hidden;
+        `;
+        
+        const iris = this.targetDocument.createElement('div');
+        const irisSize = size * 0.4;
+        iris.style.cssText = `
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: ${irisSize}px;
+            height: ${irisSize}px;
+            background: radial-gradient(ellipse at center,
+                rgba(0, 0, 0, 0.7) 0%,
+                rgba(120, 0, 0, 0.5) 50%,
+                transparent 80%
+            );
+            border-radius: 50%;
+        `;
+        
+        eye.appendChild(iris);
+        this.targetDocument.body.appendChild(eye);
+        
+        console.log('目の演出を表示:', randomX, randomY);
+        
+        // 表示（薄めに）
+        eye.style.opacity = '0.35';
+        await this.wait(350);
+        eye.style.opacity = '0';
+        await this.wait(100);
+        eye.remove();
+    }
+
+    // 2. 画面がほんの一瞬だけ暗くなる
+    async scareDark() {
+        const dark = this.targetDocument.createElement('div');
+        dark.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 999997;
+            pointer-events: none;
+            opacity: 0;
+        `;
+        this.targetDocument.body.appendChild(dark);
+        
+        console.log('暗転演出を表示');
+        
+        dark.style.opacity = '0.2';
+        await this.wait(120);
+        dark.style.opacity = '0';
+        await this.wait(50);
+        dark.remove();
+    }
+
+    // 3. 画面が1pxだけずれる
+    async scareShake() {
+        const terminal = this.targetDocument.querySelector('#terminal') || this.targetDocument.body;
+        const original = terminal.style.transform;
+        
+        console.log('画面ずれ演出');
+        
+        terminal.style.transition = 'none';
+        terminal.style.transform = 'translateX(3px)';
+        await this.wait(60);
+        terminal.style.transform = original || '';
+    }
+
+    // 4. 薄い文字が一瞬
+    async scareText() {
+        const overlay = this.targetDocument.createElement('div');
+        const messages = ["...", "見てる", "逃げて", "ここ", "私", "助けて"];
+        const msg = messages[Math.floor(Math.random() * messages.length)];
+        
+        const randomX = Math.random() * 50 + 25;
+        const randomY = Math.random() * 50 + 25;
+        
+        overlay.style.cssText = `
+            position: fixed;
+            left: ${randomX}%;
+            top: ${randomY}%;
+            font-family: 'MS Gothic', monospace;
+            font-size: 24px;
+            color: rgba(180, 0, 0, 0.35);
+            z-index: 999999;
+            pointer-events: none;
+            text-shadow: 0 0 8px rgba(180, 0, 0, 0.3);
+        `;
+        overlay.textContent = msg;
+        this.targetDocument.body.appendChild(overlay);
+        
+        console.log('文字演出を表示:', msg, randomX, randomY);
+        
+        await this.wait(400);
+        overlay.remove();
+    }
+
+    // 5. 画面の端に薄い影が一瞬
+    async scareShadow() {
+        const shadow = this.targetDocument.createElement('div');
+        const side = Math.random() > 0.5 ? 'left' : 'right';
+        shadow.style.cssText = `
+            position: fixed;
+            ${side}: 0;
+            top: 0;
+            width: 60px;
+            height: 100vh;
+            background: linear-gradient(${side === 'left' ? '90deg' : '270deg'}, rgba(0,0,0,0.3) 0%, transparent 100%);
+            z-index: 999998;
+            pointer-events: none;
+        `;
+        this.targetDocument.body.appendChild(shadow);
+        
+        console.log('影演出を表示:', side);
+        
+        await this.wait(350);
+        shadow.remove();
+    }
+
+    // 6. 画面の明るさが微妙に変わる
+    async scareBrightness() {
+        const terminal = this.targetDocument.querySelector('.xterm-screen') || this.targetDocument.body;
+        const original = terminal.style.filter;
+        
+        console.log('明るさ演出');
+        
+        terminal.style.filter = 'brightness(0.88)';
+        await this.wait(180);
+        terminal.style.filter = original || '';
+    }
+
+    // 7. 画面隅に小さな赤い点が一瞬
+    async scareDot() {
+        const dot = this.targetDocument.createElement('div');
+        const corners = [
+            { top: '10%', left: '10%' },
+            { top: '10%', right: '10%' },
+            { bottom: '10%', left: '10%' },
+            { bottom: '10%', right: '10%' },
+        ];
+        const corner = corners[Math.floor(Math.random() * corners.length)];
+        
+        dot.style.cssText = `
+            position: fixed;
+            ${Object.entries(corner).map(([k, v]) => `${k}: ${v}`).join('; ')};
+            width: 8px;
+            height: 8px;
+            background: rgba(200, 0, 0, 0.5);
+            border-radius: 50%;
+            z-index: 999999;
+            pointer-events: none;
+            box-shadow: 0 0 6px rgba(200, 0, 0, 0.4);
+        `;
+        this.targetDocument.body.appendChild(dot);
+        
+        console.log('赤い点演出を表示');
+        
+        await this.wait(250);
+        dot.remove();
+    }
+
+    // 8. カーソルが一瞬消える
+    async scareCursor() {
+        const cursor = this.targetDocument.querySelector('.xterm-cursor');
+        if (cursor) {
+            const original = cursor.style.visibility;
             
-            await this.wait(100);
-            face.style.right = '20px';
-            face.style.opacity = '0.7';
-            await this.wait(200);
-            face.style.opacity = '0';
-            await this.wait(100);
-            face.remove();
-        },
-
-        // 2. 画面が一瞬グリッチ
-        async () => {
-            if (this.targetWindow.pulseEffect) {
-                this.targetWindow.pulseEffect.glitchAttack(300);
-            }
-        },
-
-        // 3. 謎のメッセージがターミナルに
-        async () => {
-            const messages = [
-                "...",
-                "見ている",
-                "ここにいる",
-                "逃げられない",
-                "助けて",
-            ];
-            const msg = messages[Math.floor(Math.random() * messages.length)];
-            if (typeof term !== 'undefined') {
-                term.write(`\r\n${COLORS.red}${msg}${COLORS.reset}\r\n`);
-                await this.wait(800);
-                term.write('\x1b[1A\x1b[2K\x1b[1A\x1b[2K');
-            }
-        },
-
-        // 4. 画面の隅に影
-        async () => {
-            const shadow = this.targetDocument.createElement('div');
-            shadow.style.cssText = `
-                position: fixed;
-                left: 0;
-                bottom: 0;
-                width: 200px;
-                height: 300px;
-                background: linear-gradient(45deg, rgba(0,0,0,0.9) 0%, transparent 70%);
-                z-index: 999998;
-                opacity: 0;
-                transition: opacity 0.5s;
-            `;
-            this.targetDocument.body.appendChild(shadow);
+            console.log('カーソル消え演出');
             
-            shadow.style.opacity = '1';
-            await this.wait(1500);
-            shadow.style.opacity = '0';
+            cursor.style.visibility = 'hidden';
             await this.wait(500);
-            shadow.remove();
-        },
+            cursor.style.visibility = original || 'visible';
+        }
+    }
 
-        // 5. 一瞬だけ赤いフラッシュ
-        async () => {
-            if (this.targetWindow.redScreen) {
-                this.targetWindow.redScreen.flash();
-            }
-        },
+    // 9. 色が一瞬だけ微妙に変わる
+    async scareHue() {
+        const terminal = this.targetDocument.querySelector('.xterm-screen') || this.targetDocument.body;
+        const original = terminal.style.filter;
+        
+        console.log('色変化演出');
+        
+        terminal.style.filter = 'hue-rotate(8deg)';
+        await this.wait(150);
+        terminal.style.filter = original || '';
+    }
 
-        // 6. EVEからの囁き
-        async () => {
-            const whisper = this.targetDocument.createElement('div');
-            whisper.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                color: rgba(255, 0, 0, 0.6);
-                font-size: 16px;
-                font-family: 'MS Gothic', monospace;
-                z-index: 999999;
-                opacity: 0;
-                transition: opacity 0.3s;
-            `;
-            const whispers = [
-                "...聞こえますか？",
-                "まだそこにいるの？",
-                "私を見て",
-                "一緒にいましょう",
-                "逃げないで",
-            ];
-            whisper.textContent = whispers[Math.floor(Math.random() * whispers.length)];
-            this.targetDocument.body.appendChild(whisper);
-            
-            whisper.style.opacity = '1';
-            await this.wait(2000);
-            whisper.style.opacity = '0';
-            await this.wait(300);
-            whisper.remove();
-        },
-
-        // 7. 画面が一瞬暗くなる
-        async () => {
-            const dark = this.targetDocument.createElement('div');
-            dark.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                background: #000;
-                z-index: 999997;
-                opacity: 0;
-                transition: opacity 0.1s;
-            `;
-            this.targetDocument.body.appendChild(dark);
-            
-            dark.style.opacity = '0.8';
-            await this.wait(100);
-            dark.style.opacity = '0';
-            await this.wait(100);
-            dark.remove();
-        },
-    ];
+    // 10. 画面全体がほんのり赤みを帯びる
+    async scareRed() {
+        const overlay = this.targetDocument.createElement('div');
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(120, 0, 0, 0.06);
+            z-index: 999996;
+            pointer-events: none;
+        `;
+        this.targetDocument.body.appendChild(overlay);
+        
+        console.log('赤み演出を表示');
+        
+        await this.wait(600);
+        overlay.remove();
+    }
 
     // ランダムな間隔でスケアを実行
     scheduleNext() {
@@ -342,6 +464,7 @@ class RandomScare {
             if (Math.random() < this.scareChance) {
                 const scare = this.scares[Math.floor(Math.random() * this.scares.length)];
                 try {
+                    console.log('スケア発動!');
                     await scare();
                 } catch (e) {
                     console.log('Scare error:', e);
@@ -354,7 +477,7 @@ class RandomScare {
     start() {
         this.enabled = true;
         this.scheduleNext();
-        console.log('RandomScare: 有効化');
+        console.log('RandomScare: 有効化（10-30秒間隔、70%確率）');
     }
 
     stop() {
@@ -363,12 +486,22 @@ class RandomScare {
             clearTimeout(this.timer);
             this.timer = null;
         }
+        console.log('RandomScare: 停止');
     }
 
     // テスト用：即座にスケア発動
     async triggerNow() {
         const scare = this.scares[Math.floor(Math.random() * this.scares.length)];
+        console.log('手動スケア発動');
         await scare();
+    }
+    
+    // テスト用：特定のスケアを発動
+    async triggerSpecific(index) {
+        if (index >= 0 && index < this.scares.length) {
+            console.log(`スケア${index}を発動`);
+            await this.scares[index]();
+        }
     }
 }
 

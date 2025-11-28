@@ -435,3 +435,28 @@ body {
     0% {opacity: 1;}
     100% {opacity: 0;}
 }
+
+/* タスクバー時計表示 */
+.taskbar-clock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', 'Yu Gothic UI', sans-serif;
+    font-size: 12px;
+    color: #000;
+    min-width: 70px;
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+.taskbar-clock #clock-time {
+    font-weight: 1000;
+    font-size: 12px;
+}
+
+.taskbar-clock #clock-date {
+    font-weight: 1000;
+    font-size: 12px;
+    color: #333;
+}

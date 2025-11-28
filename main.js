@@ -14,7 +14,7 @@ function createWindow() {
     height: 600,
     autoHideMenuBar: true,
     // フルスクリーン表示にする場合は下のコメントアウトを外してください
-    fullscreen: true, 
+    // fullscreen: true, 
     nodeIntegration: true, // これを有効にする
     contextIsolation: false, // 必要に応じて無効化
     title: ''
@@ -27,7 +27,7 @@ app.whenReady().then(() => {
   const splashScreen = new BrowserWindow({
     width: 800, // 新しい幅
     height: 600, // 新しい高さ
-    fullscreen: true,
+    // fullscreen: true,
     frame: false,
     alwaysOnTop: true,
     transparent: true
@@ -47,7 +47,7 @@ app.whenReady().then(() => {
   setTimeout(() => {
     splashScreen.close();
     createWindow();
-  }, 2500);
+  }, 0);
    //　アニメーションを見たい方は上の0の部分を2500にしてください
 });
 
