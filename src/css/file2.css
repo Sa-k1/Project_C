@@ -1,0 +1,38 @@
+@charset "UTF-8";
+/* file2.html - 古いメモ.doc スタイル */
+
+html, body {
+    padding-top: 20px;
+}
+
+.document {
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    overflow: auto;
+    font-family: 'Yu Gothic', 'メイリオ', sans-serif;
+    color: #e0e0e0;
+    background-color: #111;
+}
+
+h1 {
+    color: #569cd6;
+    border-bottom: 2px solid #444;
+    padding-bottom: 10px;
+    margin-top: 28px;
+    font-size: 18px;
+}
+
+.content {
+    line-height: 1.8;
+    font-size: 14px;
+    padding: 8px;
+}
+
+.date {
+    color: #888;
+    font-size: 12px;
+    margin-bottom: 15px;
+    padding-left: 8px;
+}
