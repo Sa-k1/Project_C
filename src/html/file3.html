@@ -6,12 +6,200 @@
     <link rel="stylesheet" href="../css/style_con.css">
     <link rel="stylesheet" href="../css/file_common.css">
     <link rel="stylesheet" href="../css/file3.css">
+    <style>
+        .placeholder-icon {
+            opacity: 1;
+        }
+        .clickable-image {
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .clickable-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        /* 拡大表示時のスタイル */
+        body.expanded {
+            overflow: hidden;
+        }
+        body.expanded .image-viewer {
+            display: none;
+        }
+        body.expanded .fullscreen-container {
+            display: flex;
+        }
+        .fullscreen-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            cursor: pointer;
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .fullscreen-canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ノイズエフェクト - ホラー映画風グリッチ */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1001;
+            opacity: 0;
+            background: transparent;
+        }
+        .noise-overlay.active {
+            opacity: 1;
+        }
+        
+        /* グリッチアニメーション用のbody */
+        body.glitch-active {
+            animation: horrorGlitch 0.1s steps(1) infinite;
+        }
+        body.glitch-active::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            z-index: 1002;
+            pointer-events: none;
+            animation: glitchSlice 0.2s steps(1) infinite;
+        }
+        body.glitch-active::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1003;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent 0px,
+                transparent 2px,
+                rgba(0, 0, 0, 0.4) 2px,
+                rgba(0, 0, 0, 0.4) 4px
+            );
+            animation: scanlines 0.05s linear infinite;
+        }
+        
+        @keyframes horrorGlitch {
+            0% { transform: translate(0); filter: none; }
+            10% { transform: translate(-5px, 2px); }
+            20% { transform: translate(5px, -2px); filter: brightness(1.5); }
+            30% { transform: translate(-3px, 0); }
+            40% { transform: translate(3px, 3px); filter: brightness(0.5); }
+            50% { transform: translate(0, -3px); }
+            60% { transform: translate(-8px, 2px); filter: brightness(2); }
+            70% { transform: translate(6px, 0); }
+            80% { transform: translate(-2px, -2px); filter: brightness(0.3); }
+            90% { transform: translate(4px, 1px); }
+            100% { transform: translate(0); filter: none; }
+        }
+        
+        @keyframes glitchSlice {
+            0% { clip-path: inset(40% 0 50% 0); transform: translate(-10px); }
+            10% { clip-path: inset(10% 0 80% 0); transform: translate(10px); }
+            20% { clip-path: inset(70% 0 10% 0); transform: translate(-5px); }
+            30% { clip-path: inset(30% 0 60% 0); transform: translate(15px); }
+            40% { clip-path: inset(80% 0 5% 0); transform: translate(-15px); }
+            50% { clip-path: inset(5% 0 85% 0); transform: translate(5px); }
+            60% { clip-path: inset(50% 0 40% 0); transform: translate(-20px); }
+            70% { clip-path: inset(20% 0 70% 0); transform: translate(20px); }
+            80% { clip-path: inset(60% 0 30% 0); transform: translate(-8px); }
+            90% { clip-path: inset(90% 0 2% 0); transform: translate(8px); }
+            100% { clip-path: inset(0); transform: translate(0); }
+        }
+        
+        @keyframes scanlines {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 4px; }
+        }
+        /* 画面全体のグリッチ */
+        .glitch-screen {
+            animation: screenGlitch 0.3s steps(2) 3;
+        }
+        @keyframes screenGlitch {
+            0%, 100% { filter: none; }
+            25% { filter: hue-rotate(90deg) saturate(2); }
+            50% { filter: invert(1); }
+            75% { filter: hue-rotate(-90deg) contrast(2); }
+        }
+        
+        /* 意味深なオブジェクト */
+        .creepy-object {
+            position: fixed;
+            cursor: pointer;
+            opacity: 0.15;
+            transition: opacity 0.3s;
+            z-index: 1005;
+            font-size: 30px;
+            color: #8B0000;
+            text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
+            user-select: none;
+            pointer-events: auto;
+        }
+        .creepy-object:hover {
+            opacity: 0.4;
+        }
+        
+        /* ジャンプスケア */
+        .jumpscare-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .jumpscare-overlay.active {
+            display: flex;
+            animation: jumpscareFlash 0.5s steps(2) infinite;
+        }
+        .jumpscare-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            animation: jumpscareShake 0.1s infinite;
+            filter: contrast(1.2) brightness(1.1);
+        }
+        @keyframes jumpscareFlash {
+            0%, 100% { background: #000; }
+            50% { background: #1a0000; }
+        }
+        @keyframes jumpscareShake {
+            0% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(-10px, 5px) scale(1.05); }
+            50% { transform: translate(10px, -5px) scale(0.95); }
+            75% { transform: translate(-5px, -10px) scale(1.02); }
+            100% { transform: translate(5px, 10px) scale(0.98); }
+        }
+    </style>
 </head>
 <body>
     <div class="image-viewer">
         <div class="image-container">
-            <div class="placeholder-icon">🖼️📷</div>
-            <p style="color: #666;">不要な写真.jpg</p>
+            <div class="placeholder-icon">
+                <img src="../pic/家族写真.jpg" width="300" height="200" class="clickable-image" onclick="openModal()" alt="家族写真">
+            </div>
         </div>
         <div class="image-info">
             <p><span class="label">ファイル名:</span> 不要な写真.jpg</p>
@@ -21,5 +209,376 @@
             <p><span class="label">ステータス:</span> <span style="color: #f48771;">削除予定</span></p>
         </div>
     </div>
+
+    <!-- ノイズオーバーレイ -->
+    <div class="noise-overlay" id="noiseOverlay"></div>
+
+    <!-- フルスクリーン画像コンテナ -->
+    <div class="fullscreen-container" id="fullscreenContainer" onclick="closeFullscreen()">
+        <canvas class="fullscreen-canvas" id="fullscreenCanvas"></canvas>
+    </div>
+    
+    <!-- ジャンプスケアオーバーレイ -->
+    <div class="jumpscare-overlay" id="jumpscareOverlay">
+        <img src="../pic/Gemini_Generated_Image_ro1q2oro1q2oro1q.png" class="jumpscare-image" id="jumpscareImage" alt="">
+    </div>
+
+    <script>
+        let imageLoaded = false;
+        let originalImage = new Image();
+        originalImage.src = '../pic/家族写真.jpg';
+        originalImage.onload = () => { imageLoaded = true; };
+
+        function openModal() {
+            const noiseOverlay = document.getElementById('noiseOverlay');
+            const body = document.body;
+            
+            // ホラー風グリッチエフェクトを開始
+            noiseOverlay.classList.add('active');
+            body.classList.add('glitch-active');
+            
+            // ノイズ中に画像を処理
+            setTimeout(() => {
+                drawImageWithBlackEyes();
+                body.classList.add('expanded');
+            }, 400);
+            
+            // グリッチエフェクトを終了
+            setTimeout(() => {
+                noiseOverlay.classList.remove('active');
+                body.classList.remove('glitch-active');
+            }, 900);
+        }
+
+        function drawImageWithBlackEyes() {
+            const canvas = document.getElementById('fullscreenCanvas');
+            const ctx = canvas.getContext('2d');
+            const container = document.getElementById('fullscreenContainer');
+            
+            if (!imageLoaded) return;
+            
+            // キャンバスサイズをウィンドウに合わせる
+            const containerWidth = container.clientWidth || window.innerWidth;
+            const containerHeight = container.clientHeight || window.innerHeight;
+            
+            // 画像のアスペクト比を維持しながらフィット
+            const imgRatio = originalImage.width / originalImage.height;
+            const containerRatio = containerWidth / containerHeight;
+            
+            let drawWidth, drawHeight, offsetX, offsetY;
+            
+            if (imgRatio > containerRatio) {
+                // 横長の画像 - 幅に合わせる
+                drawWidth = containerWidth;
+                drawHeight = containerWidth / imgRatio;
+                offsetX = 0;
+                offsetY = (containerHeight - drawHeight) / 2;
+            } else {
+                // 縦長の画像 - 高さに合わせる
+                drawHeight = containerHeight;
+                drawWidth = containerHeight * imgRatio;
+                offsetX = (containerWidth - drawWidth) / 2;
+                offsetY = 0;
+            }
+            
+            canvas.width = containerWidth;
+            canvas.height = containerHeight;
+            
+            // 背景を黒で塗りつぶし
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, containerWidth, containerHeight);
+            
+            // 元の画像を描画
+            ctx.drawImage(originalImage, offsetX, offsetY, drawWidth, drawHeight);
+            
+            // スケール係数を計算
+            const scaleX = drawWidth / originalImage.width;
+            const scaleY = drawHeight / originalImage.height;
+            
+            // 5人家族の目の位置（元画像サイズ: 275x183 基準）
+            const eyePositions = [
+                // 人物1（左端）
+                { x: 57, y: 100, w: 10, h: 4 },
+                // 人物2（左寄り）
+                { x: 85, y: 27, w: 9, h: 4 },
+                // 人物3（中央）
+                { x: 130, y: 40, w: 10, h: 5 },
+                // 人物4（右寄り）
+                { x: 160, y: 55, w: 9, h: 4 },
+                // 人物5（右端）
+                { x: 203, y: 40, w: 8, h: 4 },
+            ];
+            
+            // ホラー風の目隠し描画
+            eyePositions.forEach(eye => {
+                const centerX = offsetX + eye.x * scaleX;
+                const centerY = offsetY + eye.y * scaleY;
+                const eyeW = eye.w * scaleX * 1.8;
+                const eyeH = eye.h * scaleY * 2.5;
+                
+                ctx.fillStyle = '#000000';
+                
+                // ぐちゃぐちゃに塗りつぶしたようなストローク
+                ctx.strokeStyle = '#000000';
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                
+                // 乱雑な横線の塗りつぶし（マーカーでぐしゃっと塗った感じ）
+                for (let i = 0; i < 15; i++) {
+                    ctx.lineWidth = (3 + Math.random() * 8) * scaleX;
+                    ctx.beginPath();
+                    const yOffset = (Math.random() - 0.5) * eyeH * 1.5;
+                    const startX = centerX - eyeW * (0.8 + Math.random() * 0.5);
+                    const endX = centerX + eyeW * (0.8 + Math.random() * 0.5);
+                    ctx.moveTo(startX, centerY + yOffset);
+                    // ガタガタした線
+                    const segments = 3 + Math.floor(Math.random() * 4);
+                    for (let j = 1; j <= segments; j++) {
+                        const segX = startX + (endX - startX) * (j / segments);
+                        const segY = centerY + yOffset + (Math.random() - 0.5) * eyeH * 0.5;
+                        ctx.lineTo(segX, segY);
+                    }
+                    ctx.stroke();
+                }
+                
+                // 斜めの乱雑な線
+                for (let i = 0; i < 8; i++) {
+                    ctx.lineWidth = (2 + Math.random() * 6) * scaleX;
+                    ctx.beginPath();
+                    const angle = (Math.random() - 0.5) * Math.PI * 0.5;
+                    const length = eyeW * (1 + Math.random());
+                    const startOffsetX = (Math.random() - 0.5) * eyeW;
+                    const startOffsetY = (Math.random() - 0.5) * eyeH;
+                    ctx.moveTo(centerX + startOffsetX, centerY + startOffsetY);
+                    ctx.lineTo(
+                        centerX + startOffsetX + Math.cos(angle) * length,
+                        centerY + startOffsetY + Math.sin(angle) * length
+                    );
+                    ctx.stroke();
+                }
+                
+                // 黒い涙のような垂れ（目から下に流れる）
+                const dripCount = 2 + Math.floor(Math.random() * 2);
+                for (let i = 0; i < dripCount; i++) {
+                    const dripX = centerX + (Math.random() - 0.5) * eyeW;
+                    const dripLength = eyeH * (4 + Math.random() * 6);
+                    const dripWidth = eyeW * (0.1 + Math.random() * 0.15);
+                    
+                    // グラデーションで自然な垂れを表現
+                    const gradient = ctx.createLinearGradient(dripX, centerY, dripX, centerY + dripLength);
+                    gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+                    gradient.addColorStop(0.6, 'rgba(0, 0, 0, 0.7)');
+                    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.moveTo(dripX - dripWidth, centerY + eyeH * 0.3);
+                    // 不規則なうねり
+                    const midY = centerY + dripLength * 0.5;
+                    ctx.quadraticCurveTo(
+                        dripX - dripWidth * 2 + (Math.random() - 0.5) * dripWidth * 3,
+                        midY,
+                        dripX,
+                        centerY + dripLength
+                    );
+                    ctx.quadraticCurveTo(
+                        dripX + dripWidth * 2 + (Math.random() - 0.5) * dripWidth * 3,
+                        midY,
+                        dripX + dripWidth,
+                        centerY + eyeH * 0.3
+                    );
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            });
+        }
+
+        function closeFullscreen() {
+            document.body.classList.remove('expanded');
+        }
+
+        // ESCキーでも閉じられるように
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeFullscreen();
+            }
+        });
+        
+        // ============ 意味深なオブジェクトとジャンプスケア ============
+        
+        // 意味深なシンボル（目と手のみ）
+        const creepySymbols = ['👁', '🖐️'];
+        
+        let creepyObjects = [];
+        let jumpscareTriggered = false;
+        
+        // ランダムな位置に意味深オブジェクトを配置
+        function spawnCreepyObjects() {
+            // 既存のオブジェクトを削除
+            creepyObjects.forEach(obj => obj.remove());
+            creepyObjects = [];
+            
+            const count = 2 + Math.floor(Math.random() * 3); // 2-4個
+            
+            for (let i = 0; i < count; i++) {
+                const obj = document.createElement('div');
+                obj.className = 'creepy-object';
+                obj.textContent = creepySymbols[Math.floor(Math.random() * creepySymbols.length)];
+                
+                // ランダムな位置（画面端に寄りがち）
+                const edge = Math.random() < 0.7;
+                if (edge) {
+                    // 画面端
+                    const side = Math.floor(Math.random() * 4);
+                    switch(side) {
+                        case 0: // 上
+                            obj.style.top = (5 + Math.random() * 10) + '%';
+                            obj.style.left = (10 + Math.random() * 80) + '%';
+                            break;
+                        case 1: // 右
+                            obj.style.top = (10 + Math.random() * 80) + '%';
+                            obj.style.right = (5 + Math.random() * 10) + '%';
+                            break;
+                        case 2: // 下
+                            obj.style.bottom = (5 + Math.random() * 10) + '%';
+                            obj.style.left = (10 + Math.random() * 80) + '%';
+                            break;
+                        case 3: // 左
+                            obj.style.top = (10 + Math.random() * 80) + '%';
+                            obj.style.left = (5 + Math.random() * 10) + '%';
+                            break;
+                    }
+                } else {
+                    // ランダム位置
+                    obj.style.top = (15 + Math.random() * 70) + '%';
+                    obj.style.left = (15 + Math.random() * 70) + '%';
+                }
+                
+                // ランダムな回転
+                obj.style.transform = `rotate(${(Math.random() - 0.5) * 30}deg)`;
+                
+                // クリックでジャンプスケア
+                obj.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    triggerJumpscare();
+                });
+                
+                document.body.appendChild(obj);
+                creepyObjects.push(obj);
+            }
+        }
+        
+        // ジャンプスケア発動（親ウィンドウに表示）
+        function triggerJumpscare() {
+            if (jumpscareTriggered) return;
+            jumpscareTriggered = true;
+            
+            // 親ウィンドウを取得
+            const targetWindow = window.parent || window;
+            const targetDocument = targetWindow.document;
+            
+            // 親ウィンドウにジャンプスケアオーバーレイを作成
+            let parentOverlay = targetDocument.getElementById('parentJumpscareOverlay');
+            if (!parentOverlay) {
+                parentOverlay = targetDocument.createElement('div');
+                parentOverlay.id = 'parentJumpscareOverlay';
+                parentOverlay.style.cssText = `
+                    display: none;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: #000;
+                    z-index: 99999;
+                    justify-content: center;
+                    align-items: center;
+                `;
+                
+                const img = targetDocument.createElement('img');
+                img.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtkm7mlrbLgi1O1dpgre8zZhf9h_tdvy1dVQ&s';
+                img.style.cssText = `
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    filter: contrast(1.2) brightness(1.1);
+                `;
+                img.id = 'parentJumpscareImage';
+                
+                parentOverlay.appendChild(img);
+                targetDocument.body.appendChild(parentOverlay);
+                
+                // スタイルを追加
+                const style = targetDocument.createElement('style');
+                style.textContent = `
+                    #parentJumpscareOverlay.active {
+                        display: flex !important;
+                        animation: parentJumpscareFlash 0.5s steps(2) infinite;
+                    }
+                    #parentJumpscareOverlay.active #parentJumpscareImage {
+                        animation: parentJumpscareShake 0.1s infinite;
+                    }
+                    @keyframes parentJumpscareFlash {
+                        0%, 100% { background: #000; }
+                        50% { background: #1a0000; }
+                    }
+                    @keyframes parentJumpscareShake {
+                        0% { transform: translate(0, 0) scale(1); }
+                        25% { transform: translate(-15px, 8px) scale(1.05); }
+                        50% { transform: translate(15px, -8px) scale(0.95); }
+                        75% { transform: translate(-8px, -15px) scale(1.02); }
+                        100% { transform: translate(8px, 15px) scale(0.98); }
+                    }
+                `;
+                targetDocument.head.appendChild(style);
+            }
+            
+            // 音を鳴らす（オプション - 音声ファイルがあれば）
+            // const audio = new Audio('../audio/scream.mp3');
+            // audio.play();
+            
+            parentOverlay.classList.add('active');
+            
+            // 画面を激しく揺らす
+            document.body.style.animation = 'none';
+            document.body.offsetHeight; // リフロー
+            document.body.classList.add('glitch-active');
+            
+            // 1秒後に終了
+            setTimeout(() => {
+                parentOverlay.classList.remove('active');
+                document.body.classList.remove('glitch-active');
+                
+                // オブジェクトを消す
+                creepyObjects.forEach(obj => obj.remove());
+                creepyObjects = [];
+                
+                // 少し後に再配置（また出現）
+                setTimeout(() => {
+                    jumpscareTriggered = false;
+                    if (document.body.classList.contains('expanded')) {
+                        spawnCreepyObjects();
+                    }
+                }, 5000);
+            }, 1000);
+        }
+        
+        // フルスクリーン表示時にオブジェクトを配置
+        const originalOpenModal = openModal;
+        openModal = function() {
+            originalOpenModal();
+            setTimeout(() => {
+                spawnCreepyObjects();
+            }, 1000);
+        };
+        
+        // フルスクリーン終了時にオブジェクトを削除
+        const originalCloseFullscreen = closeFullscreen;
+        closeFullscreen = function() {
+            originalCloseFullscreen();
+            creepyObjects.forEach(obj => obj.remove());
+            creepyObjects = [];
+        };
+    </script>
 </body>
 </html>

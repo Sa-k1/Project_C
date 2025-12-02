@@ -17,15 +17,7 @@
     justify-content: flex-start;
 }
 
-.image-container {
-    background-color: #1e1e1e;
-    border: 2px dashed #555;
-    border-radius: 4px;
-    padding: 40px;
-    margin-top: 20px;
-    margin-bottom: 15px;
-    text-align: center;
-}
+
 
 .placeholder-icon {
     font-size: 60px;

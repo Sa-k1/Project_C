@@ -542,7 +542,7 @@ let a = false;
 // sleepCounter: when >0, the next user messages receive "..." as reply (decrements each reply)
 let sleepCounter = 0;
 // sleepUsed: sleep コマンドは一度しか使えないようにするフラグ
-let sleepUsed = false;
+let sleepUsed = false
 const gameState = { alertLevel: 0 };
 
 // ANSI カラーコード（cli.js と同等に揃える）
@@ -1311,7 +1311,7 @@ async function injectedCliExitBlock(command) {
     if (/(override|exploit)/i.test(command)) {
         nameVAl = true;
         a = true;
-        increaseAlert(100);
+        increaseAlert(100);// 警戒度を100%に上げる
     await systemLine(`[SYSTEM]: 警戒度が上昇しました (${gameState.alertLevel}%)`, 30);
 
         if (gameState.alertLevel >= 100) {
