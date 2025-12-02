@@ -31,3 +31,16 @@ window.pulseEffect.nightmare('逃げられない');
 
 // 停止
 window.pulseEffect.stop();
+
+camera
+// 単発メッセージ
+cameraScare.showRealCamera(5000)
+
+// 複数メッセージ（「見えてるよ」→「ずっと」→「見てた」→「逃げないで」）
+cameraScare.showRealCameraWithMessages(8000)
+
+// じわじわ系（右下から大きくなる）
+cameraScare.cameraCreepIn(6000)
+
+// EVE「見つけた」演出
+cameraScare.eveFoundYou()

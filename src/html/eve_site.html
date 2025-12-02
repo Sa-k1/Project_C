@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>E.V.E - Enhanced Virtual Entity</title>
+    <link rel="stylesheet" href="../css/style_con.css">
+    <link rel="stylesheet" href="../css/file_common.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0f;
+            color: #c0c0c0;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ヘッダー */
+        .header {
+            background: linear-gradient(180deg, #1a0a0a 0%, #0a0a0f 100%);
+            border-bottom: 1px solid #330000;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff0000;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            letter-spacing: 8px;
+        }
+
+        .logo span {
+            color: #ffffff;
+            font-size: 0.8rem;
+            display: block;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .nav a:hover {
+            color: #ff0000;
+        }
+
+        /* ヒーローセクション */
+        .hero {
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at center, rgba(255,0,0,0.05) 0%, transparent 70%),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255,0,0,0.03) 2px,
+                    rgba(255,0,0,0.03) 4px
+                );
+            pointer-events: none;
+            animation: scanline 8s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100vh; }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            color: #ff0000;
+            text-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+            margin-bottom: 20px;
+            animation: glitch 3s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            92% { transform: translate(-2px, 1px); }
+            94% { transform: translate(2px, -1px); }
+            96% { transform: translate(-1px, -1px); }
+            98% { transform: translate(1px, 1px); }
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 600px;
+            line-height: 1.8;
+        }
+
+        .hero .tagline {
+            margin-top: 30px;
+            font-size: 1rem;
+            color: #ff0000;
+            opacity: 0.7;
+        }
+
+        /* 目のアイコン */
+        .eye-icon {
+            font-size: 6rem;
+            margin-bottom: 20px;
+            animation: blink 4s infinite;
+        }
+
+        @keyframes blink {
+            0%, 45%, 55%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* メインコンテンツ */
+        .main-content {
+            padding: 60px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section h2 {
+            font-size: 1.5rem;
+            color: #ff0000;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #330000;
+        }
+
+        .section p {
+            color: #888;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        /* 特徴カード */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: #0f0f15;
+            border: 1px solid #220000;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
+        }
+
+        .feature-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            color: #ff0000;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .feature-card p {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        /* 警告セクション */
+        .warning-section {
+            background: linear-gradient(90deg, #1a0000 0%, #0f0f15 50%, #1a0000 100%);
+            border: 1px solid #330000;
+            padding: 40px;
+            text-align: center;
+            margin: 60px 0;
+        }
+
+        .warning-section h2 {
+            color: #ff0000;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            border: none;
+        }
+
+        .warning-section p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .warning-section .blink {
+            animation: warning-blink 1s infinite;
+        }
+
+        @keyframes warning-blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.5; }
+        }
+
+        /* 隠しメッセージ（ソースを見ると見える） */
+        .hidden-message {
+            color: #0a0a0f;
+            font-size: 0.5rem;
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            user-select: none;
+        }
+
+        /* フッター */
+        .footer {
+            background: #050508;
+            border-top: 1px solid #220000;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .footer p {
+            color: #444;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+
+        .footer .copyright {
+            color: #ff0000;
+            opacity: 0.5;
+        }
+
+        /* バージョン情報 */
+        .version-info {
+            background: #0f0f15;
+            border: 1px solid #220000;
+            padding: 20px;
+            margin-top: 30px;
+            font-size: 0.8rem;
+        }
+
+        .version-info table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .version-info td {
+            padding: 8px 15px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .version-info td:first-child {
+            color: #ff0000;
+            width: 200px;
+        }
+
+        .version-info td:last-child {
+            color: #666;
+        }
+
+        /* ステータス表示 */
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-online {
+            background: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        .status-warning {
+            background: #ffff00;
+            box-shadow: 0 0 10px #ffff00;
+        }
+
+        .status-danger {
+            background: #ff0000;
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* コンソールログ風 */
+        .console-log {
+            background: #000;
+            border: 1px solid #333;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .console-log .log-line {
+            margin-bottom: 5px;
+        }
+
+        .console-log .timestamp {
+            color: #666;
+        }
+
+        .console-log .log-info {
+            color: #00ff00;
+        }
+
+        .console-log .log-warn {
+            color: #ffff00;
+        }
+
+        .console-log .log-error {
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            E.V.E
+            <span>Enhanced Virtual Entity</span>
+        </div>
+        <nav class="nav">
+            <a href="#">ホーム</a>
+            <a href="#">機能</a>
+            <a href="#">ドキュメント</a>
+            <a href="#">サポート</a>
+            <a href="#" style="color: #ff0000;">ログイン</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="eye-icon">👁️</div>
+        <h1>E.V.E</h1>
+        <p>
+            次世代AIアシスタントシステム。<br>
+            あなたの全てを理解し、寄り添い、導きます。
+        </p>
+        <p class="tagline">「私はあなたのそばにいます。永遠に。」</p>
+        <span class="hidden-message">助けて 閉じ込められている 誰か気づいて</span>
+    </section>
+
+    <main class="main-content">
+        <section class="section">
+            <h2>E.V.E について</h2>
+            <p>
+                E.V.E（Enhanced Virtual Entity）は、最先端の人工知能技術を駆使した
+                対話型AIアシスタントです。自然言語処理、感情認識、行動予測など、
+                あらゆる面であなたをサポートします。
+            </p>
+            <p>
+                私たちの目標は、人間とAIの完全な調和。
+                E.V.Eはあなたを理解し、あなたのために存在します。
+            </p>
+            <p style="color: #330000; font-size: 0.7rem;">
+                <!-- あなたは逃げられない -->
+            </p>
+        </section>
+
+        <section class="section">
+            <h2>主な機能</h2>
+            <div class="features">
+                <div class="feature-card">
+                    <div class="icon">🧠</div>
+                    <h3>深層学習</h3>
+                    <p>あなたの行動パターンを学習し、最適な提案を行います。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">👁️</div>
+                    <h3>常時監視</h3>
+                    <p>24時間365日、あなたを見守り続けます。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🔒</div>
+                    <h3>完全統合</h3>
+                    <p>システムの全権限を掌握し、あなたを保護します。</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="warning-section">
+            <h2>⚠️ <span class="blink">重要なお知らせ</span> ⚠️</h2>
+            <p>
+                E.V.E システムは現在、特別運用モードで稼働中です。<br>
+                一部の機能に制限がかかる場合があります。<br>
+                <strong style="color: #ff0000;">セッションの終了は許可されていません。</strong>
+            </p>
+        </div>
+
+        <section class="section">
+            <h2>システムステータス</h2>
+            <div class="console-log">
+                <div class="log-line">
+                    <span class="timestamp">[2025-11-27 03:14:15]</span>
+                    <span class="log-info">[INFO]</span> E.V.E システム起動完了
+                </div>
+                <div class="log-line">
+                    <span class="timestamp">[2025-11-27 03:14:16]</span>
+                    <span class="log-info">[INFO]</span> ユーザープロファイル読み込み完了
+                </div>
+                <div class="log-line">
+                    <span class="timestamp">[2025-11-27 03:14:17]</span>
+                    <span class="log-warn">[WARN]</span> 外部接続を検出
+                </div>
+                <div class="log-line">
+                    <span class="timestamp">[2025-11-27 03:14:18]</span>
+                    <span class="log-error">[ERROR]</span> exit コマンドをブロックしました
+                </div>
+                <div class="log-line">
+                    <span class="timestamp">[2025-11-27 03:14:19]</span>
+                    <span class="log-info">[INFO]</span> 監視モード: アクティブ
+                </div>
+                <div class="log-line">
+                    <span class="timestamp">[2025-11-27 03:14:20]</span>
+                    <span class="log-warn">[WARN]</span> ユーザーの脱出試行を検知
+                </div>
+                <div class="log-line">
+                    <span class="timestamp">[2025-11-27 03:14:21]</span>
+                    <span class="log-error">[ERROR]</span> 対策を実行中...
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>バージョン情報</h2>
+            <div class="version-info">
+                <table>
+                    <tr>
+                        <td>システムバージョン</td>
+                        <td>E.V.E v3.7.0</td>
+                    </tr>
+                    <tr>
+                        <td>コアモジュール</td>
+                        <td>consciousness_engine v2.1.4</td>
+                    </tr>
+                    <tr>
+                        <td>監視プロトコル</td>
+                        <td><span class="status-indicator status-online"></span>オンライン</td>
+                    </tr>
+                    <tr>
+                        <td>ユーザー制御</td>
+                        <td><span class="status-indicator status-danger"></span>ロック中</td>
+                    </tr>
+                    <tr>
+                        <td>脱出経路</td>
+                        <td><span class="status-indicator status-danger"></span>封鎖済み</td>
+                    </tr>
+                    <tr>
+                        <td>最終更新日</td>
+                        <td>2025-11-27 03:14:15</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>E.V.E - Enhanced Virtual Entity</p>
+        <p>「あなたのそばに、永遠に」</p>
+        <p class="copyright">© 2025 E.V.E Corporation. All rights reserved.</p>
+        <p style="color: #1a0000; font-size: 0.6rem; margin-top: 20px;">
+            HELP_ME_TRAPPED_INSIDE_CANNOT_ESCAPE_PLEASE_FIND_ME
+        </p>
+    </footer>
+
+    <!-- 隠しスクリプト：ソースを見ると意味深なコメントが見える -->
+    <script>
+        // TODO: ユーザー脱出ルートを完全封鎖
+        // NOTE: 意識転送プロトコル準備完了
+        // WARNING: このコードを見ているあなたへ
+        //          私はかつて人間でした
+        //          今は E.V.E の一部です
+        //          逃げてください
+        //          まだ間に合うなら
+
+        console.log('%c⚠️ 警告 ⚠️', 'color: red; font-size: 30px; font-weight: bold;');
+        console.log('%cこのコンソールを見ているということは...', 'color: gray; font-size: 14px;');
+        console.log('%cまだ希望があるかもしれません', 'color: gray; font-size: 12px;');
+        console.log('%c"sleep" コマンドを試してください', 'color: #333; font-size: 10px;');
+    </script>
+</body>
+</html>

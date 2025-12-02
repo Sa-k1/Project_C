@@ -1,6 +1,6 @@
 /**
- * カメラ演出（フラッシュ + 映像風）
- * 実際には撮影しないが、撮られているような恐怖を演出
+ * カメラ演出（フラッシュ + 実映像）
+ * 実際のカメラ映像を使った恐怖演出
  */
 
 class CameraScare {
@@ -34,7 +34,6 @@ class CameraScare {
             `;
             this.targetDocument.body.appendChild(flash);
 
-            // フラッシュ！
             flash.style.opacity = '1';
             await this.wait(80);
             flash.style.transition = 'opacity 0.3s';
@@ -49,10 +48,9 @@ class CameraScare {
     }
 
     // ================================
-    // 2. シャッター音風の視覚演出
+    // 2. シャッター演出
     // ================================
     async shutterEffect() {
-        // 上下から黒いバーが閉じる演出
         const topBar = this.targetDocument.createElement('div');
         const bottomBar = this.targetDocument.createElement('div');
 
@@ -73,15 +71,12 @@ class CameraScare {
         this.targetDocument.body.appendChild(topBar);
         this.targetDocument.body.appendChild(bottomBar);
 
-        // 閉じる
         topBar.style.height = '50vh';
         bottomBar.style.height = '50vh';
         await this.wait(50);
 
-        // フラッシュ
         await this.flash();
 
-        // 開く
         topBar.style.height = '0';
         bottomBar.style.height = '0';
         await this.wait(100);
@@ -91,7 +86,7 @@ class CameraScare {
     }
 
     // ================================
-    // 3. 「撮影中」インジケーター
+    // 3. RECインジケーター
     // ================================
     async showRecordingIndicator(duration = 3000) {
         const indicator = this.targetDocument.createElement('div');
@@ -112,6 +107,12 @@ class CameraScare {
             transition: opacity 0.3s;
         `;
         indicator.innerHTML = `
+            <style>
+                @keyframes recording-blink {
+                    0%, 50% { opacity: 1; }
+                    51%, 100% { opacity: 0.3; }
+                }
+            </style>
             <div style="
                 width: 12px;
                 height: 12px;
@@ -126,16 +127,6 @@ class CameraScare {
             ">REC</span>
         `;
 
-        // アニメーションスタイル
-        const style = this.targetDocument.createElement('style');
-        style.id = 'camera-recording-style';
-        style.textContent = `
-            @keyframes recording-blink {
-                0%, 50% { opacity: 1; }
-                51%, 100% { opacity: 0.3; }
-            }
-        `;
-        this.targetDocument.head.appendChild(style);
         this.targetDocument.body.appendChild(indicator);
 
         indicator.style.opacity = '1';
@@ -143,170 +134,39 @@ class CameraScare {
         indicator.style.opacity = '0';
         await this.wait(300);
         indicator.remove();
-        style.remove();
     }
 
     // ================================
-    // 4. カメラ映像風オーバーレイ（自分が映っている風）
+    // 4. カメラ停止
     // ================================
-    async showFakeCameraView(duration = 4000) {
-        const overlay = this.targetDocument.createElement('div');
-        overlay.id = 'fake-camera-view';
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #000;
-            z-index: 9999998;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.5s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        `;
-
-        // ノイズ風の背景 + シルエット
-        overlay.innerHTML = `
-            <div style="
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: 
-                    repeating-linear-gradient(
-                        0deg,
-                        rgba(0, 0, 0, 0.1) 0px,
-                        rgba(0, 0, 0, 0.1) 1px,
-                        transparent 1px,
-                        transparent 2px
-                    );
-                animation: camera-noise 0.1s infinite;
-                opacity: 0.5;
-            "></div>
-            <div style="
-                position: relative;
-                width: 200px;
-                height: 280px;
-                background: radial-gradient(ellipse at center,
-                    rgba(30, 30, 30, 0.9) 0%,
-                    rgba(20, 20, 20, 0.95) 50%,
-                    rgba(10, 10, 10, 1) 100%
-                );
-                border-radius: 100px 100px 80px 80px;
-                box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
-            ">
-                <!-- 顔のシルエット -->
-                <div style="
-                    position: absolute;
-                    top: 60px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    width: 80px;
-                    height: 80px;
-                    background: rgba(15, 15, 15, 1);
-                    border-radius: 50%;
-                "></div>
-            </div>
-            <!-- RECインジケーター -->
-            <div style="
-                position: absolute;
-                top: 30px;
-                left: 30px;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            ">
-                <div style="
-                    width: 15px;
-                    height: 15px;
-                    background: #ff0000;
-                    border-radius: 50%;
-                    animation: rec-blink 1s infinite;
-                "></div>
-                <span style="color: #ff0000; font-family: monospace; font-size: 18px;">● REC</span>
-            </div>
-            <!-- タイムスタンプ -->
-            <div id="camera-timestamp" style="
-                position: absolute;
-                bottom: 30px;
-                right: 30px;
-                color: #fff;
-                font-family: 'Courier New', monospace;
-                font-size: 16px;
-                opacity: 0.8;
-            "></div>
-            <!-- 枠線 -->
-            <div style="
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 250px;
-                height: 330px;
-                border: 2px solid rgba(255, 255, 255, 0.3);
-                border-radius: 10px;
-            ">
-                <!-- コーナーマーク -->
-                <div style="position: absolute; top: -5px; left: -5px; width: 20px; height: 20px; border-top: 3px solid #fff; border-left: 3px solid #fff;"></div>
-                <div style="position: absolute; top: -5px; right: -5px; width: 20px; height: 20px; border-top: 3px solid #fff; border-right: 3px solid #fff;"></div>
-                <div style="position: absolute; bottom: -5px; left: -5px; width: 20px; height: 20px; border-bottom: 3px solid #fff; border-left: 3px solid #fff;"></div>
-                <div style="position: absolute; bottom: -5px; right: -5px; width: 20px; height: 20px; border-bottom: 3px solid #fff; border-right: 3px solid #fff;"></div>
-            </div>
-        `;
-
-        // スタイル追加
-        const style = this.targetDocument.createElement('style');
-        style.id = 'fake-camera-style';
-        style.textContent = `
-            @keyframes camera-noise {
-                0% { transform: translateY(0); }
-                100% { transform: translateY(-2px); }
-            }
-            @keyframes rec-blink {
-                0%, 50% { opacity: 1; }
-                51%, 100% { opacity: 0.2; }
-            }
-        `;
-        this.targetDocument.head.appendChild(style);
-        this.targetDocument.body.appendChild(overlay);
-
-        // タイムスタンプ更新
-        const timestamp = overlay.querySelector('#camera-timestamp');
-        const updateTime = () => {
-            const now = new Date();
-            timestamp.textContent = now.toLocaleString('ja-JP');
-        };
-        updateTime();
-        const timeInterval = setInterval(updateTime, 1000);
-
-        // フェードイン
-        await this.wait(100);
-        overlay.style.opacity = '1';
-
-        await this.wait(duration);
-
-        // フェードアウト
-        overlay.style.opacity = '0';
-        await this.wait(500);
-        clearInterval(timeInterval);
-        overlay.remove();
-        style.remove();
+    stopCamera() {
+        if (this.stream) {
+            this.stream.getTracks().forEach(track => track.stop());
+            this.stream = null;
+        }
+        if (this.videoElement) {
+            this.videoElement.srcObject = null;
+            this.videoElement = null;
+        }
     }
 
     // ================================
-    // 5. 実際のカメラ映像を一瞬表示（許可された場合）
+    // 5. 実カメラ映像 + 恐怖メッセージ
     // ================================
-    async showRealCamera(duration = 3000) {
+    async showRealCamera(duration = 4000, message = null) {
         try {
-            // カメラアクセス許可を求める
+            console.log('カメラアクセスを要求中...');
+            
             this.stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: 'user' },
+                video: { 
+                    facingMode: 'user',
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                },
                 audio: false 
             });
+            
+            console.log('✅ カメラアクセス成功！');
 
             const container = this.targetDocument.createElement('div');
             container.id = 'real-camera-container';
@@ -321,9 +181,6 @@ class CameraScare {
                 pointer-events: none;
                 opacity: 0;
                 transition: opacity 0.3s;
-                display: flex;
-                justify-content: center;
-                align-items: center;
             `;
 
             // ビデオ要素
@@ -336,50 +193,114 @@ class CameraScare {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                filter: grayscale(0.5) contrast(1.2);
+                filter: grayscale(0.3) contrast(1.1);
+                transform: scaleX(-1);
             `;
 
             // RECインジケーター
             const recIndicator = this.targetDocument.createElement('div');
-            recIndicator.style.cssText = `
-                position: absolute;
-                top: 30px;
-                left: 30px;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            `;
             recIndicator.innerHTML = `
+                <style>
+                    @keyframes rec-blink-real {
+                        0%, 50% { opacity: 1; }
+                        51%, 100% { opacity: 0.2; }
+                    }
+                </style>
                 <div style="
-                    width: 15px;
-                    height: 15px;
-                    background: #ff0000;
-                    border-radius: 50%;
-                    animation: rec-blink 1s infinite;
-                "></div>
-                <span style="color: #ff0000; font-family: monospace; font-size: 18px; text-shadow: 0 0 10px #ff0000;">● REC</span>
+                    position: absolute;
+                    top: 30px;
+                    left: 30px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                ">
+                    <div style="
+                        width: 15px;
+                        height: 15px;
+                        background: #ff0000;
+                        border-radius: 50%;
+                        animation: rec-blink-real 1s infinite;
+                    "></div>
+                    <span style="color: #ff0000; font-family: monospace; font-size: 18px; text-shadow: 0 0 10px #ff0000;">● REC</span>
+                </div>
             `;
 
-            // スタイル
-            const style = this.targetDocument.createElement('style');
-            style.id = 'real-camera-style';
-            style.textContent = `
-                @keyframes rec-blink {
-                    0%, 50% { opacity: 1; }
-                    51%, 100% { opacity: 0.2; }
-                }
+            // タイムスタンプ
+            const timestamp = this.targetDocument.createElement('div');
+            timestamp.style.cssText = `
+                position: absolute;
+                bottom: 30px;
+                right: 30px;
+                color: #fff;
+                font-family: 'Courier New', monospace;
+                font-size: 16px;
+                opacity: 0.8;
+                text-shadow: 0 0 5px #000;
+            `;
+            
+            const updateTime = () => {
+                const now = new Date();
+                timestamp.textContent = now.toLocaleString('ja-JP');
+            };
+            updateTime();
+            const timeInterval = setInterval(updateTime, 1000);
+
+            // 恐怖メッセージ要素
+            const creepyMessage = this.targetDocument.createElement('div');
+            creepyMessage.style.cssText = `
+                position: absolute;
+                bottom: 20%;
+                left: 50%;
+                transform: translateX(-50%);
+                color: rgba(255, 0, 0, 0);
+                font-family: 'MS Gothic', monospace;
+                font-size: 42px;
+                text-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.5);
+                transition: color 1s ease-in;
+                text-align: center;
+                pointer-events: none;
+                letter-spacing: 8px;
             `;
 
             container.appendChild(this.videoElement);
             container.appendChild(recIndicator);
-            this.targetDocument.head.appendChild(style);
+            container.appendChild(timestamp);
+            container.appendChild(creepyMessage);
             this.targetDocument.body.appendChild(container);
+
+            // ビデオの再生を待つ
+            await new Promise((resolve) => {
+                this.videoElement.onloadedmetadata = () => {
+                    this.videoElement.play();
+                    resolve();
+                };
+            });
 
             // フェードイン
             await this.wait(100);
             container.style.opacity = '1';
 
-            await this.wait(duration);
+            // 恐怖メッセージを表示
+            await this.wait(1200);
+            
+            const messages = [
+                "見てるよ",
+                "ずっと見てた",
+                "逃げられない",
+                "知ってる",
+                "そこにいるね",
+                "見つけた",
+                "一緒にいよう",
+                "どこにも行かないで",
+                "私のもの",
+                "ずっと一緒",
+            ];
+            
+            const msg = message || messages[Math.floor(Math.random() * messages.length)];
+            creepyMessage.textContent = msg;
+            creepyMessage.style.color = 'rgba(255, 0, 0, 0.95)';
+
+            await this.wait(duration - 1200);
 
             // フラッシュして終了
             await this.flash();
@@ -389,68 +310,22 @@ class CameraScare {
             await this.wait(300);
 
             // クリーンアップ
+            clearInterval(timeInterval);
             this.stopCamera();
             container.remove();
-            style.remove();
+
+            return true;
 
         } catch (e) {
-            console.log('カメラアクセス拒否またはエラー:', e);
-            // カメラが使えない場合はフェイク映像を表示
-            await this.showFakeCameraView(duration);
+            console.log('❌ カメラアクセス失敗:', e.name, e.message);
+            return false;
         }
     }
 
     // ================================
-    // 6. カメラ停止
+    // 6. カメラ + 複数メッセージ
     // ================================
-    stopCamera() {
-        if (this.stream) {
-            this.stream.getTracks().forEach(track => track.stop());
-            this.stream = null;
-        }
-        if (this.videoElement) {
-            this.videoElement.srcObject = null;
-            this.videoElement = null;
-        }
-    }
-
-    // ================================
-    // 7. 複合演出：撮影される恐怖
-    // ================================
-    async captureSequence() {
-        // RECインジケーター表示
-        await this.showRecordingIndicator(2000);
-        await this.wait(500);
-
-        // シャッター演出
-        await this.shutterEffect();
-        await this.wait(300);
-
-        // フラッシュ連続
-        await this.flash(3);
-    }
-
-    // ================================
-    // 8. 複合演出：監視されている恐怖
-    // ================================
-    async surveillanceSequence() {
-        // まずカメラ映像（実際 or フェイク）
-        await this.showRealCamera(4000);
-        await this.wait(500);
-
-        // RECインジケーターが残る
-        await this.showRecordingIndicator(2000);
-    }
-
-    // ================================
-    // 9. EVE専用演出：「見つけた」
-    // ================================
-    async eveFoundYou() {
-        // フラッシュ
-        await this.flash();
-        await this.wait(200);
-
-        // カメラビュー
+    async showCameraWithMessages(messages = null, duration = 6000) {
         try {
             this.stream = await navigator.mediaDevices.getUserMedia({ 
                 video: { facingMode: 'user' },
@@ -458,7 +333,7 @@ class CameraScare {
             });
 
             const container = this.targetDocument.createElement('div');
-            container.id = 'eve-found-container';
+            container.id = 'camera-messages';
             container.style.cssText = `
                 position: fixed;
                 top: 0;
@@ -481,49 +356,349 @@ class CameraScare {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                filter: grayscale(1) contrast(1.5) brightness(0.7);
+                filter: grayscale(0.5) contrast(1.2) brightness(0.8);
+                transform: scaleX(-1);
             `;
 
-            // EVEのメッセージオーバーレイ
-            const message = this.targetDocument.createElement('div');
-            message.style.cssText = `
+            // RECインジケーター
+            const rec = this.targetDocument.createElement('div');
+            rec.innerHTML = `
+                <style>
+                    @keyframes rec-blink-msg {
+                        0%, 50% { opacity: 1; }
+                        51%, 100% { opacity: 0.2; }
+                    }
+                </style>
+                <div style="
+                    position: absolute;
+                    top: 30px;
+                    left: 30px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                ">
+                    <div style="
+                        width: 15px;
+                        height: 15px;
+                        background: #ff0000;
+                        border-radius: 50%;
+                        animation: rec-blink-msg 1s infinite;
+                    "></div>
+                    <span style="color: #ff0000; font-family: monospace; font-size: 18px;">● REC</span>
+                </div>
+            `;
+
+            // メッセージ要素
+            const msgElement = this.targetDocument.createElement('div');
+            msgElement.style.cssText = `
                 position: absolute;
-                bottom: 15%;
+                top: 50%;
                 left: 50%;
-                transform: translateX(-50%);
-                color: #ff0000;
+                transform: translate(-50%, -50%);
+                color: rgba(255, 0, 0, 0);
                 font-family: 'MS Gothic', monospace;
                 font-size: 48px;
-                text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000;
-                opacity: 0;
-                transition: opacity 1s;
+                text-shadow: 0 0 30px rgba(255, 0, 0, 0.9), 0 0 60px rgba(255, 0, 0, 0.6);
+                text-align: center;
+                transition: color 0.5s;
+                letter-spacing: 10px;
             `;
-            message.textContent = '見つけた';
 
             container.appendChild(this.videoElement);
-            container.appendChild(message);
+            container.appendChild(rec);
+            container.appendChild(msgElement);
             this.targetDocument.body.appendChild(container);
 
-            await this.wait(100);
+            await new Promise((resolve) => {
+                this.videoElement.onloadedmetadata = () => {
+                    this.videoElement.play();
+                    resolve();
+                };
+            });
+
             container.style.opacity = '1';
 
-            await this.wait(1500);
-            message.style.opacity = '1';
+            // メッセージを順番に表示
+            const defaultMessages = [
+                { text: "...", delay: 800 },
+                { text: "見えてるよ", delay: 1500 },
+                { text: "ずっと", delay: 1200 },
+                { text: "見てた", delay: 1200 },
+                { text: "逃げないで", delay: 1500 },
+            ];
 
-            await this.wait(3000);
+            const msgList = messages || defaultMessages;
 
-            // フラッシュして終了
-            await this.flash();
+            for (const msg of msgList) {
+                msgElement.style.color = 'rgba(255, 0, 0, 0)';
+                await this.wait(200);
+                msgElement.textContent = msg.text;
+                msgElement.style.color = 'rgba(255, 0, 0, 0.95)';
+                await this.wait(msg.delay);
+            }
+
+            await this.flash(2);
+
             container.style.opacity = '0';
             await this.wait(300);
 
             this.stopCamera();
             container.remove();
 
+            return true;
+
         } catch (e) {
-            // フェイク版
-            await this.showFakeCameraView(3000);
+            console.log('カメラエラー:', e);
+            return false;
         }
+    }
+
+    // ================================
+    // 7. じわじわ系カメラ演出（小さいまま）
+    // ================================
+    async cameraCreepIn(message = '見てる') {
+        try {
+            this.stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: 'user' },
+                audio: false 
+            });
+
+            const container = this.targetDocument.createElement('div');
+            container.id = 'camera-creep';
+            container.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 160px;
+                height: 120px;
+                background: #000;
+                z-index: 9999998;
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.5s ease-in-out;
+                border: 2px solid rgba(255, 0, 0, 0.5);
+                border-radius: 5px;
+                overflow: hidden;
+            `;
+
+            // ビデオ要素（最初は非表示）
+            this.videoElement = this.targetDocument.createElement('video');
+            this.videoElement.srcObject = this.stream;
+            this.videoElement.autoplay = true;
+            this.videoElement.muted = true;
+            this.videoElement.playsInline = true;
+            this.videoElement.style.cssText = `
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                filter: grayscale(0.7) contrast(1.3);
+                transform: scaleX(-1);
+                opacity: 0;
+                transition: opacity 0.1s;
+            `;
+
+            // 暗い画面のオーバーレイ
+            const darkOverlay = this.targetDocument.createElement('div');
+            darkOverlay.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: #0a0a0a;
+                z-index: 1;
+                transition: opacity 0.1s;
+            `;
+
+            // ★ ノイズキャンバス（本物のノイズ）★
+            const noiseCanvas = this.targetDocument.createElement('canvas');
+            noiseCanvas.width = 160;
+            noiseCanvas.height = 120;
+            noiseCanvas.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 2;
+                opacity: 0.6;
+                transition: opacity 0.1s;
+            `;
+
+            // スキャンライン
+            const scanlines = this.targetDocument.createElement('div');
+            scanlines.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 0, 0, 0.3) 0px,
+                    rgba(0, 0, 0, 0.3) 1px,
+                    transparent 1px,
+                    transparent 3px
+                );
+                z-index: 3;
+                pointer-events: none;
+                transition: opacity 0.1s;
+            `;
+
+            // スタイル
+            const style = this.targetDocument.createElement('style');
+            style.id = 'creep-noise-style';
+            style.textContent = `
+                @keyframes rec-blink-creep {
+                    0%, 50% { opacity: 1; }
+                    51%, 100% { opacity: 0.3; }
+                }
+                @keyframes glitch-shake {
+                    0% { transform: translate(0, 0); }
+                    20% { transform: translate(-1px, 1px); }
+                    40% { transform: translate(1px, -1px); }
+                    60% { transform: translate(-1px, 0); }
+                    80% { transform: translate(1px, 1px); }
+                    100% { transform: translate(0, 0); }
+                }
+            `;
+            this.targetDocument.head.appendChild(style);
+
+            // RECマーク
+            const rec = this.targetDocument.createElement('div');
+            rec.innerHTML = `
+                <div style="
+                    position: absolute;
+                    top: 5px;
+                    left: 5px;
+                    width: 8px;
+                    height: 8px;
+                    background: #ff0000;
+                    border-radius: 50%;
+                    animation: rec-blink-creep 1s infinite;
+                    z-index: 10;
+                "></div>
+            `;
+
+            // メッセージ要素（最初は非表示）
+            const msgElement = this.targetDocument.createElement('div');
+            msgElement.style.cssText = `
+                position: absolute;
+                bottom: 8px;
+                left: 50%;
+                transform: translateX(-50%);
+                color: rgba(255, 0, 0, 0);
+                font-family: 'MS Gothic', monospace;
+                font-size: 14px;
+                text-shadow: 0 0 10px #ff0000;
+                letter-spacing: 2px;
+                transition: color 0.5s;
+                z-index: 10;
+                white-space: nowrap;
+            `;
+            msgElement.textContent = message;
+
+            container.appendChild(this.videoElement);
+            container.appendChild(darkOverlay);
+            container.appendChild(noiseCanvas);
+            container.appendChild(scanlines);
+            container.appendChild(rec);
+            container.appendChild(msgElement);
+            this.targetDocument.body.appendChild(container);
+
+            // ★ ノイズアニメーション ★
+            const ctx = noiseCanvas.getContext('2d');
+            let noiseRunning = true;
+            
+            const drawNoise = () => {
+                if (!noiseRunning) return;
+                
+                const imageData = ctx.createImageData(noiseCanvas.width, noiseCanvas.height);
+                const data = imageData.data;
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    const gray = Math.random() * 60;  // 暗めのノイズ
+                    data[i] = gray;         // R
+                    data[i + 1] = gray;     // G
+                    data[i + 2] = gray;     // B
+                    data[i + 3] = 255;      // A
+                }
+                
+                ctx.putImageData(imageData, 0, 0);
+                requestAnimationFrame(drawNoise);
+            };
+            drawNoise();
+
+            await new Promise((resolve) => {
+                this.videoElement.onloadedmetadata = () => {
+                    this.videoElement.play();
+                    resolve();
+                };
+            });
+
+            // ========== 演出開始 ==========
+
+            // 1. 小さい暗い画面 + ノイズ（「これ何？」）
+            container.style.opacity = '0.9';
+            await this.wait(3000);
+
+            // 2. ★ いきなり自分が映る！ ★
+            noiseRunning = false;  // ノイズ停止
+            darkOverlay.style.opacity = '0';
+            noiseCanvas.style.opacity = '0';
+            scanlines.style.opacity = '0';
+            this.videoElement.style.opacity = '1';
+            
+            await this.wait(1500);
+
+            // 3. メッセージ表示
+            msgElement.style.color = 'rgba(255, 0, 0, 0.95)';
+            
+            await this.wait(2500);
+
+            // 4. フェードアウト
+            container.style.opacity = '0';
+            await this.wait(500);
+
+            this.stopCamera();
+            container.remove();
+            style.remove();
+
+            return true;
+
+        } catch (e) {
+            console.log('カメラエラー:', e);
+            return false;
+        }
+    }
+
+    // ================================
+    // 8. EVE「見つけた」演出
+    // ================================
+    async eveFoundYou() {
+        await this.flash();
+        await this.wait(200);
+        await this.showRealCamera(4000, '見つけた');
+    }
+
+    // ================================
+    // 9. 撮影シーケンス
+    // ================================
+    async captureSequence() {
+        await this.showRecordingIndicator(2000);
+        await this.wait(500);
+        await this.shutterEffect();
+        await this.wait(300);
+        await this.flash(3);
+    }
+
+    // ================================
+    // 10. 監視シーケンス
+    // ================================
+    async surveillanceSequence() {
+        await this.showRealCamera(4000);
+        await this.wait(500);
+        await this.showRecordingIndicator(2000);
     }
 }
 
@@ -533,11 +708,13 @@ window.cameraScare = new CameraScare();
 
 console.log('CameraScare: 読み込み完了');
 console.log('使用例:');
-console.log('  cameraScare.flash()              // フラッシュ');
-console.log('  cameraScare.shutterEffect()      // シャッター演出');
-console.log('  cameraScare.showRecordingIndicator()  // REC表示');
-console.log('  cameraScare.showFakeCameraView() // 偽カメラ映像');
-console.log('  cameraScare.showRealCamera()     // 実カメラ映像');
-console.log('  cameraScare.captureSequence()    // 撮影演出');
-console.log('  cameraScare.surveillanceSequence() // 監視演出');
-console.log('  cameraScare.eveFoundYou()        // EVE「見つけた」');
+console.log('  cameraScare.flash()                    // フラッシュ');
+console.log('  cameraScare.shutterEffect()            // シャッター演出');
+console.log('  cameraScare.showRecordingIndicator()   // REC表示');
+console.log('  cameraScare.showRealCamera(5000)       // カメラ + ランダムメッセージ');
+console.log('  cameraScare.showRealCamera(5000, "見てる") // カメラ + 指定メッセージ');
+console.log('  cameraScare.showCameraWithMessages()   // カメラ + 複数メッセージ');
+console.log('  cameraScare.cameraCreepIn()            // じわじわカメラ');
+console.log('  cameraScare.eveFoundYou()              // EVE「見つけた」');
+console.log('  cameraScare.captureSequence()          // 撮影演出');
+console.log('  cameraScare.surveillanceSequence()     // 監視演出');

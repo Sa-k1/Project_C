@@ -542,7 +542,7 @@ let a = false;
 // sleepCounter: when >0, the next user messages receive "..." as reply (decrements each reply)
 let sleepCounter = 0;
 // sleepUsed: sleep コマンドは一度しか使えないようにするフラグ
-let sleepUsed = false
+let sleepUsed = false;
 const gameState = { alertLevel: 0 };
 
 // ANSI カラーコード（cli.js と同等に揃える）
@@ -625,6 +625,14 @@ function decreaseAlert(amount) {
     const prev = gameState.alertLevel;
     gameState.alertLevel = Math.max(0, gameState.alertLevel - amount);
     if (gameState.alertLevel !== prev) applyAiTone();
+}
+
+// ★★★ プロンプト生成関数を追加 ★★★
+function getPrompt() {
+    if (window.vfs) {
+        return `${window.vfs.getPathString()}> `;
+    }
+    return 'C:\\Users\\Student\\Desktop\\Project_C> ';
 }
 
 // -------------------------
@@ -750,6 +758,10 @@ async function playLockEvent() {
             await eveLine(line, 30);
         } else if (line.includes("[ERROR]:")) {
             await errorLine(line, 30);
+        } else if (line.includes("[WARNING]:")) {
+            await warnLine(line, 30);
+        } else if (line.includes("[INFO]:")) {
+            await systemLine(line, 30);
         } else if (line.includes(COLORS.yellow)) {
             await slowPrintLine(line, 30);
         } else if (line.includes("エラー発生エラー発生")) {
@@ -991,6 +1003,7 @@ async function showCommands() {
         "─── 基本コマンド ───",
         "help         : コマンド一覧を表示",
         "status       : 現在の状態を確認",
+        "cmd          : ファイル操作コマンド一覧を表示",
         "",
         "─── 探索コマンド ───",
         "scan         : システムをスキャン",
@@ -1067,6 +1080,49 @@ async function handleInput(command) {
     // イントロ中は何も処理しない
     if (mode === "intro") return;
 
+    if (window.vfs) {
+        const cmd = command.split(/\s+/)[0].toLowerCase();
+        const fsCommands = ['cd', 'dir', 'ls', 'type', 'cat', 'pwd', 'whoami', 'date', 'time', 
+                           'open', 'run', 'cls', 'clear', 'edit', 'nano', 'vim', 'echo', 
+                           'append', 'wget', 'curl', 'browse', 'www', 'touch', 'new', 
+                           'del', 'rm', 'copy', 'cp'];
+        
+        if (fsCommands.includes(cmd)) {
+            const result = await window.vfs.execute(command);  // ★ await を追加
+            
+            // 特殊アクション処理
+            if (result && typeof result === 'object' && result.action) {
+                switch (result.action) {
+                    case 'clear':
+                        term.clear();
+                        return;
+                    case 'openFile':
+                        await systemLine(`ファイルを開いています: ${result.file}`, 20);
+                        window.open(`../html/${result.file}`, '_blank');
+                        return;
+                    case 'browse':
+                        await systemLine(`ブラウザで開いています: ${result.url}`, 20);
+                        window.open(result.url, '_blank');
+                        return;
+                    case 'wget':
+                        await systemLine('ダウンロード中...', 20);
+                        const downloadResult = await result.callback();
+                        await systemLine(downloadResult, 20);
+                        return;
+                }
+            }
+            
+            // 通常の出力
+            if (result) {
+                const lines = String(result).split('\n');
+                for (const line of lines) {
+                    term.writeln(`\r${line}`);
+                }
+            }
+            return;
+        }
+    }
+
     // sleep コマンド: 次の3回のユーザ発言に対して返信を "..." にする（ただし一度しか使用できない）
         if (command.toLowerCase() === "sleep") {
             // 警戒度が高すぎる場合は使用不可
@@ -1125,6 +1181,45 @@ async function handleInput(command) {
             await showCommands();
         } else {
             await systemLine("[SYSTEM]: コマンド一覧は現在非表示です。", 30);
+        }
+        return;
+    }
+
+    // cmd コマンド（ファイル操作コマンド一覧）
+    if (command.toLowerCase() === "cmd") {
+        const cmdLines = [
+            `${COLORS.gray}[SYSTEM]: 操作コマンド一覧${COLORS.reset}`,
+            "",
+            "─── 移動・確認 ───",
+            "dir / ls       : 今いる場所にあるものを一覧表示",
+            "cd <名前>      : 指定したフォルダに移動する",
+            "cd ..          : 一つ前の場所に戻る",
+            "pwd            : 今いる場所を表示",
+            "",
+            "─── 中身を見る ───",
+            "cat <名前>     : ファイルの中身を表示",
+            "type <名前>    : ファイルの中身を表示（catと同じ）",
+            "",
+            "─── 作成・編集・削除 ───",
+            "edit <名前>    : ファイルを編集する（書き換えモード）",
+            "nano <名前>    : ファイルを編集する（editと同じ）",
+            "touch <名前>   : 新しい空のファイルを作る",
+            "echo 内容 > 名前  : ファイルに文字を書き込む",
+            "append 内容 >> 名前 : ファイルに文字を追加する",
+            "del / rm <名前>  : ファイルを消す",
+            "copy / cp <元> <先> : ファイルをコピーする",
+            "",
+            "─── その他 ───",
+            "cls / clear    : 画面をきれいにする",
+            "browse <URL>   : ウェブページを開く",
+            "open <名前>    : ファイルを開く",
+            "whoami         : 今のユーザー名を表示",
+            "date           : 今日の日付を表示",
+            "time           : 今の時刻を表示",
+        ];
+
+        for (const line of cmdLines) {
+            term.writeln(`\r${line}`);
         }
         return;
     }
@@ -1238,11 +1333,7 @@ term.onData(async data => {
                 await handleInput(userMessage);
                 inputEnabled = true;
             }
-            if (nameVAl) {
-                term.write('C:\\Users>');
-            } else {
-                term.write('あなた：');
-            }
+            term.write(getPrompt());  // ★ 変更: 条件分岐を削除してgetPrompt()に統一
         } else if (code === 127 || code === 8) { // Backspace
             if (buffer.length > 0) {
                 buffer = buffer.slice(0, -1);
@@ -1311,7 +1402,7 @@ async function injectedCliExitBlock(command) {
     if (/(override|exploit)/i.test(command)) {
         nameVAl = true;
         a = true;
-        increaseAlert(100);// 警戒度を100%に上げる
+        increaseAlert(100);
     await systemLine(`[SYSTEM]: 警戒度が上昇しました (${gameState.alertLevel}%)`, 30);
 
         if (gameState.alertLevel >= 100) {
@@ -1553,4 +1644,4 @@ async function injectedCliExitBlock(command) {
     }
 }
 
-})();// ...existing code...
+})();//# sourceMappingURL=xterm_demo.js.map
