@@ -144,17 +144,21 @@
         .creepy-object {
             position: fixed;
             cursor: pointer;
-            opacity: 0.15;
+            opacity: 1;
             transition: opacity 0.3s;
             z-index: 1005;
-            font-size: 30px;
-            color: #8B0000;
-            text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
+            width: 60px;
+            height: 60px;
             user-select: none;
             pointer-events: auto;
         }
+        .creepy-object img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
         .creepy-object:hover {
-            opacity: 0.4;
+            opacity: 0.7;
         }
         
         /* ジャンプスケア */
@@ -214,7 +218,7 @@
     <div class="noise-overlay" id="noiseOverlay"></div>
 
     <!-- フルスクリーン画像コンテナ -->
-    <div class="fullscreen-container" id="fullscreenContainer" onclick="closeFullscreen()">
+    <div class="fullscreen-container" id="fullscreenContainer">
         <canvas class="fullscreen-canvas" id="fullscreenCanvas"></canvas>
     </div>
     
@@ -407,23 +411,54 @@
         // ============ 意味深なオブジェクトとジャンプスケア ============
         
         // 意味深なシンボル（目と手のみ）
-        const creepySymbols = ['👁', '🖐️'];
+        const creepySymbols = ['👁']; // 目だけジャンプスケア用
         
         let creepyObjects = [];
+        let handObject = null; // 手は別管理
         let jumpscareTriggered = false;
         
-        // ランダムな位置に意味深オブジェクトを配置
+        // 手オブジェクトを配置（閉じるボタン代わり）
+        function spawnHandObject() {
+            if (handObject) return;
+            
+            handObject = document.createElement('div');
+            handObject.className = 'creepy-object';
+            handObject.textContent = '🖐️';
+            handObject.style.opacity = '0.6';
+            handObject.style.fontSize = '40px';
+            
+            // 右下に固定配置
+            handObject.style.bottom = '20px';
+            handObject.style.right = '20px';
+            handObject.style.top = 'auto';
+            handObject.style.left = 'auto';
+            handObject.style.transform = 'none';
+            handObject.title = '戻る';
+            
+            // クリックで閉じる
+            handObject.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeFullscreen();
+            });
+            
+            document.body.appendChild(handObject);
+        }
+        
+        // ランダムな位置に意味深オブジェクト（1個だけ）を配置
         function spawnCreepyObjects() {
             // 既存のオブジェクトを削除
             creepyObjects.forEach(obj => obj.remove());
             creepyObjects = [];
             
-            const count = 2 + Math.floor(Math.random() * 3); // 2-4個
+            const count = 1; // 1個だけ
             
             for (let i = 0; i < count; i++) {
                 const obj = document.createElement('div');
                 obj.className = 'creepy-object';
-                obj.textContent = creepySymbols[Math.floor(Math.random() * creepySymbols.length)];
+                const img = document.createElement('img');
+                img.src = '../pic/お手手.png';
+                img.alt = '';
+                obj.appendChild(img);
                 
                 // ランダムな位置（画面端に寄りがち）
                 const edge = Math.random() < 0.7;
@@ -537,6 +572,9 @@
             // const audio = new Audio('../audio/scream.mp3');
             // audio.play();
             
+            // 一度見たフラグを立てる
+            hasViewedOnce = true;
+            
             parentOverlay.classList.add('active');
             
             // 画面を激しく揺らす
@@ -544,7 +582,7 @@
             document.body.offsetHeight; // リフロー
             document.body.classList.add('glitch-active');
             
-            // 1秒後に終了
+            // 1秒後に終了して元に戻す
             setTimeout(() => {
                 parentOverlay.classList.remove('active');
                 document.body.classList.remove('glitch-active');
@@ -553,23 +591,82 @@
                 creepyObjects.forEach(obj => obj.remove());
                 creepyObjects = [];
                 
-                // 少し後に再配置（また出現）
-                setTimeout(() => {
-                    jumpscareTriggered = false;
-                    if (document.body.classList.contains('expanded')) {
-                        spawnCreepyObjects();
-                    }
-                }, 5000);
+                // 手も消す
+                if (handObject) {
+                    handObject.remove();
+                    handObject = null;
+                }
+                
+                // フルスクリーン表示を閉じて元に戻す
+                document.body.classList.remove('expanded');
+                
+                // フラグをリセット
+                jumpscareTriggered = false;
             }, 1000);
+        }
+        
+        // 画像クリック時の処理を変更（2回目以降は即ジャンプスケア）
+        let hasViewedOnce = false;
+        let isLocked = false; // 開けなくするフラグ
+        
+        // 親ウィンドウでファイルビューアを閉じる関数
+        function closeParentFileViewer() {
+            try {
+                const targetWindow = window.parent || window;
+                const targetDocument = targetWindow.document;
+                const container = targetDocument.getElementById('fileViewerContainer3');
+                if (container) {
+                    container.style.display = 'none';
+                    const iframe = container.querySelector('iframe');
+                    if (iframe) iframe.src = '';
+                }
+                
+                // file3（不要な写真.jpg）を消す
+                const file3 = targetDocument.getElementById('file3');
+                if (file3) {
+                    file3.remove();
+                }
+                
+                // sleepファイルを追加
+                const sleepFile = targetDocument.createElement('div');
+                sleepFile.className = 'draggable-item';
+                sleepFile.draggable = true;
+                sleepFile.id = 'fileSleep';
+                sleepFile.innerHTML = `
+                    <img src="../pic/file.png" alt="">  
+                    <h1 class="word">sleep</h1>
+                `;
+                // デスクトップに追加（bodyの末尾）
+                targetDocument.body.appendChild(sleepFile);
+                
+            } catch(e) {
+                console.log('Could not close parent file viewer');
+            }
         }
         
         // フルスクリーン表示時にオブジェクトを配置
         const originalOpenModal = openModal;
         openModal = function() {
-            originalOpenModal();
-            setTimeout(() => {
-                spawnCreepyObjects();
-            }, 1000);
+            if (isLocked) {
+                // ロック後は何も起きない
+                return;
+            }
+            if (hasViewedOnce) {
+                // 2回目は即ジャンプスケア、その後ロック＆ファイルビューアを閉じる
+                triggerJumpscare();
+                // ジャンプスケア終了後にロック＆閉じる
+                setTimeout(() => {
+                    isLocked = true;
+                    closeParentFileViewer();
+                }, 1100);
+            } else {
+                // 初回は通常表示
+                originalOpenModal();
+                setTimeout(() => {
+                    spawnHandObject(); // 手は常に表示
+                    spawnCreepyObjects(); // 意味深オブジェクト
+                }, 1000);
+            }
         };
         
         // フルスクリーン終了時にオブジェクトを削除
@@ -578,6 +675,10 @@
             originalCloseFullscreen();
             creepyObjects.forEach(obj => obj.remove());
             creepyObjects = [];
+            if (handObject) {
+                handObject.remove();
+                handObject = null;
+            }
         };
     </script>
 </body>
