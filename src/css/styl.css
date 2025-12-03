@@ -12,7 +12,7 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
-    background-image: url(../pic/test.jpg);
+    background-image: url(../pic/download-the-official-windows-11-wallpaper-533232-2.jpg);
     /*background-color: rgba(255, 0, 0, 0.5);*/
     background-blend-mode: multiply;
     overflow: hidden;
@@ -434,6 +434,11 @@ body {
 @keyframes fadeOut {
     0% {opacity: 1;}
     100% {opacity: 0;}
+}
+
+#fileViewerTitle2 {
+    height: 40px;
+    filter: invert(1);
 }
 
 /* タスクバー時計表示 */
