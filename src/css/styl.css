@@ -12,10 +12,11 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
-    background-image: url(../pic/download-the-official-windows-11-wallpaper-533232-2.jpg);
+    background-image: url(../pic/windows11_1920x1080.jpg);
     /*background-color: rgba(255, 0, 0, 0.5);*/
     background-blend-mode: multiply;
     overflow: hidden;
+    background-size: 100%;
 }
 
 /*     terminal and chatarea     */

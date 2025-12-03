@@ -8,8 +8,8 @@ html, body {
     height: 100%;
     overflow: hidden;
     font-family: 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
-    background-image: url(../pic/okumono_business3.png);
-    background-size: 90%;
+    background-image: url(../pic/BG2.png);
+
 
 }
 
@@ -89,7 +89,11 @@ html, body {
     line-height: 1.8;
     color: #d0d0d0;
     overflow-y: auto;
+    text-decoration: underline;
+    text-underline-offset: 0.5em;
+    text-decoration-color: white;
 }
+
 
 .diary-content p {
     margin: 0 0 12px 0;
