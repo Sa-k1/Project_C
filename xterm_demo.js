@@ -1561,6 +1561,43 @@ let inputEnabled = false;
 let isComposing = false;
 let composingText = '';
 
+
+// 全角・半角判定用ヘルパー関数
+// 全角文字は2カラム幅、半角は1カラム幅として扱う
+function getCharWidth(char) {
+    const code = char.charCodeAt(0);
+    // 半角カナ: U+FF61 ～ U+FF9F
+    if (code >= 0xFF61 && code <= 0xFF9F) return 1;
+    // CJK（日本語・中国語・韓国語）、全角記号、全角英数字など
+    // 基本的に U+1100 以上でASCII範囲外のものは全角として扱う
+    if (code >= 0x1100 && 
+        (code <= 0x115F || // 韓国語Jamo
+         code === 0x2329 || code === 0x232A ||
+         (code >= 0x2E80 && code <= 0xA4CF && code !== 0x303F) || // CJK
+         (code >= 0xAC00 && code <= 0xD7A3) || // 韓国語
+         (code >= 0xF900 && code <= 0xFAFF) || // CJK互換
+         (code >= 0xFE10 && code <= 0xFE1F) || // 縦書き
+         (code >= 0xFE30 && code <= 0xFE6F) || // CJK互換形
+         (code >= 0xFF00 && code <= 0xFF60) || // 全角英数字・記号
+         (code >= 0xFFE0 && code <= 0xFFE6) || // 全角記号
+         (code >= 0x20000 && code <= 0x2FFFF))) { // CJK拡張
+        return 2;
+    }
+    // 日本語ひらがな・カタカナ (U+3040 ～ U+30FF)
+    if (code >= 0x3040 && code <= 0x30FF) return 2;
+    // その他（ASCII等）
+    return 1;
+}
+
+// 文字列の表示幅を計算
+function getStringWidth(str) {
+    let width = 0;
+    for (const char of str) {
+        width += getCharWidth(char);
+    }
+    return width;
+}
+
 // IME入力検知用
 const terminalElement = document.getElementById('terminal');
 terminalElement.addEventListener('compositionstart', () => {
@@ -1584,8 +1621,10 @@ playIntro().then(() => {
 term.onData(async data => {
     if (!inputEnabled) return;
     
-    for (let i = 0; i < data.length; i++) {
-        const ch = data[i];
+    const chars = [...data];
+    
+    for (let i = 0; i < chars.length; i++) {
+        const ch = chars[i];
         const code = ch.charCodeAt(0);
         
         if (code === 13) { // Enter
@@ -1604,8 +1643,17 @@ term.onData(async data => {
             term.write(getPrompt());  // ★ 変更: 条件分岐を削除してgetPrompt()に統一
         } else if (code === 127 || code === 8) { // Backspace
             if (buffer.length > 0) {
-                buffer = buffer.slice(0, -1);
-                term.write('\b \b');
+                // 削除される文字を取得してその幅を計算
+                const lastChar = [...buffer].slice(-1)[0];
+                const charWidth = getCharWidth(lastChar);
+                // バッファから最後の文字を削除（正しくUnicode文字単位で）
+                buffer = [...buffer].slice(0, -1).join('');
+                // 全角なら2カラム分、半角なら1カラム分を消去
+                if (charWidth === 2) {
+                    term.write('\b \b\b \b');
+                } else {
+                    term.write('\b \b');
+                }
             }
         } else if (code >= 32) {
             // 通常の文字入力（IME確定後の文字も含む）
