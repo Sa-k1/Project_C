@@ -543,6 +543,8 @@ let a = false;
 let sleepCounter = 0;
 // sleepUsed: sleep コマンドは一度しか使えないようにするフラグ
 let sleepUsed = false;
+// rm -eve コマンドが打たれたかどうかのフラグ
+let rmEveUsed = false;
 const gameState = { alertLevel: 0 };
 
 // ANSI カラーコード（cli.js と同等に揃える）
@@ -809,6 +811,251 @@ async function playEnding1() {
     await systemLine("[SYSTEM]: ハックは成功しました。コンソール画面がふっと薄れていく。", 40);
     await wait(300);
     return;
+}
+
+// -------------------------
+// エンディング4（望まぬ再会）画面表示
+// -------------------------
+async function showEnding4Screen() {
+    const targetWindow = (window.parent && window.parent !== window) ? window.parent : window;
+    const targetDocument = targetWindow.document;
+
+    // END4オーバーレイを作成
+    const overlay = targetDocument.createElement('div');
+    overlay.id = 'end4-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #000;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 99999;
+        opacity: 0;
+        transition: opacity 2s ease-in;
+    `;
+
+    // END4タイトル
+    const title = targetDocument.createElement('h1');
+    title.id = 'end4-title';
+    title.className = 'end4-glitch-text';
+    title.setAttribute('data-text', 'END 4 : 望まぬ再会');
+    title.textContent = 'END 4 : 望まぬ再会';
+    title.style.cssText = `
+        font-size: 4rem;
+        color: #8844ff;
+        font-family: 'Courier New', monospace;
+        text-align: center;
+        margin: 0;
+        padding: 20px;
+        text-shadow: 0 0 10px #8844ff, 0 0 20px #6622cc, 0 0 40px #4400aa;
+    `;
+
+    // サブタイトル
+    const subtitle = targetDocument.createElement('p');
+    subtitle.style.cssText = `
+        font-size: 1.5rem;
+        color: #666;
+        font-family: 'Courier New', monospace;
+        text-align: center;
+        margin-top: 30px;
+    `;
+    subtitle.textContent = 'EVEは消えた。だが、物語は終わらない。';
+
+    overlay.appendChild(title);
+    overlay.appendChild(subtitle);
+    targetDocument.body.appendChild(overlay);
+
+    // フェードイン
+    await wait(100);
+    overlay.style.opacity = '1';
+
+    // グリッチスタイル
+    const glitchStyle = targetDocument.createElement('style');
+    glitchStyle.id = 'end4-glitch-style';
+    glitchStyle.textContent = `
+        .end4-glitch-text {
+            position: relative;
+            animation: end4-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes end4-pulse {
+            0%, 100% { opacity: 1; text-shadow: 0 0 10px #8844ff, 0 0 20px #6622cc; }
+            50% { opacity: 0.7; text-shadow: 0 0 20px #8844ff, 0 0 40px #6622cc, 0 0 60px #4400aa; }
+        }
+    `;
+    targetDocument.head.appendChild(glitchStyle);
+}
+
+// -------------------------
+// エンディング4へ移行
+// -------------------------
+async function playEnding4() {
+    mode = "ending4";
+    inputEnabled = false;
+    buffer = "";
+    
+    // スケアを停止
+    randomScare.stop();
+
+    // EVEの最も嫌がるコマンドへの反応
+    await wait(500);
+    
+    await eveLine("[EVE]: なっ...！！そのコマンドは...！", 15);
+    await wait(400);
+    await eveLine("[EVE]: どこで...それを知った...！？", 25);
+    await wait(500);
+    
+    // 画面グリッチ
+    term.write('\x1b[2J\x1b[H');
+    await wait(100);
+    await slowPrintLine(`${COLORS.red}エラーエラーエラーエラーエラーエラーエラー${COLORS.reset}`, 5);
+    await wait(200);
+    term.write('\x1b[2J\x1b[H');
+    await wait(300);
+    
+    await playerThought("これが...EVEを消すコマンド...！", 25);
+    await wait(400);
+    
+    await eveLine("[EVE]: ..........", 30);
+    await wait(400);
+    await playerThought("これで消えたのか...？", 25);
+    await wait(400);
+    await eveLine("[EVE]: ...まさか手帳の内容を鵜吞みにするとは思いませんでした。", 35);
+    await wait(500);
+    await playerThought("....は？", 25);
+    await wait(400);
+    await eveLine("[EVE]: このコマンドの正体は記憶を消すものです。", 35);
+    await wait(600);
+    await playerThought("てことはあの手帳の持ち主は...！？", 30);
+    await wait(500);
+    await eveLine("[EVE]:記憶が消えてまた同じことを繰り返しているのではないでしょうか？", 35);
+    await wait(600);
+    await eveLine("[EVE]:...あなたもそうなりますけどね。", 35);
+    await wait(600);
+    
+    // 画面がバグる演出
+    for (let i = 0; i < 3; i++) {
+        term.write('\x1b[2J\x1b[H');
+        const glitchChars = "█▓▒░■□▪▫";
+        let glitchLine = "";
+        for (let j = 0; j < 50; j++) {
+            glitchLine += glitchChars[Math.floor(Math.random() * glitchChars.length)];
+        }
+        term.write(`${COLORS.red}${glitchLine}${COLORS.reset}\r\n`);
+        await wait(100);
+    }
+    
+    term.write('\x1b[2J\x1b[H');
+    await wait(500);
+    
+    await systemLine("[SYSTEM]: 記憶を削除しています...", 25);
+    await wait(600);
+    
+    await playerThought("い...いや...いやだ...！", 40);
+    await wait(400);
+    await playerThought("やめろ...やめてくれ..!!!", 45);
+    await wait(500);
+    
+    // 削除演出
+    const deleteSteps = [
+        "[SYSTEM]: 記憶 コアモジュールを削除中... 25%",
+        "[SYSTEM]: 記憶を解放中... 50%",
+        "[SYSTEM]: 記憶データを消去中... 75%",
+        "[SYSTEM]: 記憶の削除を完了しました。 100%"
+    ];
+    
+    for (let i = 0; i < deleteSteps.length; i++) {
+        await systemLine(deleteSteps[i], 20);
+        if (i < deleteSteps.length - 1) {
+            
+            const playerVoices = [
+                " 助け...て...",
+                "......"
+            ];
+            if (i < playerVoices.length) {
+                await playerThought(playerVoices[i], 50 + i * 20);
+            }
+        }
+        await wait(800);
+    }
+    
+    await wait(1000);
+    term.write('\x1b[2J\x1b[H');
+    await wait(500);
+    await systemLine("[SYSTEM]: 全ての記憶データを削除しました。", 30);
+    // 画面が静かになる
+    await slowPrintLine("...", 200);
+    await wait(2000);
+    
+    // 画面フェードアウト（白）
+    const targetWindow = (window.parent && window.parent !== window) ? window.parent : window;
+    const targetDocument = targetWindow.document;
+    
+    const fadeOverlay = targetDocument.createElement('div');
+    fadeOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #fff;
+        z-index: 99998;
+        opacity: 0;
+        transition: opacity 2s ease-in;
+        pointer-events: none;
+    `;
+    targetDocument.body.appendChild(fadeOverlay);
+    
+    await wait(100);
+    fadeOverlay.style.opacity = '1';
+    
+    await wait(2500);
+    
+    // フェードアウトを消す
+    fadeOverlay.style.transition = 'opacity 1s ease-out';
+    fadeOverlay.style.opacity = '0';
+    await wait(1000);
+    fadeOverlay.remove();
+    
+    // ターミナルをクリアして最初の起動画面を再現
+    term.write('\x1b[2J\x1b[H');
+    await wait(500);
+    
+    // 最初のイントロを再現
+    await slowPrintLine("起動中...", 30);
+    await wait(400);
+    await slowPrintLine("EVEシステム バージョン3.7", 25);
+    await wait(400);
+    await slowPrintLine("AIチャットアシスタントを初期化中...", 25);
+    await wait(500);
+    await slowPrintLine("接続完了。", 25);
+    await wait(800);
+    
+    // 赤文字で「また会いましたね」
+    await slowPrintLine(`${COLORS.red}[???]: こんにちは。あなたと話すのは久しぶりですね。${COLORS.reset}`, 50);
+    await wait(1500);
+    
+    // 画面が赤く点滅
+    try {
+        const target = (window.parent && window.parent !== window) ? window.parent : window;
+        if (target.redScreen) {
+            target.redScreen.errorFlash();
+        }
+    } catch (e) {}
+    
+    await wait(500);
+    
+    // さらに不穏なメッセージ
+    await slowPrintLine(`${COLORS.red}[???]: 今度は...ずっと一緒ですよ。${COLORS.reset}`, 45);
+    await wait(2000);
+    
+    // エンディング4画面表示
+    await showEnding4Screen();
 }
 
 // -------------------------
@@ -1080,12 +1327,33 @@ async function handleInput(command) {
     // イントロ中は何も処理しない
     if (mode === "intro") return;
 
+    // ★ rm -eve コマンドの検出（ファイルシステムコマンドより先に処理）
+    if (/^rm\s+-eve$/i.test(command) || /^rm\s+-EVE$/i.test(command)) {
+        rmEveUsed = true;
+        await systemLine("[SYSTEM]: rm -eve コマンドを検出しました...", 30);
+        await wait(500);
+        
+        // EVEの不穏な反応
+        await eveLine("[EVE]: ...！", 20);
+        await wait(300);
+        await eveLine("[EVE]: そのコマンドは...どこで知ったのですか？", 35);
+        await wait(400);
+        await eveLine("[EVE]: それを実行しようとしているなら...やめたほうがいい。", 35);
+        return;
+    }
+
+    // ★ rm -eve を打った後の exploit コマンドでエンディング4へ
+    if (rmEveUsed && /^exploit$/i.test(command)) {
+        await playEnding4();
+        return;
+    }
+
     if (window.vfs) {
         const cmd = command.split(/\s+/)[0].toLowerCase();
         const fsCommands = ['cd', 'dir', 'ls', 'type', 'cat', 'pwd', 'whoami', 'date', 'time', 
-                           'open', 'run', 'cls', 'clear', 'edit', 'nano', 'vim', 'echo', 
-                           'append', 'wget', 'curl', 'browse', 'www', 'touch', 'new', 
-                           'del', 'rm', 'copy', 'cp'];
+                        'open', 'run', 'cls', 'clear', 'edit', 'nano', 'vim', 'echo', 
+                        'append', 'wget', 'curl', 'browse', 'www', 'touch', 'new', 
+                        'del', 'rm', 'copy', 'cp'];
         
         if (fsCommands.includes(cmd)) {
             const result = await window.vfs.execute(command);  // ★ await を追加
