@@ -21,7 +21,7 @@ windowContainer.addEventListener('mousedown', (e) => {
         if (!handle) return; // not clicking the titlebar area -> do not start drag
 
         // If clicked element is an interactive child (button, control, tab, icon, inputs), don't start drag
-        const ignored = e.target.closest('.window-controls, .ctrl, .tab, .tab-icon, .tab-label, .icon_ALL, .icon, .text, #mini-iframe, #trash-can, #trash-image, .draggable-item, .trash-button, #eve, #eve-image, .side-panel-content');
+        const ignored = e.target.closest('.window-controls, .ctrl, .tab, .tab-icon, .tab-label, .icon_ALL, .icon, .text, #mini-iframe, #trash-can, #trash-image, .draggable-item, #eve, #eve-image, .side-panel-content');
         if (ignored) return;
 
         isDragging = true;
@@ -175,57 +175,6 @@ items.forEach(item => {
             }
         }
     });
-});
-
-// ゴミ箱の処理
-trashCan.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    trashCan.classList.add('drag-over');
-});
-
-trashCan.addEventListener('dragleave', () => {
-    trashCan.classList.remove('drag-over');
-});
-
-// ゴミ箱のドロップ処理
-trashCan.addEventListener('drop', (e) => {
-    e.preventDefault();
-    trashCan.classList.remove('drag-over');
-
-    const id = e.dataTransfer.getData('text/plain');
-    const draggedElement = document.getElementById(id);
-
-    if (draggedElement) {
-        const trashItem = document.createElement('div');
-        trashItem.className = 'trash-item';
-        trashItem.innerHTML = `
-            ${draggedElement.textContent}
-            <button onclick="restoreItem('${id}', '${draggedElement.textContent}')">
-                復元
-            </button>
-        `;
-        
-        const trashContent = document.getElementById('trash-content');
-        trashContent.appendChild(trashItem);
-        draggedElement.style.display = 'none';
-    }
-});
-
-// ゴミ箱を開く/閉じる処理
-const toggleButton = document.getElementById('toggle-trash-content');
-const trashContent = document.getElementById('trash-content');
-
-// ゴミ箱のダブルクリックとボタンクリックの処理
-const trashImage = document.getElementById('trash-image');
-
-// ダブルクリックイベントを追加
-trashImage.addEventListener('dblclick', () => {
-    toggleTrashContent();
-});
-
-// ボタンクリックイベントを修正
-toggleButton.addEventListener('click', () => {
-    toggleTrashContent();
 });
 
 // トグル機能を関数化

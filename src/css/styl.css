@@ -54,7 +54,7 @@ body {
     height: 400px;
     background-color: #000000;
     border: 2px solid #555;
-    border-radius: 0 10px 10px 0;
+    border-radius: 0 10px 10px 10px;
     box-shadow: 2px 2px 18px rgba(0,0,0,0.25);
     box-sizing: border-box;
     overflow: hidden;
@@ -291,6 +291,11 @@ body {
     width: 100%;
     margin-top: 0;
 }
+
+.word_trash {
+    padding: 0;
+}
+
 /* ゴミ箱エリアのスタイル */
 #trash-can {
     position: absolute; 
@@ -312,18 +317,9 @@ body {
     z-index: 100;  /* ← 変更：-100 から 100 に */
 }
 
-/* ゴミ箱にファイルがドラッグされてきた時のスタイル */
-#trash-can.drag-over {
-    border-color: #ff0000; /* 赤い点線に変更 */
-    background-color: #ffe6e6; /* 薄い赤色の背景 */
-    transform: scale(1.05); /* 少し大きくする */
-}
-
-
 /* ゴミ箱画像のスタイル */
 #trash-image {
-    width: 60px; /* 画像もコンパクトに */
-    height: 60px; /* 画像もコンパクトに */
+    width: 50px; /* 画像もコンパクトに */
     object-fit: contain; /* 画像が歪まないように */
 }
 
@@ -346,33 +342,6 @@ body {
     align-items: center;
     padding: 8px;
     border-bottom: 1px solid #eee;
-}
-
-.trash-item button {
-    background: #4CAF50;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.trash-item button:hover {
-    background: #45a049;
-}
-
-.trash-button {
-    width: 100%;
-    padding: 5px;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-}
-
-.trash-button:hover {
-    background-color: #e0e0e0;
 }
 
 /*    taskbar    */
@@ -420,7 +389,9 @@ body {
     margin: 1px 0 8px 15px;;
 }
 
-
+.icon_taskb {
+    margin-left: 18.5%;
+}
 
 .fade {
     position: absolute;
