@@ -1544,11 +1544,32 @@ async function handleInput(command) {
             await eveLine("[EVE]: その質問には答えられません。", 30);
         }
     } catch (error) {
-        await systemLine(`[SYSTEM]: AI呼び出しエラー: ${error.message || error}`, 30);
+        // ランダムな文字列生成（文字化けを含む）
+        const generateGarbledText = () => {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
+            const garbled = '■□▲△◆◇○●★☆※§¶†‡¨¤¦¬¯´¸˛˝˙˚˜˘˝΄΅΢ΆΈΉΊΌΎΏΐΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩάέήίΰαβγδεζηθικλμνξοπρςστυφχψωϊϋόύώ';
+            const broken = '�░▒▓█▄▌▐│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌';
+            
+            let result = '';
+            const length = Math.floor(Math.random() * 50) + 30;
+            
+            for (let i = 0; i < length; i++) {
+                const rand = Math.random();
+                if (rand < 0.5) {
+                    result += chars[Math.floor(Math.random() * chars.length)];
+                } else if (rand < 0.8) {
+                    result += garbled[Math.floor(Math.random() * garbled.length)];
+                } else {
+                    result += broken[Math.floor(Math.random() * broken.length)];
+                }
+            }
+            return result;
+        };
+       console.log(`[SYSTEM]: AI呼び出しエラー: ${error.message || error}`, 30);
         if (conv) {
-            await eveLine(`[EVE]: ${conv.eve}`, 20);
+            await eveLine(`[EVE]: ${generateGarbledText()}`, 20);
         } else {
-            await eveLine("[EVE]: その質問には答えられません。", 30);
+            await eveLine(`[EVE]: ${generateGarbledText()}`, 30);
         }
     }
 }
