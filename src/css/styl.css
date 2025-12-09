@@ -198,6 +198,10 @@ body {
     justify-content: space-between;
 }
 
+.all_img {
+    width: 110px;
+}
+
 /* titlebar 内のタブとコントロール */
 .titlebar {
     display: flex;
@@ -298,14 +302,14 @@ body {
 .word {
     font-size: 12px;
     text-align: center;
-    padding-left: 10px;
+    padding-left: 8px;
     width: 100%;
     margin-top: -7px;
 }
 
 .word_trash {
-    padding: 0;
     margin-top: 0;
+    margin-right: 15px;
 }
 
 /* ゴミ箱エリアのスタイル */
@@ -329,8 +333,10 @@ body {
 
 /* ゴミ箱画像のスタイル */
 #trash-image {
-    width: 50px; /* 画像もコンパクトに */
+    width: 90px;
     object-fit: contain; /* 画像が歪まないように */
+    padding-top: 20px;
+    padding-right: 10px;
 }
 
 #trash-content {
@@ -357,8 +363,8 @@ body {
 /*    taskbar    */
 .win {
     position: absolute;
-    top: 8px;
-    left: 15%;
+    top: 6px;
+    left: 14.5%;
 }
 
 .win_surch {
@@ -400,8 +406,8 @@ body {
 
 .i_task_bar {
     padding-left: 1%;
-    width: 32px;
-    margin: 1px 0 8px 15px;;
+    width: 35px;
+    margin: 0px 0 7px 14px;
 }
 
 .icon_taskb {
