@@ -312,6 +312,33 @@ body {
     margin-right: 15px;
 }
 
+.search {
+    outline: none;
+    border: none;
+}
+
+.warning-text {
+    font-size: 16px;
+    background: linear-gradient(
+        to right, 
+        red, orange, yellow, green, cyan, blue, violet, red
+    );
+    background-size: 400% auto; /* アニメーション用に幅を広く */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: rainbow 7.5s linear infinite; /* 速度を調整 */
+}
+
+@keyframes rainbow {
+    0% {
+        background-position: 0% center;
+    }
+    100% {
+        background-position: 400% center;
+    }
+}
+
 /* ゴミ箱エリアのスタイル */
 #trash-can {
     position: absolute; 
@@ -430,8 +457,7 @@ body {
 }
 
 #fileViewerTitle2 {
-    height: 40px;
-    filter: invert(1);
+    height: 50px;
 }
 
 /* タスクバー時計表示 */

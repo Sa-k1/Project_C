@@ -314,8 +314,51 @@ function processCommand(command) {
     
     // exit コマンドでびっくり演出
     if (cmd === 'exit') {
-        window.redScreen.options.message = '逃げられると思った？';
+        window.redScreen.options.message = '逃げられると思った?';
         window.redScreen.shock();
         return;
     }
+}
+
+// ★ 検索バーへのドラッグ&ドロップ処理 ★
+const searchInput = document.querySelector('.search');
+
+if (searchInput) {
+    let draggedElement = null;
+    
+    // ドラッグ開始時に要素を記録
+    document.addEventListener('dragstart', (e) => {
+        draggedElement = e.target;
+    });
+    
+    // dragoverイベントをキャンセルしてドロップを許可
+    searchInput.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    // dropイベントで独自の処理を実行
+    searchInput.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        let customText = ''; // デフォルトは何も入れない
+        
+        // まずクラスをリセット
+        searchInput.classList.remove('warning-text');
+        
+        // ★★ ドラッグされた要素を判定 ★★
+        if (draggedElement) {
+            // タスクバーのsecuアイコンがドラッグされた場合
+            if (draggedElement.classList && draggedElement.classList.contains('secu')) {
+                customText = 'SUPER ARMOR';  // ← secuの場合に表示したいテキスト
+                // 上部は一例です。
+                searchInput.classList.add('warning-text'); // ★ 警告スタイルを適用するクラスを追加
+            }
+            // それ以外は空白1文字のまま
+        }
+        
+        searchInput.value = customText;
+        draggedElement = null; // リセット
+    });
 }

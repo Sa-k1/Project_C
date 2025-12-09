@@ -267,7 +267,7 @@ class RandomScare {
         eye.appendChild(iris);
         this.targetDocument.body.appendChild(eye);
         
-        console.log('目の演出を表示:', randomX, randomY);
+        // console.log('目の演出を表示:', randomX, randomY);
         
         // 表示（薄めに）
         eye.style.opacity = '0.35';
@@ -293,7 +293,7 @@ class RandomScare {
         `;
         this.targetDocument.body.appendChild(dark);
         
-        console.log('暗転演出を表示');
+        // console.log('暗転演出を表示');
         
         dark.style.opacity = '0.2';
         await this.wait(120);
@@ -307,7 +307,7 @@ class RandomScare {
         const terminal = this.targetDocument.querySelector('#terminal') || this.targetDocument.body;
         const original = terminal.style.transform;
         
-        console.log('画面ずれ演出');
+        // console.log('画面ずれ演出');
         
         terminal.style.transition = 'none';
         terminal.style.transform = 'translateX(3px)';
@@ -338,7 +338,7 @@ class RandomScare {
         overlay.textContent = msg;
         this.targetDocument.body.appendChild(overlay);
         
-        console.log('文字演出を表示:', msg, randomX, randomY);
+        // console.log('文字演出を表示:', msg, randomX, randomY);
         
         await this.wait(400);
         overlay.remove();
@@ -360,7 +360,7 @@ class RandomScare {
         `;
         this.targetDocument.body.appendChild(shadow);
         
-        console.log('影演出を表示:', side);
+        // console.log('影演出を表示:', side);
         
         await this.wait(350);
         shadow.remove();
@@ -371,7 +371,7 @@ class RandomScare {
         const terminal = this.targetDocument.querySelector('.xterm-screen') || this.targetDocument.body;
         const original = terminal.style.filter;
         
-        console.log('明るさ演出');
+        // console.log('明るさ演出');
         
         terminal.style.filter = 'brightness(0.88)';
         await this.wait(180);
@@ -402,7 +402,7 @@ class RandomScare {
         `;
         this.targetDocument.body.appendChild(dot);
         
-        console.log('赤い点演出を表示');
+        // console.log('赤い点演出を表示');
         
         await this.wait(250);
         dot.remove();
@@ -414,7 +414,7 @@ class RandomScare {
         if (cursor) {
             const original = cursor.style.visibility;
             
-            console.log('カーソル消え演出');
+            // console.log('カーソル消え演出');
             
             cursor.style.visibility = 'hidden';
             await this.wait(500);
@@ -427,7 +427,7 @@ class RandomScare {
         const terminal = this.targetDocument.querySelector('.xterm-screen') || this.targetDocument.body;
         const original = terminal.style.filter;
         
-        console.log('色変化演出');
+        // console.log('色変化演出');
         
         terminal.style.filter = 'hue-rotate(8deg)';
         await this.wait(150);
@@ -449,7 +449,7 @@ class RandomScare {
         `;
         this.targetDocument.body.appendChild(overlay);
         
-        console.log('赤み演出を表示');
+        // console.log('赤み演出を表示');
         
         await this.wait(600);
         overlay.remove();
@@ -464,7 +464,7 @@ class RandomScare {
             if (Math.random() < this.scareChance) {
                 const scare = this.scares[Math.floor(Math.random() * this.scares.length)];
                 try {
-                    console.log('スケア発動!');
+                    // console.log('スケア発動!');
                     await scare();
                 } catch (e) {
                     console.log('Scare error:', e);
