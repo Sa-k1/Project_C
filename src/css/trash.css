@@ -1,0 +1,208 @@
+@charset "UTF-8";
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f0f0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.window {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: white;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    background-color: #e9ecef;
+    gap: 6px;
+}
+
+.nav-btn, .refresh-btn {
+    border: none;
+    background-color: #e9ecef;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.nav-btn:hover, .refresh-btn:hover {
+    background-color: #e9ecef;
+}
+
+.address-bar {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 2px 6px;
+    gap: 6px;
+    height: 24px;
+}
+
+.address-bar {
+    font-size: 14px;
+}
+
+.icon {
+    padding-left: 10px;
+}
+
+.address-bar .path {
+    font-size: 12px;
+}
+
+.address-bar {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 2px;
+    font-size: 12px;
+}
+
+.search {
+    outline: none;
+    border: none;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 2px 6px;
+    gap: 6px;
+    height: 24px;
+}
+
+.search-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.menu-bar {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border-bottom: 1px solid #ddd;
+}
+
+.menu-bar button {
+    padding: 4px 10px;
+    border: 1px solid transparent;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.menu-bar button:hover {
+    background-color: #e9ecef;
+    border-color: #ccc;
+}
+
+.details-btn {
+    margin-left: auto;
+}
+
+.content-area {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 110px;
+    background-color: #f8f9fa;
+    border-right: 1px solid #ddd;
+    padding: 8px 6px;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.sidebar-item {
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-bottom: 2px;
+}
+
+.sidebar-item:hover {
+    background-color: #e9ecef;
+}
+
+.sidebar-item.active {
+    background-color: #0078d4;
+    color: white;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.file-item {
+    display: flex;
+    padding: 6px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.file-item:hover {
+    background-color: #f8f9fa;
+}
+
+.file-item .file-icon {
+    font-size: 16px;
+    margin-right: 8px;
+}
+
+.file-name {
+    margin-right: 10px;
+}
+
+.file-location {
+    position: absolute;
+    left: 40%;
+}
+
+.file-date {
+    position: absolute;
+    left: 70%;
+}
+
+.file-size {
+    position: absolute;
+    left: 90%;
+}
+
+
+.file-item .file-name::before {
+    content: attr(data-icon);
+    margin-right: 8px;
+}
+
+.file-item .file-name {
+    display: flex;
+    align-items: center;
+}
+
+.status-bar {
+    padding: 4px 12px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #ddd;
+    font-size: 11px;
+    color: #666;
+}

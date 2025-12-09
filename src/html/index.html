@@ -50,17 +50,13 @@
   <!-- ゴミ箱改装中 -->
   <div id="trash-can">
     <img src="../pic/ゴミ箱の無料アイコン.png" alt="ゴミ箱" id="trash-image">
-    <h1 class="word word_trash">ゴミ箱</h1>
+    <h1 class="word word_trash">ごみ箱</h1>
   </div>
 
   <!-- ここを追加/確認: EVE アイコン（クリックで子ウィンドウを開閉） -->
   <div class="eve">
     <img src="../pic/icon_E.png" alt="EVE" id="eve-image">
     <h1 class="word">E.V.E</h1>
-  </div>
-  
-  <div id="trash-content" style="display: none;">
-    <h3>🗑️ ゴミ箱の中身 (移動済み要素)</h3>
   </div>
     
   <div class="draggable-item" draggable="true" id="file1">
@@ -76,6 +72,27 @@
   <div class="draggable-item" draggable="true" id="file3">
     <img src="../pic/file.png" alt="">  
     <h1 class="word">不要な写真.jpg</h1>
+  </div>
+
+    <!-- ファイルビューア用ウィンドウコンテナ（ゴミ箱用） -->
+  <div class="trash-viewer-container" id="trashViewerContainer" style="display: none; top: 160px; right: 90px;">
+    <div class="file-viewer-window" id="trashViewerWindow" style="height: 500px; width: 850px;">
+      <div class="box" style=" background-color: aliceblue;">
+        <div class="titlebar" style="background-color: aliceblue;">
+          <div class="tabs" style="background-color: aliceblue;">
+            <div class="tab active" style="background-color: rgb(233 236 239); top: 7px; width: 150px;">
+              <span class="tab-label" id="trashViewerTitle" style="color: black;  font-size: 18px;">ごみ箱</span>
+            </div>
+          </div>
+          <div class="window-controls">
+            <button class="ctrl minimize" title="最小化" style="color: black;">一</button>
+            <button class="ctrl maximize" title="最大化" style="color: black;">▢</button>
+            <button class="ctrl close" data-viewer="3" title="閉じる" style="color: black;">✕</button>
+          </div>
+        </div>
+      </div>
+      <iframe id="trash-viewer-iframe" frameborder="0"></iframe>
+    </div>
   </div>
 
   <!-- ファイルビューア用ウィンドウコンテナ（file1用） -->
@@ -144,7 +161,7 @@
     <!-- 追加: 検索アイコンとラベル -->
     <div class="win_surch">
       <div class="icon_taskb">
-        <img src="../pic/okumono_te01.png" alt="" class="i_task_bar win">
+        <img src="../pic/win.png" alt="" class="i_task_bar win">
       </div>
       
       <div class="app-pill">

@@ -2,11 +2,12 @@ const mini = document.getElementById('miniWindow');
 const windowContainer = document.getElementById('windowContainer');
 let offsetX, offsetY, isDragging = false;
 
-// ファイルビューア用の変数（3つのウィンドウ）
+// ファイルビューア用の変数(3つのウィンドウ + ゴミ箱)
 const fileViewerContainers = {
     1: document.getElementById('fileViewerContainer1'),
     2: document.getElementById('fileViewerContainer2'),
-    3: document.getElementById('fileViewerContainer3')
+    3: document.getElementById('fileViewerContainer3'),
+    'trash': document.getElementById('trashViewerContainer')
 };
 let fileViewerDragState = { id: null, offsetX: 0, offsetY: 0 };
 
@@ -114,11 +115,19 @@ document.addEventListener('mousemove', (e) => {
     }
 });
 
-// ファイルビューアの閉じるボタン（3つのウィンドウに対応）
-document.querySelectorAll('.file-viewer-container .ctrl.close').forEach(btn => {
+// ファイルビューアの閉じるボタン(3つのウィンドウ + ゴミ箱に対応)
+document.querySelectorAll('.file-viewer-container .ctrl.close, .trash-viewer-container .ctrl.close').forEach(btn => {
     btn.addEventListener('click', (e) => {
-        const viewerId = e.target.dataset.viewer;   
-        const container = fileViewerContainers[viewerId];
+        const viewerId = e.target.dataset.viewer;
+        let container;
+        
+        // viewerIdが'trash'や特殊な値の場合、直接取得
+        if (viewerId === '3' && e.target.closest('.trash-viewer-container')) {
+            container = document.getElementById('trashViewerContainer');
+        } else {
+            container = fileViewerContainers[viewerId];
+        }
+        
         if (container) {
             container.style.display = 'none';
             const iframe = container.querySelector('iframe');
@@ -132,12 +141,37 @@ document.querySelectorAll('.file-viewer-container .ctrl.close').forEach(btn => {
 const items = document.querySelectorAll('.draggable-item');
 const trashCan = document.getElementById('trash-can');
 
-// ファイルごとのページ設定（ファイルIDとウィンドウ番号のマッピング）
+// ファイルごとのページ設定(ファイルIDとウィンドウ番号のマッピング)
 const filePages = {
     'file1': { page: 'file1.html', viewerId: 1 },  // 重要なデータ.txt
     'file2': { page: 'file2.html', viewerId: 2 },  // 古いメモ.doc
     'file3': { page: 'file3.html', viewerId: 3 }   // 不要な写真.jpg
 };
+
+// ゴミ箱のダブルクリック処理
+if (trashCan) {
+    trashCan.addEventListener('dblclick', (e) => {
+        const container = fileViewerContainers['trash'];
+        const iframe = document.getElementById('trash-viewer-iframe');
+        const title = document.getElementById('trashViewerTitle');
+        
+        // タイトル設定
+        if (title) {
+            title.textContent = 'ごみ箱';
+        }
+        
+        // iframeにページを読み込み
+        if (iframe) {
+            iframe.src = 'trash.html';
+        }
+        
+        // ウィンドウを表示して前面に
+        if (container) {
+            container.style.display = 'block';
+            bringToFront(container);
+        }
+    });
+}
 
 items.forEach(item => {
     item.addEventListener('dragstart', (e) => {
@@ -176,27 +210,6 @@ items.forEach(item => {
         }
     });
 });
-
-// トグル機能を関数化
-function toggleTrashContent() {
-    if (trashContent.style.display === 'none') {
-        trashContent.style.display = 'block';
-        toggleButton.textContent = 'ゴミ箱を閉じる';
-    } else {
-        trashContent.style.display = 'none';
-        toggleButton.textContent = 'ゴミ箱を開く';
-    }
-}
-
-// 復元機能
-window.restoreItem = function(id, content) {
-    const originalElement = document.getElementById(id);
-    if (originalElement) {
-        originalElement.style.display = 'block';
-        const trashItem = event.target.parentElement;
-        trashItem.parentElement.removeChild(trashItem);
-    }
-};
 
 document.addEventListener('DOMContentLoaded', () => {
     const eveImage = document.getElementById('eve-image');
