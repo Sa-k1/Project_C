@@ -2,23 +2,27 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>Xterm Demo</title>
-  <!-- xterm CSS via CDN -->
-  <link rel="stylesheet" href="https://unpkg.com/xterm/css/xterm.css">
-  <link rel="stylesheet" href="../css/style_con.css">
-  <!-- ウイルス演出用 CSS を追加 -->
-  <link rel="stylesheet" href="../error_direction/virus.css">
+  <title>AI チャット</title>
+  <link rel="stylesheet" href="../css/chat.css">
 </head>
-<body>
-  <div id="terminal"></div>
+<body>  
+    <!-- メッセージエリア -->
+    <div class="chat-messages" id="chatMessages">
+      <div class="welcome-message"></div>
+    </div>
+    <!-- 入力エリア -->
+    <div class="chat-input-container">
+      <textarea 
+        class="chat-input" 
+        id="chatInput" 
+        placeholder="メッセージを入力..." 
+        rows="1"
+      ></textarea>
+      <button class="send-button" id="sendButton" title="送信">
+        ➤
+      </button>
+    </div>
 
-  <!-- xterm + fit addon via CDN (UMD builds) -->
-  <script src="https://unpkg.com/xterm/lib/xterm.js"></script>
-  <script src="https://unpkg.com/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
-  <!-- ウイルス演出用 JS を追加（xterm_demo.js より前に読み込む） -->
-  <script src="../error_direction/virus-config.js"></script>
-  <script src="../error_direction/virus.js"></script>
-  <script src="../js/file_system.js"></script>
-　<script src="../../xterm_demo.js"></script>
+  <script src="../../chat.js"></script>
 </body>
 </html>

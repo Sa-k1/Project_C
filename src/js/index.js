@@ -2,12 +2,13 @@ const mini = document.getElementById('miniWindow');
 const windowContainer = document.getElementById('windowContainer');
 let offsetX, offsetY, isDragging = false;
 
-// ファイルビューア用の変数(3つのウィンドウ + ゴミ箱)
+// ファイルビューア用の変数(3つのウィンドウ + ゴミ箱 + ターミナル)
 const fileViewerContainers = {
     1: document.getElementById('fileViewerContainer1'),
     2: document.getElementById('fileViewerContainer2'),
     3: document.getElementById('fileViewerContainer3'),
-    'trash': document.getElementById('trashViewerContainer')
+    'trash': document.getElementById('trashViewerContainer'),
+    'terminal': document.getElementById('terminalViewerContainer')
 };
 let fileViewerDragState = { id: null, offsetX: 0, offsetY: 0 };
 
@@ -115,14 +116,16 @@ document.addEventListener('mousemove', (e) => {
     }
 });
 
-// ファイルビューアの閉じるボタン(3つのウィンドウ + ゴミ箱に対応)
-document.querySelectorAll('.file-viewer-container .ctrl.close, .trash-viewer-container .ctrl.close').forEach(btn => {
+// ファイルビューアの閉じるボタン(3つのウィンドウ + ゴミ箱 + ターミナルに対応)
+document.querySelectorAll('.file-viewer-container .ctrl.close, .trash-viewer-container .ctrl.close, .terminal-viewer-container .ctrl.close').forEach(btn => {
     btn.addEventListener('click', (e) => {
         const viewerId = e.target.dataset.viewer;
         let container;
         
-        // viewerIdが'trash'や特殊な値の場合、直接取得
-        if (viewerId === '3' && e.target.closest('.trash-viewer-container')) {
+        // viewerIdが'trash'や'terminal'や特殊な値の場合、直接取得
+        if (viewerId === 'terminal') {
+            container = document.getElementById('terminalViewerContainer');
+        } else if (viewerId === '3' && e.target.closest('.trash-viewer-container')) {
             container = document.getElementById('trashViewerContainer');
         } else {
             container = fileViewerContainers[viewerId];
@@ -163,6 +166,27 @@ if (trashCan) {
         // iframeにページを読み込み
         if (iframe) {
             iframe.src = 'trash.html';
+        }
+        
+        // ウィンドウを表示して前面に
+        if (container) {
+            container.style.display = 'block';
+            bringToFront(container);
+        }
+    });
+}
+
+// AIチャットターミナルアイコンのダブルクリック処理
+const terminalIcon = document.getElementById('terminalIcon');
+if (terminalIcon) {
+    terminalIcon.addEventListener('dblclick', (e) => {
+        const container = fileViewerContainers['terminal'];
+        const iframe = document.getElementById('terminal-viewer-iframe');
+        
+        // iframeにページを読み込み
+        if (iframe && !iframe.dataset.loaded) {
+            iframe.src = 'terminal.html';
+            iframe.dataset.loaded = 'true';
         }
         
         // ウィンドウを表示して前面に

@@ -15,28 +15,20 @@
   
   <!-- ターミナルと小窓をまとめるコンテナ -->
   <div class="window-container" id="windowContainer" style="display: none;">
-    <!-- ターミナルに隣接する小窓（イラスト用）- 左側 -->
-    <div class="side-panel" id="sidePanel">
-      <div class="side-panel-content">
-        <!-- ここにイラストを入れる -->
-        <img id="side-panel-image" src="../pic/fotor-ai-2025112710534.gif" alt="EVE イラスト">
-      </div>
-    </div>
-    
     <!-- メインのターミナルウィンドウ - 右側 -->
-    <div class="mini-window" id="miniWindow">
+    <div class="mini-window" id="miniWindow" style="width: 815px; height: 500px;">
       <div class="box">
-        <div class="titlebar">
+        <div class="titlebar" style="background-color: rgb(255, 255, 255); border: #0d1b2a 2px solid; position: absolute; left: -1px;">
           <div class="tabs">
-            <div class="tab active">
-              <span class="tab-icon" aria-hidden="true"></span>
+            <div class="tab active" style="background-color: #fff; color: black;">
+              <img src="../pic/icon_E_21.png" alt="" class="tab-icon">
               <span class="tab-label">アシスタントAI : EVE</span>
             </div>
           </div>
           <div class="window-controls">
-            <button class="ctrl minimize" title="最小化">一</button>
-            <button class="ctrl maximize" title="最大化">▢</button>
-            <button class="ctrl close" title="閉じる">✕</button>
+            <button class="ctrl minimize" title="最小化" style="color: #0d1b2a;">一</button>
+            <button class="ctrl maximize" title="最大化" style="color: #0d1b2a;">☐</button>
+            <button class="ctrl close" title="閉じる" style="color: #0d1b2a;">✕</button>
           </div>
         </div>
       </div>
@@ -74,6 +66,12 @@
     <h1 class="word">不要な写真.png</h1>
   </div>
 
+  <!-- AIチャットターミナルアイコン -->
+  <div class="draggable-item" draggable="true" id="terminalIcon">
+    <img src="../pic/txt.png" alt="" class="all_img">  
+    <h1 class="word">terminal</h1>
+  </div>
+
     <!-- ファイルビューア用ウィンドウコンテナ（ゴミ箱用） -->
   <div class="trash-viewer-container" id="trashViewerContainer" style="display: none; top: 160px; right: 90px;">
     <div class="file-viewer-window" id="trashViewerWindow" style="height: 500px; width: 850px;">
@@ -86,7 +84,7 @@
           </div>
           <div class="window-controls">
             <button class="ctrl minimize" title="最小化" style="color: black;">一</button>
-            <button class="ctrl maximize" title="最大化" style="color: black;">▢</button>
+            <button class="ctrl maximize" title="最大化" style="color: black;">☐</button>
             <button class="ctrl close" data-viewer="3" title="閉じる" style="color: black;">✕</button>
           </div>
         </div>
@@ -107,7 +105,7 @@
           </div>
           <div class="window-controls">
             <button class="ctrl minimize" title="最小化">一</button>
-            <button class="ctrl maximize" title="最大化">▢</button>
+            <button class="ctrl maximize" title="最大化">☐</button>
             <button class="ctrl close" data-viewer="1" title="閉じる">✕</button>
           </div>
         </div>
@@ -127,8 +125,8 @@
           </div>
           <div class="window-controls">
             <button class="ctrl minimize" title="最小化">一</button>
-            <!-- ▢, ❐ 最大化の機能の時に使う文字 -->
-            <button class="ctrl maximize" title="最大化">▢</button>
+            <!-- ☐, ❐ 最大化の機能の時に使う文字 -->
+            <button class="ctrl maximize" title="最大化">☐</button>
             <button class="ctrl close" data-viewer="2" title="閉じる">✕</button>
           </div>
         </div>
@@ -149,12 +147,33 @@
           </div>
           <div class="window-controls">
             <button class="ctrl minimize" title="最小化">一</button>
-            <button class="ctrl maximize" title="最大化">▢</button>
+            <button class="ctrl maximize" title="最大化">☐</button>
             <button class="ctrl close" data-viewer="3" title="閉じる">✕</button>
           </div>
         </div>
       </div>
       <iframe id="file-viewer-iframe3" frameborder="0"></iframe>
+    </div>
+  </div>
+
+  <!-- AIチャットターミナル用ウィンドウコンテナ -->
+  <div class="terminal-viewer-container" id="terminalViewerContainer" style="display: none; top: 100px; left: 100px;">
+    <div class="file-viewer-window" id="terminalViewerWindow" style="height: 450px; width: 800px; border: 2px solid #333;">
+      <div class="box">
+        <div class="titlebar" style="background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);">
+          <div class="tabs">
+            <div class="tab active" style="background-color: #0d1b2a;">
+              <span class="tab-label" id="terminalViewerTitle" style="color: rgb(255, 255, 255);">ターミナル</span>
+            </div>
+          </div>
+          <div class="window-controls">
+            <button class="ctrl minimize" title="最小化">一</button>
+            <button class="ctrl maximize" title="最大化">☐</button>
+            <button class="ctrl close" data-viewer="terminal" title="閉じる">✕</button>
+          </div>
+        </div>
+      </div>
+      <iframe id="terminal-viewer-iframe" frameborder="0"></iframe>
     </div>
   </div>
 

@@ -32,67 +32,17 @@ body {
     z-index: 100;
 }
 
-/* ターミナルに隣接する小窓（イラスト用）- 左側に配置 */
-.side-panel {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    background-color: #1a1a1a;
-    border: 2px solid #555;
-    border-right: none; /* ターミナルとの境界を繋げる */
-    border-radius: 10px 0 0 10px;
-    box-shadow: 2px 2px 18px rgba(0,0,0,0.25);
-    box-sizing: border-box;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
 .mini-window {
     position: relative;
     width: 800px;
     height: 400px;
     background-color: #000000;
     border: 2px solid #555;
-    border-radius: 0 10px 10px 10px;
+    border-radius: 10px 10px 10px 10px;
     box-shadow: 2px 2px 18px rgba(0,0,0,0.25);
     box-sizing: border-box;
     overflow: hidden;
     z-index: 500;  /* ← 追加：赤演出より上 */
-}
-
-.side-panel-header {
-    height: 48px;
-    background-color: #2e2e2e;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-bottom: 1px solid #444;
-}
-
-.side-panel-title {
-    color: #ddd;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.side-panel-content {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-    background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
-}
-
-.side-panel-content img {
-    position: absolute;
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    border-radius: 8px;
-    /* イラストにグロー効果を追加（オプション） */
-    filter: drop-shadow(0 0 10px rgba(0, 200, 255, 0.3));
 }
 
 .terminal {
@@ -156,6 +106,13 @@ body {
     position: absolute;
     top: 100px;
     right: 100px;
+    z-index: 150;
+}
+
+.terminal-viewer-container {
+    position: absolute;
+    top: 100px;
+    left: 100px;
     z-index: 150;
 }
 
@@ -230,14 +187,11 @@ body {
     padding: 6px 10px; /* 内側の余白を少し減らして隙間を詰める */
 }
 .tab .tab-icon{
-    background-image: url(../pic/flutter_dash.png);
-    width:20px;
     height:20px;
     display:inline-block;
     vertical-align:middle;
     border-radius:4px;
     margin-right:6px; /* アイコンとラベルの間隔を詰める */
-    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 .tab .tab-label{
     vertical-align:middle;
@@ -266,7 +220,8 @@ body {
     border: none;
     background: transparent;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 18px;
+    font-weight: bold;
     color: floralwhite;
 }
 
