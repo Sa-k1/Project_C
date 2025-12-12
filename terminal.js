@@ -137,6 +137,31 @@
         return width;
     }
 
+    // 現在の入力行をクリアするヘルパー関数
+    function clearCurrentLine() {
+        var bufChars = Array.from(buffer);
+        // カーソルより後ろの幅を計算
+        var afterWidth = 0;
+        for (var i = cursorPos; i < bufChars.length; i++) {
+            afterWidth += getCharWidth(bufChars[i]);
+        }
+        // カーソルより前の幅を計算
+        var beforeWidth = 0;
+        for (var i = 0; i < cursorPos; i++) {
+            beforeWidth += getCharWidth(bufChars[i]);
+        }
+        // まずカーソルを末尾に移動
+        for (var i = 0; i < afterWidth; i++) {
+            term.write('\x1b[C');
+        }
+        // 全体を消去
+        var totalWidth = beforeWidth + afterWidth;
+        for (var i = 0; i < totalWidth; i++) {
+            term.write("\b \b");
+        }
+        cursorPos = 0;
+    }
+
     // -------------------------
     // コマンド処理
     // -------------------------
@@ -221,6 +246,14 @@
     var inputEnabled = true;
     var isComposing = false;
     var composingText = "";
+    
+    // コマンド履歴
+    var commandHistory = [];
+    var historyIndex = -1;
+    var tempBuffer = ""; // 履歴参照前の入力を一時保存
+    
+    // カーソル位置（バッファ内の文字インデックス）
+    var cursorPos = 0;
 
     // IME入力検知用
     var terminalElement = document.getElementById("terminal");
@@ -239,12 +272,80 @@
     }
 
     // 起動メッセージ
-    systemPrint("ターミナルを初期化しました。");
+    systemPrint("\x1b[0mEVE-OS [Version A-3.1.2077]\n");
     term.write(getPrompt());
 
     // 入力処理
     term.onData(async function(data) {
         if (!inputEnabled) return;
+        
+        // 矢印キーのエスケープシーケンス検出
+        if (data === '\x1b[A' || data === '\x1bOA') {
+            // 上矢印: 履歴を遡る
+            if (commandHistory.length > 0) {
+                if (historyIndex === -1) {
+                    tempBuffer = buffer; // 現在の入力を保存
+                    historyIndex = commandHistory.length - 1;
+                } else if (historyIndex > 0) {
+                    historyIndex--;
+                }
+                // 現在行をクリアして履歴を表示
+                clearCurrentLine();
+                buffer = commandHistory[historyIndex];
+                cursorPos = Array.from(buffer).length;
+                term.write(buffer);
+            }
+            return;
+        }
+        
+        if (data === '\x1b[B' || data === '\x1bOB') {
+            // 下矢印: 履歴を進む
+            if (historyIndex !== -1) {
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    clearCurrentLine();
+                    buffer = commandHistory[historyIndex];
+                    cursorPos = Array.from(buffer).length;
+                    term.write(buffer);
+                } else {
+                    // 最新まで戻ったら元の入力に戻す
+                    historyIndex = -1;
+                    clearCurrentLine();
+                    buffer = tempBuffer;
+                    cursorPos = Array.from(buffer).length;
+                    term.write(buffer);
+                }
+            }
+            return;
+        }
+        
+        // 右矢印: カーソルを右に移動
+        if (data === '\x1b[C' || data === '\x1bOC') {
+            var bufChars = Array.from(buffer);
+            if (cursorPos < bufChars.length) {
+                var charWidth = getCharWidth(bufChars[cursorPos]);
+                // カーソルを右に移動（全角なら2カラム分）
+                for (var j = 0; j < charWidth; j++) {
+                    term.write('\x1b[C');
+                }
+                cursorPos++;
+            }
+            return;
+        }
+        
+        // 左矢印: カーソルを左に移動
+        if (data === '\x1b[D' || data === '\x1bOD') {
+            if (cursorPos > 0) {
+                cursorPos--;
+                var bufChars = Array.from(buffer);
+                var charWidth = getCharWidth(bufChars[cursorPos]);
+                // カーソルを左に移動（全角なら2カラム分）
+                for (var j = 0; j < charWidth; j++) {
+                    term.write('\x1b[D');
+                }
+            }
+            return;
+        }
         
         var chars = Array.from(data);
         
@@ -259,6 +360,15 @@
                 term.write("\r\n");
                 var userMessage = buffer.trim();
                 buffer = "";
+                cursorPos = 0;
+                
+                // 履歴に追加（空でなく、直前と重複しない場合）
+                if (userMessage && (commandHistory.length === 0 || 
+                    commandHistory[commandHistory.length - 1] !== userMessage)) {
+                    commandHistory.push(userMessage);
+                }
+                historyIndex = -1;
+                tempBuffer = "";
                 
                 if (userMessage) {
                     inputEnabled = false;
@@ -267,24 +377,61 @@
                 }
                 term.write(getPrompt());
             } else if (code === 127 || code === 8) { // Backspace
-                if (buffer.length > 0) {
-                    // 削除される文字を取得してその幅を計算
+                if (cursorPos > 0) {
                     var bufChars = Array.from(buffer);
-                    var lastChar = bufChars[bufChars.length - 1];
-                    var charWidth = getCharWidth(lastChar);
-                    // バッファから最後の文字を削除（正しくUnicode文字単位で）
-                    buffer = bufChars.slice(0, -1).join("");
-                    // 全角なら2カラム分、半角なら1カラム分を消去
-                    if (charWidth === 2) {
-                        term.write("\b \b\b \b");
-                    } else {
-                        term.write("\b \b");
+                    var delChar = bufChars[cursorPos - 1];
+                    var charWidth = getCharWidth(delChar);
+                    
+                    // カーソル位置の前の文字を削除
+                    bufChars.splice(cursorPos - 1, 1);
+                    buffer = bufChars.join("");
+                    cursorPos--;
+                    
+                    // カーソルを左に移動
+                    for (var j = 0; j < charWidth; j++) {
+                        term.write('\x1b[D');
+                    }
+                    
+                    // カーソル位置から後ろを再描画
+                    var afterCursor = bufChars.slice(cursorPos).join("");
+                    var afterWidth = getStringWidth(afterCursor);
+                    term.write(afterCursor);
+                    // 削除した文字の分を空白で埋める
+                    for (var j = 0; j < charWidth; j++) {
+                        term.write(' ');
+                    }
+                    // カーソルを元の位置に戻す
+                    for (var j = 0; j < afterWidth + charWidth; j++) {
+                        term.write('\x1b[D');
                     }
                 }
             } else if (code >= 32) {
                 // 通常の文字入力（IME確定後の文字も含む）
-                buffer += ch;
-                term.write(ch);
+                
+                // 入力幅の上限チェック（ターミナル幅 - プロンプト幅 - 余白2文字）
+                var maxInputWidth = term.cols - getStringWidth(getPrompt()) - 2;
+                var currentWidth = getStringWidth(buffer);
+                var newCharWidth = getCharWidth(ch);
+                
+                if (currentWidth + newCharWidth > maxInputWidth) {
+                    // 上限を超える場合は入力を無視
+                    return;
+                }
+                
+                var bufChars = Array.from(buffer);
+                bufChars.splice(cursorPos, 0, ch);
+                buffer = bufChars.join("");
+                cursorPos++;
+                
+                // カーソル位置に文字を挿入して後ろを再描画
+                var charWidth = getCharWidth(ch);
+                var afterCursor = bufChars.slice(cursorPos).join("");
+                var afterWidth = getStringWidth(afterCursor);
+                term.write(ch + afterCursor);
+                // カーソルを正しい位置に戻す
+                for (var j = 0; j < afterWidth; j++) {
+                    term.write('\x1b[D');
+                }
             }
         }
     });
