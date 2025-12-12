@@ -207,6 +207,10 @@ body {
     height: 30px;
 }
 
+.MyDay_logo {
+    font-family: 'Segoe UI', 'Meiryo', sans-serif;
+    color: #fff;
+}
 
 .window-controls {
     display: flex;

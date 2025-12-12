@@ -139,6 +139,21 @@ document.querySelectorAll('.file-viewer-container .ctrl.close, .trash-viewer-con
     });
 });
 
+// EVEウィンドウ（メインウィンドウ）の閉じるボタン処理
+document.querySelectorAll('.window-container .ctrl.close').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const container = document.getElementById('windowContainer');
+        if (container) {
+            container.style.display = 'none';
+            const iframe = document.getElementById('mini-iframe');
+            if (iframe) {
+                iframe.src = '';
+                iframe.dataset.loaded = '';  // 次回開くときに再読み込みできるようにリセット
+            }
+        }
+    });
+});
+
 
 // ドラッグ可能なアイテムの処理
 const items = document.querySelectorAll('.draggable-item');
