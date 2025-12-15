@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // EVE起動時にfile3の画像差し替えフラグをクリア（毎回リセット）
+    localStorage.removeItem('file3_image_replaced');
+    
     // 背景の色変化アニメーション
     const style = document.createElement('style');
     style.textContent = `

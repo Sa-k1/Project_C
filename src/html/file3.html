@@ -604,7 +604,7 @@
             }, 1000);
         }
         
-        // 画像クリック時の処理を変更（2回目以降は即ジャンプスケア＆画像差し替え）
+        // 画像クリック時の処理を変更（2回目以降は即ジャンプスケア）
         let hasViewedOnce = false;
         let isLocked = false; // 開けなくするフラグ
         
@@ -619,40 +619,29 @@
                     const iframe = container.querySelector('iframe');
                     if (iframe) iframe.src = '';
                 }
+                
+                // file3（不要な写真.jpg）を消す
+                const file3 = targetDocument.getElementById('file3');
+                if (file3) {
+                    file3.remove();
+                }
+                
+                // sleepファイルを追加
+                const sleepFile = targetDocument.createElement('div');
+                sleepFile.className = 'draggable-item';
+                sleepFile.draggable = true;
+                sleepFile.id = 'fileSleep';
+                sleepFile.innerHTML = `
+                    <img src="../pic/file.png" alt="">  
+                    <h1 class="word">sleep</h1>
+                `;
+                // デスクトップに追加（bodyの末尾）
+                targetDocument.body.appendChild(sleepFile);
+                
             } catch(e) {
                 console.log('Could not close parent file viewer');
             }
         }
-        
-        // ページ読み込み時に画像差し替えフラグをチェック
-        window.addEventListener('DOMContentLoaded', () => {
-            // localStorageから差し替えフラグを確認
-            const shouldReplace = localStorage.getItem('file3_image_replaced');
-            if (shouldReplace === 'true') {
-                // サムネイル画像を差し替え
-                const thumbnailImg = document.querySelector('.clickable-image');
-                if (thumbnailImg) {
-                    thumbnailImg.src = '../pic/BG2.png';
-                }
-                
-                // 元画像も差し替え
-                originalImage = new Image();
-                originalImage.src = '../pic/BG2.png';
-                originalImage.onload = () => { 
-                    imageLoaded = true;
-                };
-                
-                // ファイル情報を更新
-                const statusElement = document.querySelector('.image-info p:last-child span:last-child');
-                if (statusElement) {
-                    statusElement.textContent = '変更済み';
-                    statusElement.style.color = '#ff0000';
-                }
-                
-                // ロック状態にする
-                isLocked = true;
-            }
-        });
         
         // フルスクリーン表示時にオブジェクトを配置
         const originalOpenModal = openModal;
@@ -662,11 +651,11 @@
                 return;
             }
             if (hasViewedOnce) {
-                // 2回目は即ジャンプスケア、その後ファイルを閉じる
+                // 2回目は即ジャンプスケア、その後ロック＆ファイルビューアを閉じる
                 triggerJumpscare();
-                // ジャンプスケア終了後にフラグを保存してファイルを閉じる
+                // ジャンプスケア終了後にロック＆閉じる
                 setTimeout(() => {
-                    localStorage.setItem('file3_image_replaced', 'true');
+                    isLocked = true;
                     closeParentFileViewer();
                 }, 1100);
             } else {
