@@ -134,7 +134,10 @@ document.querySelectorAll('.file-viewer-container .ctrl.close, .trash-viewer-con
         if (container) {
             container.style.display = 'none';
             const iframe = container.querySelector('iframe');
-            if (iframe) iframe.src = '';
+            if (iframe) {
+                iframe.src = '';
+                iframe.dataset.loaded = '';  // 次回開くときに再読み込みできるようにリセット
+            }
         }
     });
 });
