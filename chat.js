@@ -51,7 +51,7 @@
         if (type === "ai") {
             const label = document.createElement("span");
             label.className = "ai-label";
-            label.textContent = "🤖 AI";
+            label.textContent = "EVE";
             messageDiv.appendChild(label);
             
             const content = document.createElement("span");

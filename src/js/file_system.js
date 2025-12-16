@@ -41,7 +41,7 @@ class VirtualFileSystem {
                                                                 content: `メモ:\n- パスワードを変更する\n- バックアップを取る`,
                                                                 editable: true
                                                             },
-                                                            '不要な写真.jpg': {
+                                                            '不要な写真.png': {
                                                                 type: 'file',
                                                                 htmlFile: 'file3.html',
                                                                 contentSelector: '.image-info',

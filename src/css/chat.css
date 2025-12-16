@@ -80,7 +80,6 @@ body {
     align-self: flex-end;
     background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
     color: white;
-    border-bottom-right-radius: 4px;
     box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
 }
 
@@ -90,7 +89,6 @@ body {
     background: #ffffff;
     color: #333333;
     border: 1px solid #e0e0e0;
-    border-bottom-left-radius: 4px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
