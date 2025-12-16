@@ -202,9 +202,25 @@
       <div class="taskbar-clock">
         <span id="clock-time">00:00</span>
         <span id="clock-date">0000/00/00</span>
+        <span class="chat-badge" id="chatBadge" style="display: none;">1</span>
       </div>
     </div>
   </footer>
+
+  <!-- EVE会話パネル -->
+  <div class="notification-panel" id="notificationPanel">
+    <div class="notification-header">
+      <span class="notification-title">EVE - チャット</span>
+      <button class="notification-close" id="notificationClose">✕</button>
+    </div>
+    <div class="notification-content" id="notificationContent">
+      <!-- 会話がここに表示される -->
+    </div>
+    <div class="chat-input-area">
+      <input type="text" class="chat-input" id="chatInput" placeholder="メッセージを入力...">
+      <button class="chat-send-btn" id="chatSendBtn">送信</button>
+    </div>
+  </div>
 
   <!-- スクリプト（footer の後） -->
   <script src="../error_direction/virus-config.js"></script>

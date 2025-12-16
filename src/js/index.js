@@ -404,3 +404,174 @@ if (searchInput) {
         draggedElement = null; // リセット
     });
 }
+
+// ========================
+// EVE会話パネルの制御
+// ========================
+const notificationPanel = document.getElementById('notificationPanel');
+const notificationClose = document.getElementById('notificationClose');
+const notificationContent = document.getElementById('notificationContent');
+const chatInput = document.getElementById('chatInput');
+const chatSendBtn = document.getElementById('chatSendBtn');
+const chatBadge = document.getElementById('chatBadge');
+
+// 未読カウント管理
+let unreadCount = 0;
+
+// 未読バッジを更新
+function updateChatBadge() {
+    if (unreadCount > 0) {
+        chatBadge.textContent = unreadCount;
+        chatBadge.style.display = 'flex';
+    } else {
+        chatBadge.style.display = 'none';
+    }
+}
+
+// 未読をクリア
+function clearUnread() {
+    unreadCount = 0;
+    updateChatBadge();
+}
+
+// 時計エリアをクリックで会話パネルの表示/非表示
+const taskbarClock = document.querySelector('.taskbar-clock');
+if (taskbarClock) {
+    taskbarClock.addEventListener('click', () => {
+        notificationPanel.classList.toggle('show');
+        if (notificationPanel.classList.contains('show')) {
+            chatInput.focus();
+            clearUnread(); // パネルを開いたら未読をクリア
+        }
+    });
+}
+
+// 閉じるボタン
+if (notificationClose) {
+    notificationClose.addEventListener('click', () => {
+        notificationPanel.classList.remove('show');
+    });
+}
+
+// ユーザーメッセージを追加
+function addUserMessage(message) {
+    const time = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'chat-message-user';
+    messageDiv.innerHTML = `
+        ${message}
+        <div class="chat-timestamp">${time}</div>
+    `;
+    
+    notificationContent.appendChild(messageDiv);
+    notificationContent.scrollTop = notificationContent.scrollHeight;
+}
+
+// EVEメッセージを追加
+function addEveMessage(message, isAutoMessage = false) {
+    const time = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'chat-message-eve';
+    messageDiv.innerHTML = `
+        ${message}
+        <div class="chat-timestamp">${time}</div>
+    `;
+    
+    notificationContent.appendChild(messageDiv);
+    notificationContent.scrollTop = notificationContent.scrollHeight;
+    
+    // 自動メッセージの場合、パネルが閉じていたら未読カウントを増やす
+    if (isAutoMessage && !notificationPanel.classList.contains('show')) {
+        unreadCount++;
+        updateChatBadge();
+    }
+}
+
+// メッセージ送信処理
+function sendMessage() {
+    const message = chatInput.value.trim();
+    if (!message) return;
+    
+    // ユーザーのメッセージを表示
+    addUserMessage(message);
+    chatInput.value = '';
+    
+    // EVEの返答を取得して表示
+    setTimeout(() => {
+        const response = getEveResponse(message);
+        addEveMessage(response);
+    }, 500);
+}
+
+// EVEの返答を取得する関数（ここに会話内容を追加していく）
+function getEveResponse(userMessage) {
+    const msg = userMessage.toLowerCase();
+    
+    // ここに会話パターンを追加していく
+    if (msg.includes('こんにちは') || msg.includes('はじめまして')) {
+        return 'こんにちは。何かお手伝いできることはありますか？';
+    }
+    
+    if (msg.includes('助けて') || msg.includes('help')) {
+        return '大丈夫ですよ。落ち着いてください。';
+    }
+    
+    if (msg.includes('ありがとう')) {
+        return 'どういたしまして。';
+    }
+    
+    // デフォルトの返答
+    return 'そうですね...';
+}
+
+// 送信ボタンクリック
+if (chatSendBtn) {
+    chatSendBtn.addEventListener('click', sendMessage);
+}
+
+// Enterキーで送信
+if (chatInput) {
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+}
+
+// EVEから自動的にメッセージを送る関数（グローバルで使用可能）
+window.sendEveMessage = function(message) {
+    addEveMessage(message, true);
+};
+
+// 初期メッセージを追加
+addEveMessage('こんにちは。私はEVEです。何か質問はありますか？');
+
+// ========================
+// 特定条件でEVEからメッセージを送る例
+// ========================
+
+// 例1: 起動から10秒後にメッセージ
+setTimeout(() => {
+    window.sendEveMessage('まだそこにいますか？');
+}, 10000);
+
+// 例2: ファイルがドラッグされたときにメッセージ
+document.addEventListener('dragstart', (e) => {
+    if (e.target.classList.contains('draggable-item')) {
+        // ランダムでメッセージを送る
+        if (Math.random() > 0.7) {
+            window.sendEveMessage('何をしているのですか？');
+        }
+    }
+});
+
+// 例3: 特定のファイルが開かれたときにメッセージ（グローバル関数として定義）
+window.onFileOpen = function(fileName) {
+    if (fileName === 'file1') {
+        window.sendEveMessage('そのファイルを開いたのですね...');
+    } else if (fileName === 'file3') {
+        window.sendEveMessage('その写真は...興味深いですね。');
+    }
+};
