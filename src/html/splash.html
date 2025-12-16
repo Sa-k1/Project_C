@@ -7,14 +7,30 @@
     <link rel="stylesheet" href="../css/anime.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Atma:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+      /* 最初はアニメーションを停止 */
+      .paused * {
+        animation-play-state: paused !important;
+      }
+      .paused {
+        animation-play-state: paused !important;
+      }
+    </style>
 </head>
-<body>
+<body class="paused">
   <h1 class="fade-in">E.V.E</h1>
   <!-- <div class="expanding-box"></div> -->
   <div class="rotating-circle"></div>
   <div class="glow-ring"></div>
   <div class="fade-out-white"></div>
   <script src="../js/anime.js" defer></script>
+  <script>
+    const { ipcRenderer } = require('electron');
+    // アニメーション開始のIPCを受信
+    ipcRenderer.on('start-animation', () => {
+      document.body.classList.remove('paused');
+    });
+  </script>
 </body>
 
 </html>

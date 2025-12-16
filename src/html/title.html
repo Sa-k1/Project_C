@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>startSC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .title-container {
+            margin-top: 15vh;
+            text-align: center;
+        }
+
+        .game-title {
+            font-size: 4rem;
+            color: #e94560;
+            text-shadow: 0 0 20px rgba(233, 69, 96, 0.5),
+                         0 0 40px rgba(233, 69, 96, 0.3),
+                         0 0 60px rgba(233, 69, 96, 0.2);
+            letter-spacing: 0.2em;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from {
+                text-shadow: 0 0 20px rgba(233, 69, 96, 0.5),
+                             0 0 40px rgba(233, 69, 96, 0.3),
+                             0 0 60px rgba(233, 69, 96, 0.2);
+            }
+            to {
+                text-shadow: 0 0 30px rgba(233, 69, 96, 0.8),
+                             0 0 60px rgba(233, 69, 96, 0.5),
+                             0 0 90px rgba(233, 69, 96, 0.3);
+            }
+        }
+
+        .start-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .start-button {
+            font-size: 2rem;
+            padding: 20px 60px;
+            background: transparent;
+            border: 3px solid #e94560;
+            color: #e94560;
+            cursor: pointer;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-button:hover {
+            background: #e94560;
+            color: #1a1a2e;
+            box-shadow: 0 0 30px rgba(233, 69, 96, 0.6);
+            transform: scale(1.05);
+        }
+
+        .start-button:active {
+            transform: scale(0.98);
+        }
+
+        .start-button.clicked {
+            animation: buttonPulse 0.5s ease-out;
+        }
+
+        @keyframes buttonPulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+
+        .fade-out {
+            animation: fadeOut 1s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="title-container">
+        <h1 class="game-title">title</h1>
+    </div>
+
+    <div class="start-container">
+        <button class="start-button" id="startBtn">start</button>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        const startButton = document.getElementById('startBtn');
+
+        startButton.addEventListener('click', function() {
+            startButton.classList.add('clicked');
+            
+            // フェードアウト開始と同時にスプラッシュのアニメーションを開始
+            ipcRenderer.send('prepare-splash');
+            
+            // フェードアウトを開始
+            document.body.classList.add('fade-out');
+            
+            // フェードアウト完了後に画面切り替え
+            setTimeout(() => {
+                ipcRenderer.send('game-start');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
