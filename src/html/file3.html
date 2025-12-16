@@ -626,17 +626,6 @@
                     file3.remove();
                 }
                 
-                // sleepファイルを追加
-                const sleepFile = targetDocument.createElement('div');
-                sleepFile.className = 'draggable-item';
-                sleepFile.draggable = true;
-                sleepFile.id = 'fileSleep';
-                sleepFile.innerHTML = `
-                    <img src="../pic/file.png" alt="">  
-                    <h1 class="word">sleep</h1>
-                `;
-                // デスクトップに追加（bodyの末尾）
-                targetDocument.body.appendChild(sleepFile);
                 
             } catch(e) {
                 console.log('Could not close parent file viewer');
