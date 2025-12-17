@@ -109,6 +109,11 @@ html, body {
     font-family: monospace;
 }
 
+/* 文字化け状態 */
+.diary-content.corrupted {
+    text-shadow: 0 0 2px rgba(255, 100, 100, 0.3);
+}
+
 /* 謎のメッセージ */
 .diary-content.mystery {
     color: #888;

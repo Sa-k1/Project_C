@@ -204,6 +204,70 @@
         } else {
             await errorLine("[ERROR]: コマンドハンドラが初期化されていません", 20);
         }
+<<<<<<< Updated upstream
+=======
+
+        // helpコマンド（常に使用可能）
+        if (command.toLowerCase() === "help") {
+            await systemLine("[SYSTEM]: 利用可能なコマンド一覧", 20);
+            term.writeln("\r");
+            term.writeln("\r  === 基本コマンド ===");
+            term.writeln("\r  help          - このヘルプを表示");
+            term.writeln("\r  dir / ls      - ディレクトリの内容を表示");
+            term.writeln("\r  cd <フォルダ名> - フォルダに移動");
+            term.writeln("\r  cd ..         - 上のフォルダに戻る");
+            term.writeln("\r  cat <ファイル名> - ファイルの内容を表示");
+            term.writeln("\r  open <ファイル名> - ファイルを開く");
+            term.writeln("\r  clear         - 画面をクリア");
+            term.writeln("\r  trash         - ゴミ箱を開く");
+            term.writeln("\r  history <ファイル名> - ファイルの履歴を復元");
+            return;
+        }
+
+        // clearコマンド
+        if (command.toLowerCase() === "clear" || command.toLowerCase() === "cls") {
+            term.clear();
+            return;
+        }
+
+        // historyコマンド - ファイルの履歴を復元
+        if (command.toLowerCase().indexOf('history ') === 0) {
+            var args = command.split(/\s+/);
+            var target = args[1] ? args[1].trim() : '';
+            
+            if (target.toLowerCase() === 'myday') {
+                await systemLine("[SYSTEM]: MyDay の履歴データを復元しています...", 25);
+                await wait(500);
+                
+                // file2.htmlのiframeを取得して unlockDiary を呼び出す
+                var iframe = parent.document.getElementById('file-viewer-iframe2');
+                if (iframe && iframe.contentWindow && typeof iframe.contentWindow.unlockDiary === 'function') {
+                    iframe.contentWindow.unlockDiary();
+                    await systemLine("[SYSTEM]: 復元完了。ファイルの内容が読めるようになりました。", 25);
+                } else {
+                    // iframeがまだ読み込まれていない場合、親ウィンドウ（index.html）にフラグを設定
+                    try {
+                        parent.window.diaryUnlockPending = true;
+                    } catch(e) {
+                        console.log('Could not set flag on parent:', e);
+                    }
+                    await systemLine("[SYSTEM]: 復元データを準備しました。MyDay を開くと内容が読めます。", 25);
+                }
+                return;
+            } else if (target === '') {
+                await errorLine("[ERROR]: ファイル名を指定してください。", 20);
+                await systemLine("[SYSTEM]: 使用方法: history <ファイル名>", 20);
+                return;
+            } else {
+                await errorLine("[ERROR]: '" + target + "' の履歴データは見つかりませんでした。", 20);
+                return;
+            }
+        }
+
+        // 不明なコマンド
+        await errorLine("[ERROR]: '" + command + "' は認識されないコマンドです。", 20);
+        await systemLine("[SYSTEM]: 'help' でコマンド一覧を確認できます。", 20);
+>>>>>>> Stashed changes
     }
 
     // -------------------------
