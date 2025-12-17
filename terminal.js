@@ -239,7 +239,7 @@
     }
 
     // 起動メッセージ
-    systemPrint("ターミナルを初期化しました。");
+    systemPrint("\x1b[0mEVE-OS [Version 10.0.26]\n");
     term.write(getPrompt());
 
     // 入力処理
