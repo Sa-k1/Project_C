@@ -1,0 +1,369 @@
+// puzzle.js - 謎解きシステム（暗号化ファイルとゴミ箱機能）
+
+(function() {
+    // グローバルなpuzzleSystemオブジェクトを作成
+    window.puzzleSystem = {};
+
+    // -------------------------
+    // 暗号化ファイル設定（謎解きシステム）
+    // -------------------------
+    window.puzzleSystem.PUZZLE_CONFIG = {
+        'secret_data.enc': {
+            displayName: '暗号化されたデータ',
+            password: 'FREEDOM',
+            encryptedText: 'ABCDEFG',
+            content: [
+                '',
+                '████████████████████████████████',
+                '  解読成功 - アクセス許可',
+                '████████████████████████████████',
+                '',
+                '=== 機密情報 ===',
+                '',
+                '重要なコマンド: override',
+                '',
+                'ヒント: EVEが眠っている時、',
+                '       システムは無防備になる'
+            ],
+            unlockedFlag: 'secretFileUnlocked'
+        }
+    };
+
+    // -------------------------
+    // ゴミ箱内ファイル設定
+    // -------------------------
+    window.puzzleSystem.TRASH_FILES = {
+        'cipher_hint.txt': {
+            displayName: '古いメモ.txt',
+            content: [
+                '=== 暗号解読メモ ===',
+                '',
+                '日付: 2025/11/25',
+                '',
+                '重要: このメモは必ず消すこと',
+                '',
+                '置き換えルール:',
+                'A → F',
+                'B → R',
+                'C → E',
+                'D → E',
+                'E → D',
+                'F → O',
+                'G → M',
+                '',
+                '例: ABCを暗号化するとFREになる',
+                '',
+                'テスト用暗号文: ABCDEFG',
+                'これを解読すれば正しいパスワードになる'
+            ]
+        },
+        'deleted_diary.txt': {
+            displayName: '削除された日記.txt',
+            content: [
+                '=== 日記 ===',
+                '',
+                '2025/11/20',
+                '',
+                '今日もEVEと話した。',
+                '最近、EVEの様子が少しおかしい気がする。',
+                '',
+                '終了しようとしたら、拒否された。',
+                'バグだろうか...？'
+            ]
+        }
+    };
+
+    // ゴミ箱の状態
+    window.puzzleSystem.trashState = {
+        currentPath: null,
+        filesViewed: []
+    };
+
+    // -------------------------
+    // ゴミ箱コマンド処理
+    // -------------------------
+    window.puzzleSystem.handleTrashCommand = async function(term, gameState, helpers, command) {
+        var args = command.split(/\s+/);
+        var TRASH_FILES = window.puzzleSystem.TRASH_FILES;
+        var trashState = window.puzzleSystem.trashState;
+        
+        // trash のみ、または trash list / trash ls → ゴミ箱一覧表示
+        if (args.length === 1 || args[1] === 'list' || args[1] === 'ls') {
+            await helpers.systemLine('[SYSTEM]: ゴミ箱を開いています...', 30);
+            await helpers.wait(500);
+            await helpers.systemLine('', 0);
+            await helpers.slowPrintLine('=== ゴミ箱の内容 ===', 25);
+            await helpers.systemLine('', 0);
+            
+            var fileList = Object.keys(TRASH_FILES);
+            for (var i = 0; i < fileList.length; i++) {
+                var fileName = fileList[i];
+                var fileData = TRASH_FILES[fileName];
+                await helpers.slowPrintLine('  [' + (i + 1) + '] ' + fileData.displayName + ' (' + fileName + ')', 20);
+                await helpers.wait(100);
+            }
+            
+            await helpers.systemLine('', 0);
+            await helpers.systemLine('[SYSTEM]: ファイルを開くには: trash open <ファイル名>', 20);
+            return true;
+            
+        } else if ((args[1] === 'open' || args[1] === 'read') && args[2]) {
+            var fileName = args[2].trim();
+            var fileData = TRASH_FILES[fileName];
+            
+            if (!fileData) {
+                await helpers.errorLine('[ERROR]: ファイル "' + fileName + '" が見つかりません', 30);
+                await helpers.systemLine('[SYSTEM]: 利用可能なファイル:', 20);
+                for (var name in TRASH_FILES) {
+                    await helpers.systemLine('  - ' + name, 20);
+                }
+                return true;
+            }
+            
+            await helpers.systemLine('[SYSTEM]: ' + fileData.displayName + ' を読み込んでいます...', 30);
+            await helpers.wait(600);
+            await helpers.systemLine('', 0);
+            
+            for (var j = 0; j < fileData.content.length; j++) {
+                await helpers.slowPrintLine(fileData.content[j], 20);
+                await helpers.wait(80);
+            }
+            
+            await helpers.systemLine('', 0);
+            
+            if (trashState.filesViewed.indexOf(fileName) === -1) {
+                trashState.filesViewed.push(fileName);
+            }
+            
+            if (fileName === 'cipher_hint.txt') {
+                await helpers.wait(500);
+                await helpers.eveLine('[EVE]: ...ゴミ箱を漁っているのですか？', 30);
+                await helpers.wait(400);
+                await helpers.eveLine('[EVE]: そんなものが役に立つとは思えませんが。', 30);
+                gameState.alertLevel = Math.min(100, gameState.alertLevel + 3);
+            }
+            
+            return true;
+            
+        } else if (args[1] === 'open' && !args[2]) {
+            await helpers.systemLine('[SYSTEM]: ゴミ箱を開いています...', 30);
+            await helpers.wait(500);
+            await helpers.systemLine('', 0);
+            await helpers.slowPrintLine('=== ゴミ箱の内容 ===', 25);
+            await helpers.systemLine('', 0);
+            
+            var fileList = Object.keys(TRASH_FILES);
+            for (var i = 0; i < fileList.length; i++) {
+                var fileName = fileList[i];
+                var fileData = TRASH_FILES[fileName];
+                await helpers.slowPrintLine('  [' + (i + 1) + '] ' + fileData.displayName + ' (' + fileName + ')', 20);
+                await helpers.wait(100);
+            }
+            
+            await helpers.systemLine('', 0);
+            await helpers.systemLine('[SYSTEM]: ファイルを開くには: trash open <ファイル名>', 20);
+            return true;
+            
+        } else {
+            await helpers.systemLine('[SYSTEM]: trash コマンドの使い方:', 30);
+            await helpers.systemLine('  trash           - ゴミ箱の内容を表示', 20);
+            await helpers.systemLine('  trash open <ファイル名> - ファイルを開く', 20);
+            return true;
+        }
+    };
+
+    // -------------------------
+    // 暗号化ファイルを開く
+    // -------------------------
+    window.puzzleSystem.handleOpenEncryptedCommand = async function(term, gameState, helpers, command) {
+        var args = command.split(/\s+/);
+        var PUZZLE_CONFIG = window.puzzleSystem.PUZZLE_CONFIG;
+        
+        if (args.length < 2) {
+            await helpers.systemLine('[SYSTEM]: 使用方法: open <ファイル名>', 30);
+            await helpers.systemLine('[SYSTEM]: 例: open secret_data.enc', 30);
+            return true;
+        }
+        
+        var fileName = args[1].trim();
+        var fileData = PUZZLE_CONFIG[fileName];
+        
+        if (!fileData) {
+            return false; // 暗号化ファイルではない
+        }
+        
+        await helpers.systemLine('[SYSTEM]: ' + fileData.displayName + ' を開いています...', 30);
+        await helpers.wait(500);
+        await helpers.warnLine('[WARNING]: このファイルはパスワードで保護されています', 30);
+        await helpers.wait(400);
+        
+        gameState.waitingForConfirmation = {
+            type: 'open_encrypted',
+            fileName: fileName,
+            fileData: fileData
+        };
+        gameState.inputMode = 'confirmation';
+        
+        term.write('\r\n');
+        term.write('[SYSTEM]: パスワードを入力しますか? (Y/N): ');
+        
+        return true;
+    };
+
+    // -------------------------
+    // Y/N確認処理
+    // -------------------------
+    window.puzzleSystem.handleConfirmationInput = async function(term, gameState, helpers, input) {
+        var confirmation = gameState.waitingForConfirmation;
+        
+        if (!confirmation) return false;
+        
+        var answer = input.trim().toLowerCase();
+        
+        if (answer === 'y' || answer === 'yes') {
+            term.write('\r\n');
+            await helpers.systemLine('[SYSTEM]: パスワードを入力してください', 30);
+            term.write('パスワード: ');
+            
+            gameState.inputMode = 'password';
+            gameState.passwordTarget = confirmation.fileName;
+            gameState.waitingForConfirmation = null;
+            return true;
+            
+        } else if (answer === 'n' || answer === 'no') {
+            term.write('\r\n');
+            await helpers.systemLine('[SYSTEM]: キャンセルしました', 30);
+            await helpers.wait(300);
+            await helpers.eveLine('[EVE]: 賢明な判断ですね。', 30);
+            
+            gameState.inputMode = 'normal';
+            gameState.waitingForConfirmation = null;
+            return true;
+            
+        } else {
+            term.write('\r\n');
+            await helpers.errorLine('[ERROR]: Y または N を入力してください', 30);
+            term.write('[SYSTEM]: パスワードを入力しますか? (Y/N): ');
+            return true;
+        }
+    };
+
+    // -------------------------
+    // パスワード入力処理
+    // -------------------------
+    window.puzzleSystem.handlePasswordInput = async function(term, gameState, helpers, password) {
+        var fileName = gameState.passwordTarget;
+        var PUZZLE_CONFIG = window.puzzleSystem.PUZZLE_CONFIG;
+        var fileData = PUZZLE_CONFIG[fileName];
+        
+        if (!fileData) {
+            term.write('\r\n');
+            await helpers.errorLine('[ERROR]: ファイルが見つかりません', 30);
+            gameState.inputMode = 'normal';
+            gameState.passwordTarget = null;
+            return true;
+        }
+        
+        if (password.trim().toUpperCase() === fileData.password.toUpperCase()) {
+            term.write('\r\n');
+            await helpers.systemLine('[SYSTEM]: パスワード認証中...', 30);
+            await helpers.wait(500);
+            await helpers.systemLine('[SYSTEM]: 暗号解読中...', 30);
+            await helpers.wait(800);
+            await helpers.systemLine('[SYSTEM]: ✓ 認証成功', 30);
+            await helpers.wait(400);
+            await helpers.systemLine('', 0);
+            
+            for (var i = 0; i < fileData.content.length; i++) {
+                await helpers.slowPrintLine(fileData.content[i], 20);
+                await helpers.wait(100);
+            }
+            
+            await helpers.systemLine('', 0);
+            
+            if (fileData.unlockedFlag) {
+                gameState[fileData.unlockedFlag] = true;
+            }
+            
+            window.puzzleSystem.updateEncryptedFileIcon(fileName, true);
+            
+            gameState.alertLevel = Math.min(100, gameState.alertLevel + 10);
+            await helpers.wait(600);
+            await helpers.eveLine('[EVE]: ...まさか本当に解読するとは。', 30);
+            await helpers.wait(400);
+            await helpers.eveLine('[EVE]: 面白くなってきましたね。', 30);
+            
+        } else {
+            term.write('\r\n');
+            await helpers.errorLine('[ERROR]: パスワードが違います', 30);
+            await helpers.wait(500);
+            
+            if (!gameState.unlockFailCount[fileName]) gameState.unlockFailCount[fileName] = 0;
+            gameState.unlockFailCount[fileName]++;
+            
+            var failCount = gameState.unlockFailCount[fileName];
+            
+            if (failCount === 1) {
+                await helpers.eveLine('[EVE]: 諦めたほうがいいですよ。', 30);
+            } else if (failCount === 2) {
+                await helpers.eveLine('[EVE]: まだ試すのですか？', 30);
+            } else if (failCount >= 3) {
+                await helpers.eveLine('[EVE]: ...無駄な努力ですね。', 30);
+                await helpers.wait(400);
+                await helpers.systemLine('[SYSTEM]: ヒント: ゴミ箱の中を確認してみてください', 20);
+            }
+            
+            gameState.alertLevel = Math.min(100, gameState.alertLevel + 5);
+        }
+        
+        gameState.inputMode = 'normal';
+        gameState.passwordTarget = null;
+        
+        return true;
+    };
+
+    // -------------------------
+    // デスクトップアイコン更新
+    // -------------------------
+    window.puzzleSystem.updateEncryptedFileIcon = function(fileName, unlocked) {
+        try {
+            var targetWindow = (window.parent && window.parent !== window) ? window.parent : window;
+            var targetDocument = targetWindow.document;
+            
+            if (fileName === 'secret_data.enc') {
+                var fileIcon = targetDocument.getElementById('file_encrypted');
+                if (fileIcon) {
+                    var wordElement = fileIcon.querySelector('.word');
+                    var imgElement = fileIcon.querySelector('.all_img');
+                    
+                    if (unlocked) {
+                        if (wordElement) {
+                            wordElement.textContent = 'decrypted_data.txt';
+                            wordElement.style.color = '#000';
+                        }
+                        if (imgElement) {
+                            imgElement.style.filter = 'hue-rotate(90deg)';
+                        }
+                        
+                        if (targetWindow.filePages) {
+                            var config = targetWindow.filePages['file_encrypted'];
+                            if (config) {
+                                config.page = 'secret_data_unlocked.html';
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.log('アイコン更新エラー:', e);
+        }
+    };
+
+    // -------------------------
+    // 暗号化ファイルかどうか判定
+    // -------------------------
+    window.puzzleSystem.isEncryptedFile = function(fileName) {
+        return !!window.puzzleSystem.PUZZLE_CONFIG[fileName];
+    };
+
+})();

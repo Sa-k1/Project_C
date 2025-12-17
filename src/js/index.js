@@ -7,6 +7,7 @@ const fileViewerContainers = {
     1: document.getElementById('fileViewerContainer1'),
     2: document.getElementById('fileViewerContainer2'),
     3: document.getElementById('fileViewerContainer3'),
+    4: document.getElementById('fileViewerContainer4'),
     'trash': document.getElementById('trashViewerContainer'),
     'terminal': document.getElementById('terminalViewerContainer')
 };
@@ -166,8 +167,12 @@ const trashCan = document.getElementById('trash-can');
 const filePages = {
     'file1': { page: 'file1.html', viewerId: 1 },  // 重要なデータ.txt
     'file2': { page: 'file2.html', viewerId: 2 },  // 古いメモ.doc
-    'file3': { page: 'file3.html', viewerId: 3 }   // 不要な写真.jpg
+    'file3': { page: 'file3.html', viewerId: 3 },  // 不要な写真.jpg
+    'file_encrypted': { page: 'file_encrypted.html', viewerId: 4 }  // 暗号化ファイル
 };
+
+// グローバルに公開（ターミナルからアクセス可能に）
+window.filePages = filePages;
 
 // ゴミ箱のダブルクリック処理
 if (trashCan) {

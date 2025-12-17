@@ -72,6 +72,12 @@
     <h1 class="word">terminal</h1>
   </div>
 
+      <!-- 暗号化ファイルアイコン -->
+  <div class="draggable-item" draggable="true" id="file_encrypted">
+    <img src="../pic/txt.png" alt="" class="all_img" style="filter: hue-rotate(180deg);">
+    <h1 class="word">secret_data.enc</h1>
+  </div>
+
     <!-- ファイルビューア用ウィンドウコンテナ（ゴミ箱用） -->
   <div class="trash-viewer-container" id="trashViewerContainer" style="display: none; top: 160px; right: 90px;">
     <div class="file-viewer-window" id="trashViewerWindow" style="height: 500px; width: 850px;">
@@ -153,6 +159,27 @@
         </div>
       </div>
       <iframe id="file-viewer-iframe3" frameborder="0"></iframe>
+    </div>
+  </div>
+  
+  <!-- 暗号化ファイル用ウィンドウコンテナ -->
+  <div class="file-viewer-container" id="fileViewerContainer4" style="display: none; top: 140px; right: 100px;">
+    <div class="file-viewer-window" id="fileViewerWindow4" style="height: 400px; width: 500px; border: 2px solid #333;">
+      <div class="box">
+        <div class="titlebar" style="background: linear-gradient(180deg, #0a1a0a 0%, #163e16 100%);">
+          <div class="tabs">
+            <div class="tab active" style="background-color: #0d1b0d;">
+              <span class="tab-label" id="fileViewerTitle4" style="color: #00ff00;">🔒 secret_data.enc</span>
+            </div>
+          </div>
+          <div class="window-controls">
+            <button class="ctrl minimize" title="最小化">一</button>
+            <button class="ctrl maximize" title="最大化">☐</button>
+            <button class="ctrl close" data-viewer="4" title="閉じる">✕</button>
+          </div>
+        </div>
+      </div>
+      <iframe id="file-viewer-iframe4" frameborder="0"></iframe>
     </div>
   </div>
 

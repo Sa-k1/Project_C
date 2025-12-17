@@ -27,6 +27,27 @@
         reset: "\x1b[0m"
     };
 
+    // ゲーム状態管理
+    const gameState = {
+        alertLevel: 0,
+        inputMode: 'normal',
+        waitingForConfirmation: null,
+        passwordTarget: null,
+        unlockFailCount: {},
+        sleepUsed: false,
+        sleepCounter: 0,
+        helpEnabled: false,
+        secretFileUnlocked: false,
+        rmEveUsed: false
+    };
+
+
+
+    // 警戒度を上げる関数
+    function increaseAlert(amount) {
+        gameState.alertLevel = Math.min(100, gameState.alertLevel + amount);
+    }
+
     //  文字
     function getPrompt() {
         if (window.vfs) {
@@ -163,19 +184,57 @@
     }
 
     // -------------------------
+    // 謎解きシステム用ヘルパーオブジェクト
+    // -------------------------
+    var puzzleHelpers = {
+        wait: wait,
+        slowPrintLine: slowPrintLine,
+        systemLine: systemLine,
+        eveLine: eveLine,
+        errorLine: errorLine,
+        warnLine: warnLine
+    };
+
+    // -------------------------
     // コマンド処理
     // -------------------------
     async function handleInput(command) {
         command = (command || "").trim();
         if (!command) return;
 
+        // ★★★ 入力モード分岐 ★★★
+        if (gameState.inputMode === 'confirmation') {
+            await window.puzzleSystem.handleConfirmationInput(term, gameState, puzzleHelpers, command);
+            return;
+        }
+        
+        if (gameState.inputMode === 'password') {
+            await window.puzzleSystem.handlePasswordInput(term, gameState, puzzleHelpers, command);
+            return;
+        }
+
+        // ゴミ箱コマンド
+        if (command.toLowerCase().indexOf('trash') === 0) {
+            await window.puzzleSystem.handleTrashCommand(term, gameState, puzzleHelpers, command);
+            return;
+        }
+
+        // 暗号化ファイルを開くコマンド
+        if (command.toLowerCase().indexOf('open ') === 0) {
+            var args = command.split(/\s+/);
+            var fileName = args[1] ? args[1].trim() : '';
+            if (window.puzzleSystem.isEncryptedFile(fileName)) {
+                await window.puzzleSystem.handleOpenEncryptedCommand(term, gameState, puzzleHelpers, command);
+                return;
+            }
+            // 暗号化ファイルでない場合は既存のvfs処理に委ねる
+        }
+
         // ファイルシステムコマンドの処理
         if (window.vfs) {
             var cmd = command.split(/\s+/)[0].toLowerCase();
-            var fsCommands = ["cd", "dir", "ls", "type", "cat", "pwd", "whoami", "date", "time", 
-                            "open", "run", "cls", "clear", "edit", "nano", "vim", "echo", 
-                            "append", "wget", "curl", "browse", "www", "touch", "new", 
-                            "del", "rm", "copy", "cp"];
+            // チャプター1で使用可能な基本コマンドのみ
+            var fsCommands = ["cd", "dir", "ls", "type", "cat", "open", "cls", "clear"];
             
             if (fsCommands.indexOf(cmd) !== -1) {
                 var result = await window.vfs.execute(command);
@@ -190,15 +249,6 @@
                             await systemLine("ファイルを開いています: " + result.file, 20);
                             window.open("../html/" + result.file, "_blank");
                             return;
-                        case "browse":
-                            await systemLine("ブラウザで開いています: " + result.url, 20);
-                            window.open(result.url, "_blank");
-                            return;
-                        case "wget":
-                            await systemLine("ダウンロード中...", 20);
-                            var downloadResult = await result.callback();
-                            await systemLine(downloadResult, 20);
-                            return;
                     }
                 }
                 
@@ -211,14 +261,28 @@
                 }
                 return;
             }
+        } else {
+            // vfsが利用できない場合のフォールバック
+            var cmd = command.split(/\s+/)[0].toLowerCase();
+            if (cmd === "dir" || cmd === "ls" || cmd === "cd" || cmd === "cat" || cmd === "type") {
+                await errorLine("[ERROR]: ファイルシステムが初期化されていません", 20);
+                return;
+            }
         }
 
-        // helpコマンド
+        // helpコマンド（常に使用可能）
         if (command.toLowerCase() === "help") {
             await systemLine("[SYSTEM]: 利用可能なコマンド一覧", 20);
-            term.writeln("\r  help    - このヘルプを表示");
-            term.writeln("\r  clear   - 画面をクリア");
-            term.writeln("\r  echo    - テキストを表示");
+            term.writeln("\r");
+            term.writeln("\r  === 基本コマンド ===");
+            term.writeln("\r  help          - このヘルプを表示");
+            term.writeln("\r  dir / ls      - ディレクトリの内容を表示");
+            term.writeln("\r  cd <フォルダ名> - フォルダに移動");
+            term.writeln("\r  cd ..         - 上のフォルダに戻る");
+            term.writeln("\r  cat <ファイル名> - ファイルの内容を表示");
+            term.writeln("\r  open <ファイル名> - ファイルを開く");
+            term.writeln("\r  clear         - 画面をクリア");
+            term.writeln("\r  trash         - ゴミ箱を開く");
             return;
         }
 
@@ -228,15 +292,9 @@
             return;
         }
 
-        // echoコマンド
-        if (command.toLowerCase().indexOf("echo ") === 0) {
-            var text = command.substring(5);
-            term.writeln("\r" + text);
-            return;
-        }
-
         // 不明なコマンド
-        term.writeln("\r'" + command + "' は認識されないコマンドです。");
+        await errorLine("[ERROR]: '" + command + "' は認識されないコマンドです。", 20);
+        await systemLine("[SYSTEM]: 'help' でコマンド一覧を確認できます。", 20);
     }
 
     // -------------------------
@@ -272,7 +330,7 @@
     }
 
     // 起動メッセージ
-    systemPrint("\x1b[0mEVE-OS [Version A-3.1.2077]\n");
+    systemPrint("ターミナルを初期化しました。");
     term.write(getPrompt());
 
     // 入力処理
@@ -375,7 +433,11 @@
                     await handleInput(userMessage);
                     inputEnabled = true;
                 }
-                term.write(getPrompt());
+                
+                // ★ 通常モードの場合のみプロンプト表示 ★
+                if (gameState.inputMode === 'normal') {
+                    term.write(getPrompt());
+                }
             } else if (code === 127 || code === 8) { // Backspace
                 if (cursorPos > 0) {
                     var bufChars = Array.from(buffer);

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>secret_data.enc</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a0a0a 0%, #2d1515 100%);
+            color: #ff6666;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ff3333;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+        }
+        
+        .lock-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        h1 {
+            color: #ff4444;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+        
+        .encrypted-text {
+            background: #111;
+            border: 1px solid #333;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 5px;
+            font-size: 1.8em;
+            color: #00ff00;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+        }
+        
+        .warning {
+            color: #ffcc00;
+            font-size: 0.9em;
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px dashed #ffcc00;
+            background: rgba(255, 204, 0, 0.1);
+        }
+        
+        .hint {
+            color: #888;
+            font-size: 0.8em;
+            margin-top: 15px;
+            font-style: italic;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            background: #220000;
+            border-left: 3px solid #ff0000;
+        }
+        
+        .status-label {
+            color: #ff6666;
+            font-weight: bold;
+        }
+        
+        .status-value {
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>暗号化されたファイル</h1>
+        
+        <p>このファイルはパスワードで保護されています。</p>
+        
+        <div class="encrypted-text">ABCDEFG</div>
+        
+        <div class="status">
+            <span class="status-label">ステータス: </span>
+            <span class="status-value">ロック中</span>
+        </div>
+        
+        <p class="hint">
+            ターミナルで「open secret_data.enc」と入力してパスワードを解除してください
+        </p>
+    </div>
+</body>
+</html>
