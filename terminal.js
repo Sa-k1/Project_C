@@ -241,6 +241,80 @@
             isComposing = false;
             composingText = "";
         });
+        
+        // 右クリックでペースト
+        terminalElement.addEventListener("contextmenu", async function(e) {
+            e.preventDefault(); // デフォルトのコンテキストメニューを無効化
+            
+            if (!inputEnabled) return;
+            
+            try {
+                // クリップボードからテキストを読み取る
+                const text = await navigator.clipboard.readText();
+                if (!text) return;
+                
+                // 改行を含む場合は最初の行のみを使用（または空白に置換）
+                const pasteText = text.replace(/[\r\n]+/g, ' ');
+                
+                // 入力幅の上限チェック
+                var maxInputWidth = term.cols - getStringWidth(getPrompt()) - 2;
+                var currentWidth = getStringWidth(buffer);
+                var pasteWidth = getStringWidth(pasteText);
+                
+                if (currentWidth + pasteWidth > maxInputWidth) {
+                    // 上限を超える場合は入力可能な範囲だけ貼り付け
+                    var availableWidth = maxInputWidth - currentWidth;
+                    if (availableWidth <= 0) return;
+                    
+                    var trimmedText = "";
+                    var width = 0;
+                    for (var i = 0; i < pasteText.length; i++) {
+                        var charWidth = getCharWidth(pasteText[i]);
+                        if (width + charWidth > availableWidth) break;
+                        trimmedText += pasteText[i];
+                        width += charWidth;
+                    }
+                    if (!trimmedText) return;
+                    
+                    // カーソル位置に挿入
+                    var bufChars = Array.from(buffer);
+                    var pasteChars = Array.from(trimmedText);
+                    bufChars.splice(cursorPos, 0, ...pasteChars);
+                    buffer = bufChars.join("");
+                    
+                    // 画面に表示
+                    var afterCursor = bufChars.slice(cursorPos + pasteChars.length).join("");
+                    var afterWidth = getStringWidth(afterCursor);
+                    term.write(trimmedText + afterCursor);
+                    
+                    // カーソル位置を更新して正しい位置に戻す
+                    cursorPos += pasteChars.length;
+                    for (var j = 0; j < afterWidth; j++) {
+                        term.write('\x1b[D');
+                    }
+                } else {
+                    // カーソル位置に挿入
+                    var bufChars = Array.from(buffer);
+                    var pasteChars = Array.from(pasteText);
+                    bufChars.splice(cursorPos, 0, ...pasteChars);
+                    buffer = bufChars.join("");
+                    
+                    // 画面に表示
+                    var afterCursor = bufChars.slice(cursorPos + pasteChars.length).join("");
+                    var afterWidth = getStringWidth(afterCursor);
+                    term.write(pasteText + afterCursor);
+                    
+                    // カーソル位置を更新して正しい位置に戻す
+                    cursorPos += pasteChars.length;
+                    for (var j = 0; j < afterWidth; j++) {
+                        term.write('\x1b[D');
+                    }
+                }
+            } catch (err) {
+                // クリップボードへのアクセス権限がない場合など
+                console.error("Clipboard read failed:", err);
+            }
+        });
     }
 
     // 起動メッセージ

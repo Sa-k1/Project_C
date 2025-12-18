@@ -401,12 +401,22 @@ if (searchInput) {
                 customText = 'SUPER ARMOR';  // ← secuの場合に表示したいテキスト
                 // 上部は一例です。
                 searchInput.classList.add('warning-text'); // ★ 警告スタイルを適用するクラスを追加
+                searchInput.type = 'text';
             }
             // それ以外は空白1文字のまま
         }
-        
+
         searchInput.value = customText;
         draggedElement = null; // リセット
+    });
+    
+    // キーボード入力を検知 
+    searchInput.addEventListener('input', (e) => {
+        const value = e.target.value;
+        if (value.length > 0) {
+            searchInput.type = 'password';      
+            searchInput.classList.remove('warning-text');
+        }
     });
 }
 
