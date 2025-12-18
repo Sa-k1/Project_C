@@ -44,8 +44,10 @@
     };
 
     // VFSをgameStateと一緒に初期化
-    if (!window.vfs && window.VirtualFileSystem) {
-
+    function increaseAlert(amount) {
+        gameState.alertLevel = Math.min(100, gameState.alertLevel + amount);
+    }
+    
     // 警戒度を上げる関数
     function increaseAlert(amount) {
         gameState.alertLevel = Math.min(100, gameState.alertLevel + amount);
