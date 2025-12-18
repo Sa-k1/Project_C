@@ -33,7 +33,7 @@ function createtitleWindow() {
     transparent: true,  // 透明にする
     frame: false,       // フレームを消す（透明にするために必要）
     // フルスクリーン表示にする場合は下のコメントアウトを外してください
-    // fullscreen: true,
+    fullscreen: true,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false

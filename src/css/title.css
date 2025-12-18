@@ -1,0 +1,135 @@
+@charset "UTF-8";
+
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+body {
+width: 100vw;
+height: 100vh;
+display: flex;
+flex-direction: column;
+justify-content: flex-start;
+align-items: center;
+overflow: hidden;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+position: relative;
+background-color: #ffffff;
+}
+
+body::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-image: url(../pic/okumono_yugami4.png);
+background-size: 120%;
+background-position: 0 0;
+animation: slideBackground 20s linear infinite alternate;
+z-index: -1;
+opacity: 1;
+transition: opacity 1s ease-out;
+}
+
+body.fade-out::before {
+opacity: 0;
+}
+
+body.fade-out > * {
+opacity: 0;
+transition: opacity 1s ease-out;
+}
+
+.title-container {
+margin-top: 15vh;
+text-align: center;
+font-family: serif;
+}
+
+.game-title {
+width: 400px;
+}
+
+.start-container {
+position: absolute;
+top: 60%;
+left: 50%;
+transform: translate(-50%, -50%);
+}
+
+.start-button {
+font-size: 3rem;
+padding: 25px 80px;
+background: #00000099;
+border: 3px solid #4a9eff;
+color: #4a9eff;
+/* 128*128   pointer */
+cursor: url(), pointer;
+letter-spacing: 0.1em;
+transition: all 0.3s ease;
+position: relative;
+overflow: hidden;
+}
+
+.start-button:hover {
+background: #4a9eff;
+color: rgb(0, 0, 0);
+box-shadow: 0 0 30px rgba(74, 158, 255, 0.6);
+transform: scale(1.05);
+}
+
+.start-button:active {
+transform: scale(0.98);
+}
+
+.start-button.clicked {
+animation: buttonPulse 0.5s ease-out;
+}
+
+@keyframes buttonPulse {
+0% {
+transform: scale(1);
+}
+50% {
+transform: scale(1.1);
+}
+100% {
+transform: scale(1);
+opacity: 0;
+}
+}
+
+@keyframes buttonPulse {
+0% {
+transform: scale(1);
+}
+50% {
+transform: scale(1.1);
+}
+100% {
+transform: scale(1);
+opacity: 0;
+}
+}
+
+@keyframes fadeOut {
+from {
+opacity: 1;
+}
+to {
+opacity: 0;
+}
+}
+
+@keyframes slideBackground {
+0% {
+background-position: 0 0;
+}
+100% {
+background-position: 100% 0;
+}
+}
