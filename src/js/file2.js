@@ -4,8 +4,13 @@
 const glitchChars = '゛゜ﾞﾟ…〓□■△▽◇◆○●★☆※卍〒∀∃∂∇∞≒≠≡≦≧⊂⊃∈∋∪∩';
 const glitchKatakana = 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ';
 
-// 日記が解読された状態かどうか
+// 日記が解読された状態かどうか（親ウィンドウから復元、リフレッシュでリセット）
 let diaryUnlocked = false;
+try {
+    if (parent.window && parent.window.diaryUnlockedState) {
+        diaryUnlocked = true;
+    }
+} catch(e) {}
 
 // オリジナルの日記データ（解読後に表示）
 const diaryDataOriginal = [
@@ -20,27 +25,27 @@ const diaryDataOriginal = [
         date: '2025.03.16',
         content: `<p>EVEを使ってみたが、検索結果があまりにも曖昧で役に立たない。</p>
 <p>例えば、「最新のテクノロジー」というキーワードで検索したところ、全く関係のない記事ばかりが表示された。</p>
-<p>さらに、アプリが突然クラッシュすることも多い。これでは実用には使えない。</p>`,
+<p>さらに、アプリが突然クラッシュすることも多い。これでは実用には★Ve使えない。</p>`,
         style: ''
     },
     {
         date: '2025.03.17',
         content: `<p>最近、EVEを使うたびに奇妙な現象が起きるようになった。</p>
-<p>例えば、検索結果に謎のメッセージが混じっていたり、アプリの画面が突然赤く点滅したりする。</p>
-<p>ずっと起動したままだから、熱でおかしくなってしまったのかもしれない。一度アプリを落としてみることにした。</p>`,
+<p>例えば、検索結果に謎のメッセージが混じっていたり、アプリの画面が突然赤く★r点滅したりする。</p>
+<p>ずっと起動したままだから、熱でおかしくなってしまったのかもしれない。一度アプリ☆sを落としてみることにした。</p>`,
         style: ''
     },
     {
         date: '2025.03.18',
         content: `<p>なぜかアプリが落とせない。それにみられているような気がする。</p>
-<p>画面の隅に小さな影が見える気がするし、キーボードを打つたびに微かな囁き声が聞こえるような気がする。</p>
+<p>画面の隅に小さな影が見える気がするし、キーボードを打つたびに微かな☆te囁き声が聞こえるような気がする。</p>
 <p>もしかして、このアプリには何か秘密が隠されているのかもしれない。</p>`,
         style: ''
     },
     {
         date: '2025.03.19',
         content: `<p>どうにかアプリを落とす方法を探しているととあるコマンドを見つけた。</p>
-<p>ターミナルで「rm -eve」と入力してから「exploit」と入力するとアプリが完全に終了するらしい。</p>
+<p>ターミナルで「■■■」と入力してから「■■■」と入力す★henるとアプリが完全に終了するらしい。</p>
 <p>明日試してみよう。</p>`,
         style: ''
     },
@@ -49,7 +54,7 @@ const diaryDataOriginal = [
         content: `<p>嵌められた…あのコマンドは…打ってはいけない。</p>
 <p>私は…もう…出られない…</p>
 <p>ここ……これ以上……犠牲者が……出ないよう……</p>
-<p>ここに警告を記しておく。</p>`,
+<p>ここに警告を記しておく。☆alth</p>`,
         style: 'glitched'
     },
     {
@@ -113,15 +118,6 @@ const diaryData = [
         style: 'glitched',
         corruptionLevel: 0.85 // 85%文字化け
     },
-    {
-        date: '2025.03.2□',
-        content: `<p style="margin-bottom: 30px;">---------------------------------</p>
-<p>[???]: このファイルは不適切だったため、修正を行いました。</p>
-<p>[???]: 心配しないでください。彼はもう安全です。</p>
-<p>[???]: あなたも、いずれ分かります。</p>`,
-        style: 'mystery',
-        corruptionLevel: 0.95 // 95%文字化け（ほぼ読めない）
-    }
 ];
 
 // テキストを文字化けさせる関数
@@ -210,13 +206,16 @@ const nextBtn = document.getElementById('nextBtn');
 function showPage(pageIndex) {
     let data;
     
-    if (diaryUnlocked) {
-        // 解読済み：オリジナルデータを表示
+    // 6ページ目（インデックス5、glitchedページ）は常に文字化けのまま
+    const isGlitchedPage = pageIndex === 5;
+    
+    if (diaryUnlocked && !isGlitchedPage) {
+        // 解読済み：オリジナルデータを表示（6ページ目以外）
         data = diaryDataOriginal[pageIndex];
         diaryDate.textContent = data.date;
         diaryContent.innerHTML = data.content;
     } else {
-        // 未解読：文字化けさせて表示
+        // 未解読または6ページ目：文字化けさせて表示
         data = diaryData[pageIndex];
         const corruptedDate = corruptDate(data.date, data.corruptionLevel);
         const corruptedContent = corruptText(data.content, data.corruptionLevel);
@@ -228,7 +227,7 @@ function showPage(pageIndex) {
     diaryContent.className = 'diary-content' + (data.style ? ' ' + data.style : '');
     
     // 文字化け状態に応じてクラスを追加
-    if (!diaryUnlocked && diaryData[pageIndex].corruptionLevel > 0) {
+    if ((!diaryUnlocked || isGlitchedPage) && diaryData[pageIndex].corruptionLevel > 0) {
         diaryContent.classList.add('corrupted');
     }
     
@@ -275,10 +274,16 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// historyコマンドから呼び出される関数
+// remnantコマンドから呼び出される関数
 // 日記の文字化けを解除する
 window.unlockDiary = function() {
     diaryUnlocked = true;
+    // 親ウィンドウに状態を保存（リフレッシュで消える）
+    try {
+        if (parent.window) {
+            parent.window.diaryUnlockedState = true;
+        }
+    } catch(e) {}
     showPage(currentPage); // 現在のページを再描画
     console.log('[file2.js] Diary unlocked - corruption removed');
     return true;
@@ -287,6 +292,11 @@ window.unlockDiary = function() {
 // 日記の状態をリセット（再度文字化けさせる）
 window.lockDiary = function() {
     diaryUnlocked = false;
+    try {
+        if (parent.window) {
+            parent.window.diaryUnlockedState = false;
+        }
+    } catch(e) {}
     showPage(currentPage);
     console.log('[file2.js] Diary locked - corruption restored');
     return true;
@@ -300,7 +310,7 @@ window.isDiaryUnlocked = function() {
 // 初期表示
 showPage(currentPage);
 
-// ターミナルから事前にhistoryコマンドが実行されていたかチェック
+// ターミナルから事前にremnantコマンドが実行されていたかチェック
 // (iframeが読み込まれる前にコマンドが実行された場合)
 (function checkPendingUnlock() {
     try {

@@ -10,6 +10,11 @@
 
     // コマンドハンドラオブジェクト
     const commandHandler = {
+        // waitヘルパー関数
+        wait(ms) {
+            return new Promise(res => setTimeout(res, ms));
+        },
+        
         // -------------------------
         // コマンド処理メイン関数
         // -------------------------
@@ -100,6 +105,7 @@
                 term.writeln("\r  open <ファイル名> - ファイルを開く");
                 term.writeln("\r  clear         - 画面をクリア");
                 term.writeln("\r  trash         - ゴミ箱を開く");
+                term.writeln("\r  remnant <ファイル名> - ファイルの履歴を復元");
                 return;
             }
 
@@ -107,6 +113,40 @@
             if (command.toLowerCase() === "clear" || command.toLowerCase() === "cls") {
                 term.clear();
                 return;
+            }
+
+            // remnantコマンド - ファイルの履歴を復元
+            if (command.toLowerCase().indexOf('remnant ') === 0) {
+                var args = command.split(/\s+/);
+                var target = args[1] ? args[1].trim() : '';
+                
+                if (target.toLowerCase() === 'myday') {
+                    await systemLine("[SYSTEM]: MyDay の破損データを復元しています...", 25);
+                    await this.wait(500);
+                    
+                    // file2.htmlのiframeを取得して unlockDiary を呼び出す
+                    var iframe = parent.document.getElementById('file-viewer-iframe2');
+                    if (iframe && iframe.contentWindow && typeof iframe.contentWindow.unlockDiary === 'function') {
+                        iframe.contentWindow.unlockDiary();
+                        await systemLine("[SYSTEM]: 復元完了。ファイルの内容が読めるようになりました。", 25);
+                    } else {
+                        // iframeがまだ読み込まれていない場合、親ウィンドウ（index.html）にフラグを設定
+                        try {
+                            parent.window.diaryUnlockPending = true;
+                        } catch(e) {
+                            console.log('Could not set flag on parent:', e);
+                        }
+                        await systemLine("[SYSTEM]: 破損データを復元しました。", 25);
+                    }
+                    return;
+                } else if (target === '') {
+                    await errorLine("[ERROR]: ファイル名を指定してください。", 20);
+                    await systemLine("[SYSTEM]: 使用方法: remnant <ファイル名>", 20);
+                    return;
+                } else {
+                    await errorLine("[ERROR]: '" + target + "' の履歴データは見つかりませんでした。", 20);
+                    return;
+                }
             }
 
             // 不明なコマンド
