@@ -54,7 +54,7 @@ const diaryDataOriginal = [
         content: `<p>嵌められた…あのコマンドは…打ってはいけない。</p>
 <p>私は…もう…出られない…</p>
 <p>ここ……これ以上……犠牲者が……出ないよう……</p>
-<p>ここに警告を記しておく。☆alth</p>`,
+<p>ここに…記しておく…☆alth</p>`,
         style: 'glitched'
     },
     {

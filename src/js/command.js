@@ -197,7 +197,7 @@
                 var iframe = parent.document.getElementById('file-viewer-iframe2');
                 if (iframe && iframe.contentWindow && typeof iframe.contentWindow.unlockDiary === 'function') {
                     iframe.contentWindow.unlockDiary();
-                    await systemLine("[SYSTEM]: 復元完了。ファイルの内容が読めるようになりました。", 25);
+                    await systemLine("[SYSTEM]: 復元完了。ファイルの内容が一部読めるようになりました。", 25);
                 } else {
                     // iframeがまだ読み込まれていない場合、親ウィンドウ（index.html）にフラグを設定
                     try {
