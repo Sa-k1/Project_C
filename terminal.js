@@ -38,10 +38,13 @@
         sleepCounter: 0,
         helpEnabled: false,
         secretFileUnlocked: false,
-        rmEveUsed: false
+        rmEveUsed: false,
+        searchUnlocked: false,          // searchコマンドが解放されたか（magic1クリア報酬）
+        discoveredHidden: []            // searchで発見した隠しファイル/フォルダのパス
     };
 
-
+    // VFSをgameStateと一緒に初期化
+    if (!window.vfs && window.VirtualFileSystem) {
 
     // 警戒度を上げる関数
     function increaseAlert(amount) {

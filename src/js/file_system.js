@@ -4,7 +4,8 @@
  */
 
 class VirtualFileSystem {
-    constructor() {
+    constructor(gameState) {
+        this.gameState = gameState || null;
         this.fileSystem = {
             'C:': {
                 type: 'drive',
@@ -64,6 +65,49 @@ class VirtualFileSystem {
                                                                 hidden: true,
                                                                 content: `E.V.E\n\n私はここにいる\n私はあなたを見ている\n\n逃げられない`,
                                                                 editable: false
+                                                            },
+                                                            'backup': {
+                                                                type: 'folder',
+                                                                hidden: true,
+                                                                children: {
+                                                                    '.fragment_1.dat': {
+                                                                        type: 'file',
+                                                                        hidden: true,
+                                                                        content: `[データ断片 1/4]\n\n記録された文字: 【E】\n\nこれは何かの一部のようだ...`,
+                                                                        editable: false
+                                                                    },
+                                                                    '.fragment_2.dat': {
+                                                                        type: 'file',
+                                                                        hidden: true,
+                                                                        content: `[データ断片 2/4]\n\n記録された文字: 【P】\n\nこれは何かの一部のようだ...`,
+                                                                        editable: false
+                                                                    },
+                                                                    '.fragment_3.dat': {
+                                                                        type: 'file',
+                                                                        hidden: true,
+                                                                        content: `[データ断片 3/4]\n\n記録された文字: 【O】\n\nこれは何かの一部のようだ...`,
+                                                                        editable: false
+                                                                    },
+                                                                    '.fragment_4.dat': {
+                                                                        type: 'file',
+                                                                        hidden: true,
+                                                                        content: `[データ断片 4/4]\n\n記録された文字: 【H】\n\nこれは何かの一部のようだ...`,
+                                                                        editable: false
+                                                                    },
+                                                                    '.order_hint.memo': {
+                                                                        type: 'file',
+                                                                        hidden: true,
+                                                                        content: `=== 復元メモ ===\n\n断片の正しい順序:\n4番目 → 3番目 → 2番目 → 1番目\n\nこの順で文字を並べると...\n(H → O → P → E)`,
+                                                                        editable: false
+                                                                    },
+                                                                    'restored_data.enc': {
+                                                                        type: 'file',
+                                                                        hidden: true,
+                                                                        encrypted: true,
+                                                                        content: `[暗号化されたファイル]\n\nこのファイルはパスワードで保護されています。\nopenコマンドで開いてパスワードを入力してください。`,
+                                                                        editable: false
+                                                                    }
+                                                                }
                                                             }
                                                         }
                                                     },
@@ -150,7 +194,7 @@ class VirtualFileSystem {
         }
 
         switch (cmd) {
-            case 'cd': return this.cmdCd(args);
+            case 'cd': return this.cmdCd(args, this.gameState);
             case 'dir':
             case 'ls': return this.cmdDir(args);
             case 'type':
@@ -235,7 +279,7 @@ class VirtualFileSystem {
         return `[${this.editBuffer.length}] ${input}`;
     }
 
-    cmdCd(args) {
+    cmdCd(args, gameState) {
         if (args.length === 0) return this.getPathString();
 
         const target = args[0];
@@ -266,6 +310,13 @@ class VirtualFileSystem {
         if (this.pathExists(newPath)) {
             const node = this.getNodeAtPath(newPath);
             if (node && (node.type === 'folder' || node.type === 'drive')) {
+                // 隠しフォルダへのアクセスチェック
+                if (node.hidden) {
+                    const pathString = newPath.join('/');
+                    if (gameState && gameState.discoveredHidden && !gameState.discoveredHidden.includes(pathString)) {
+                        return `指定されたパスが見つかりません。`;
+                    }
+                }
                 this.currentPath = newPath;
                 return '';
             } else {
@@ -277,7 +328,14 @@ class VirtualFileSystem {
     }
 
     cmdDir(args) {
-        const showHidden = args.includes('/a') || args.includes('-a');
+        // 隠しファイル表示オプション（複数パターン対応）
+        const showHidden = args.includes('/a') || 
+                          args.includes('-a') || 
+                          args.includes('hidden') || 
+                          args.includes('all') ||
+                          args.includes('すべて') ||
+                          args.includes('全部');
+        
         const currentDir = this.getCurrentDir();
         
         if (!currentDir || !currentDir.children) {
@@ -289,21 +347,32 @@ class VirtualFileSystem {
         const entries = Object.entries(currentDir.children);
         let fileCount = 0;
         let dirCount = 0;
+        let hiddenCount = 0;
 
         for (const [name, node] of entries) {
-            if (node.hidden && !showHidden) continue;
+            if (node.hidden) {
+                hiddenCount++;
+                if (!showHidden) continue;
+            }
 
             const date = '2025/11/27  10:30';
             
             if (node.type === 'folder') {
-                output += `${date}    <DIR>          ${name}\n`;
+                const hiddenMark = node.hidden ? ' [隠し]' : '';
+                output += `${date}    <DIR>          ${name}${hiddenMark}\n`;
                 dirCount++;
             } else {
                 const size = (node.content?.length || 0).toString().padStart(10);
                 const editFlag = node.editable ? '' : ' [読取専用]';
-                output += `${date}           ${size} ${name}${editFlag}\n`;
+                const hiddenMark = node.hidden ? ' [隠し]' : '';
+                output += `${date}           ${size} ${name}${editFlag}${hiddenMark}\n`;
                 fileCount++;
             }
+        }
+        
+        // 隠しファイルがあることをヒント表示（隠し表示モードでない場合）
+        if (!showHidden && hiddenCount > 0) {
+            output += `\n[TIP]: 隠しファイルがあるかもしれません。search で確認できます。\n`;
         }
 
         output += `\n               ${fileCount} 個のファイル\n`;
@@ -707,6 +776,5 @@ class VirtualFileSystem {
 }
 
 window.VirtualFileSystem = VirtualFileSystem;
-window.vfs = new VirtualFileSystem();
 
 console.log('VirtualFileSystem: 読み込み完了');

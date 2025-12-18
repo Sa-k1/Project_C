@@ -1,4 +1,4 @@
-// puzzle.js - 謎解きシステム（暗号化ファイルとゴミ箱機能）
+// magic1.js - ギミック1: 暗号解読システム（暗号化ファイルとゴミ箱機能）
 
 (function() {
     // グローバルなpuzzleSystemオブジェクトを作成
@@ -286,6 +286,18 @@
             }
             
             window.puzzleSystem.updateEncryptedFileIcon(fileName, true);
+            
+            // ★★★ クリア報酬: searchコマンド解放 ★★★
+            if (!gameState.searchUnlocked) {
+                gameState.searchUnlocked = true;
+                await helpers.wait(500);
+                await helpers.systemLine('', 0);
+                await helpers.systemLine('[SYSTEM]: ████████████████████████████████', 25);
+                await helpers.systemLine('[SYSTEM]:   新しいコマンドを取得しました', 25);
+                await helpers.systemLine('[SYSTEM]:   「search」 - ヒントを検索', 25);
+                await helpers.systemLine('[SYSTEM]: ████████████████████████████████', 25);
+                await helpers.systemLine('', 0);
+            }
             
             gameState.alertLevel = Math.min(100, gameState.alertLevel + 10);
             await helpers.wait(600);
