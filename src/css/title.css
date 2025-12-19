@@ -51,12 +51,14 @@ font-family: serif;
 }
 
 .game-title {
-width: 400px;
+font-size: 300px;
+
+/* width: 400px; */
 }
 
 .start-container {
 position: absolute;
-top: 60%;
+top: 70%;
 left: 50%;
 transform: translate(-50%, -50%);
 }
