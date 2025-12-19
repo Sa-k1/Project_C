@@ -590,3 +590,109 @@ window.onFileOpen = function(fileName) {
         window.sendEveMessage('その写真は...興味深いですね。');
     }
 };
+
+// ==========================================
+// IME監視機能
+// ==========================================
+
+// IME状態表示用の要素を作成
+function createIMEStatusDisplay() {
+    const existingDisplay = document.getElementById('ime-status-display');
+    if (existingDisplay) return; // 既に存在する場合はスキップ
+
+    const imeDisplay = document.createElement('div');
+    imeDisplay.id = 'ime-status-display';
+    imeDisplay.innerHTML = `
+        <div style="margin-bottom: 5px;">
+            <span style="font-weight: bold;">IME:</span> 
+            <span id="imeEnabled" style="color: #00ff00;">-</span>
+        </div>
+        <div>
+            <span style="font-weight: bold;">モード:</span> 
+            <span id="imeMode" style="color: #00ffff;">-</span>
+        </div>
+    `;
+    
+    // スタイルを設定
+    Object.assign(imeDisplay.style, {
+        position: 'fixed',
+        top: '10px',
+        right: '10px',
+        background: 'rgba(0, 0, 0, 0.85)',
+        color: 'white',
+        padding: '12px 15px',
+        borderRadius: '8px',
+        fontSize: '13px',
+        fontFamily: 'monospace',
+        zIndex: '10000',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
+        minWidth: '150px',
+        backdropFilter: 'blur(5px)'
+    });
+    
+    document.body.appendChild(imeDisplay);
+}
+
+// IME状態を更新する関数
+async function updateIMEStatus() {
+    try {
+        // electronAPIが存在するか確認
+        if (!window.electronAPI || !window.electronAPI.getIMEStatus) {
+            console.warn('electronAPI.getIMEStatus is not available');
+            return;
+        }
+
+        const status = await window.electronAPI.getIMEStatus();
+        
+        if (status && !status.error) {
+            // 表示要素を取得
+            const enabledEl = document.getElementById('imeEnabled');
+            const modeEl = document.getElementById('imeMode');
+            
+            if (enabledEl && modeEl) {
+                // IME有効/無効の表示
+                if (status.enabled) {
+                    enabledEl.textContent = 'ON';
+                    enabledEl.style.color = '#00ff00';
+                    modeEl.textContent = '日本語入力';
+                    modeEl.style.color = '#00ffff';
+                } else {
+                    enabledEl.textContent = 'OFF';
+                    enabledEl.style.color = '#ff6b6b';
+                    modeEl.textContent = '英数字';
+                    modeEl.style.color = '#aaaaaa';
+                }
+            }
+            
+            // コンソールにも出力（デバッグ用）
+            console.log('IME状態:', status.enabled ? 'ON' : 'OFF');
+        } else if (status && status.error) {
+            console.error('IME状態取得エラー:', status.error);
+        }
+    } catch (error) {
+        console.error('IME状態更新失敗:', error);
+    }
+}
+
+// IME監視を開始する関数
+function startIMEMonitoring() {
+    // 表示要素を作成
+    createIMEStatusDisplay();
+    
+    // 初回実行
+    updateIMEStatus();
+    
+    // 定期的に更新（200ms間隔）
+    setInterval(updateIMEStatus, 200);
+    
+    console.log('IME監視を開始しました');
+}
+
+// ページ読み込み完了後にIME監視を開始
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startIMEMonitoring);
+} else {
+    // 既に読み込み完了している場合は即座に実行
+    startIMEMonitoring();
+}

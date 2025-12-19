@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
-import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
+import koffi from 'koffi';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -9,6 +9,87 @@ const __dirname = path.dirname(__filename);
 let cliProcess;
 let TitleScreen;
 let splashScreen;
+let imeMonitorInterval = null;
+let lastIMEStatus = false;
+
+// Windows APIの読み込み（koffiを使用）
+let user32, imm32, GetForegroundWindow, ImmGetDefaultIMEWnd, SendMessageW;
+
+try {
+  user32 = koffi.load('user32.dll');
+  imm32 = koffi.load('imm32.dll');
+  
+  // Windows API関数の定義
+  GetForegroundWindow = user32.func('GetForegroundWindow', 'void*', []);
+  ImmGetDefaultIMEWnd = imm32.func('ImmGetDefaultIMEWnd', 'void*', ['void*']);
+  SendMessageW = user32.func('SendMessageW', 'long', ['void*', 'uint', 'void*', 'void*']);
+  
+  console.log('✅ Windows API読み込み成功');
+} catch (error) {
+  console.error('❌ Windows API読み込み失敗:', error);
+}
+
+// IME状態を直接取得する関数（koffi使用）
+function checkIMEStatus() {
+  try {
+    if (!GetForegroundWindow || !ImmGetDefaultIMEWnd || !SendMessageW) {
+      console.log('⚠️ Windows API関数が未定義');
+      return false;
+    }
+    
+    const hwnd = GetForegroundWindow();
+    const imeWnd = ImmGetDefaultIMEWnd(hwnd);
+    
+    // SendMessageWを使用してIME状態を取得
+    // 0x0283 = WM_IME_CONTROL, 0x0005 = IMC_GETOPENSTATUS
+    const result = SendMessageW(imeWnd, 0x0283, 0x0005, 0);
+    
+    const newStatus = result !== 0;
+    
+    // 状態が変わった時だけログ出力
+    if (newStatus !== lastIMEStatus) {
+      console.log(`🔄 IME状態変更: ${newStatus ? 'ON' : 'OFF'} (result: ${result})`);
+    }
+    
+    lastIMEStatus = newStatus;
+    return lastIMEStatus;
+  } catch (error) {
+    console.error('❌ IME状態取得エラー:', error);
+    return false;
+  }
+}
+
+// IME監視を開始
+function startIMEMonitor() {
+  if (imeMonitorInterval) return; // 既に起動済み
+  
+  // 初回実行
+  checkIMEStatus();
+  
+  // 200ms間隔で監視
+  imeMonitorInterval = setInterval(() => {
+    checkIMEStatus();
+  }, 200);
+  
+  console.log('✅ IME監視を開始しました（koffi使用）');
+}
+
+// IME監視を停止
+function stopIMEMonitor() {
+  if (imeMonitorInterval) {
+    clearInterval(imeMonitorInterval);
+    imeMonitorInterval = null;
+    console.log('✅ IME監視を停止しました');
+  }
+}
+
+// IME状態を取得する関数（最後の状態を即座に返す）
+async function getIMEStatus() {
+  return {
+    enabled: lastIMEStatus,
+    timestamp: Date.now()
+  };
+}
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -17,8 +98,11 @@ function createWindow() {
     autoHideMenuBar: true,
     // フルスクリーン表示にする場合は下のコメントアウトを外してください
     // fullscreen: true, 
-    nodeIntegration: true, // これを有効にする
-    contextIsolation: false, // 必要に応じて無効化
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js')
+    },
     title: ''
   });
   
@@ -35,8 +119,8 @@ function createtitleWindow() {
     // フルスクリーン表示にする場合は下のコメントアウトを外してください
     // fullscreen: true,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
+      nodeIntegration: true,  // 既存のコードとの互換性のため維持
+      contextIsolation: false  // 既存のコードとの互換性のため維持
     },
     title: 's'
   });
@@ -44,6 +128,14 @@ function createtitleWindow() {
 }
 
 app.whenReady().then(() => {
+  // IME監視プロセスを起動
+  startIMEMonitor();
+
+  // IME状態取得のIPCハンドラーを登録
+  ipcMain.handle('get-ime-status', async () => {
+    return await getIMEStatus();
+  });
+
   // スプラッシュ画面を事前に作成（非表示）
   splashScreen = new BrowserWindow({
     width: 800,
@@ -54,8 +146,8 @@ app.whenReady().then(() => {
     transparent: true,
     show: false,  // 最初は非表示
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
+      nodeIntegration: true,  // 既存のコードとの互換性のため維持
+      contextIsolation: false  // 既存のコードとの互換性のため維持
     }
   });
 
@@ -100,11 +192,33 @@ app.whenReady().then(() => {
   });
 });
 
+// アプリ終了時のクリーンアップ
+app.on('before-quit', () => {
+  console.log('apri end...');
+  stopIMEMonitor();
+});
+
 app.on('window-all-closed', () => {
   if (cliProcess) {
     cliProcess.kill();
   }
+  stopIMEMonitor();
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+// Ctrl+C などでプロセスが終了する場合
+process.on('exit', () => {
+  stopIMEMonitor();
+});
+
+process.on('SIGINT', () => {
+  stopIMEMonitor();
+  process.exit();
+});
+
+process.on('SIGTERM', () => {
+  stopIMEMonitor();
+  process.exit();
 });
