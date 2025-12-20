@@ -604,31 +604,22 @@ function createIMEStatusDisplay() {
     imeDisplay.id = 'ime-status-display';
     imeDisplay.innerHTML = `
         <div style="margin-bottom: 5px;">
-            <span style="font-weight: bold;">IME:</span> 
-            <span id="imeEnabled" style="color: #00ff00;">-</span>
+            <span id="imeEnabled" style="color: #fff;">-</span>
         </div>
-        <div>
-            <span style="font-weight: bold;">モード:</span> 
-            <span id="imeMode" style="color: #00ffff;">-</span>
-        </div>
+
     `;
     
     // スタイルを設定
     Object.assign(imeDisplay.style, {
+        display: 'flex',
         position: 'fixed',
-        top: '10px',
-        right: '10px',
-        background: 'rgba(0, 0, 0, 0.85)',
-        color: 'white',
+        top: '95%',
+        right: '80px',
         padding: '12px 15px',
-        borderRadius: '8px',
-        fontSize: '13px',
+        fontSize: '32px',
         fontFamily: 'monospace',
-        zIndex: '10000',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
-        minWidth: '150px',
-        backdropFilter: 'blur(5px)'
+        zIndex: '1000',
+        fontWeight: 'bold'
     });
     
     document.body.appendChild(imeDisplay);
@@ -648,25 +639,22 @@ async function updateIMEStatus() {
         if (status && !status.error) {
             // 表示要素を取得
             const enabledEl = document.getElementById('imeEnabled');
-            const modeEl = document.getElementById('imeMode');
+            // const modeEl = document.getElementById('imeMode');
             
-            if (enabledEl && modeEl) {
+            if (enabledEl) {
                 // IME有効/無効の表示
                 if (status.enabled) {
-                    enabledEl.textContent = 'ON';
-                    enabledEl.style.color = '#00ff00';
-                    modeEl.textContent = '日本語入力';
-                    modeEl.style.color = '#00ffff';
+                    enabledEl.textContent = 'あ';
+                    enabledEl.style.color = '#000000ff';
+                    // modeEl.textContent = '全角';
+                    // modeEl.style.color = '#000000ff';
                 } else {
-                    enabledEl.textContent = 'OFF';
-                    enabledEl.style.color = '#ff6b6b';
-                    modeEl.textContent = '英数字';
-                    modeEl.style.color = '#aaaaaa';
+                    enabledEl.textContent = 'A';
+                    enabledEl.style.color = '#000000ff';
+                    // modeEl.textContent = '半角';
+                    // modeEl.style.color = '#000000ff';
                 }
             }
-            
-            // コンソールにも出力（デバッグ用）
-            console.log('IME状態:', status.enabled ? 'ON' : 'OFF');
         } else if (status && status.error) {
             console.error('IME状態取得エラー:', status.error);
         }
