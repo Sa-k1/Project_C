@@ -33,7 +33,7 @@ try {
 function checkIMEStatus() {
   try {
     if (!GetForegroundWindow || !ImmGetDefaultIMEWnd || !SendMessageW) {
-      console.log('⚠️ Windows API関数が未定義');
+      console.log('Windows API Not');
       return false;
     }
     
@@ -47,15 +47,15 @@ function checkIMEStatus() {
     const newStatus = result !== 0;
     
     // 状態が変わった時だけログ出力
-    if (newStatus !== lastIMEStatus) {
-      console.log(`🔄 IME状態変更: ${newStatus ? 'ON' : 'OFF'} (result: ${result})`);
-    }
+    // if (newStatus !== lastIMEStatus) {
+      // console.log(`🔄 IME状態変更: ${newStatus ? 'ON' : 'OFF'} (result: ${result})`);
+    // }
     
     lastIMEStatus = newStatus;
     return lastIMEStatus;
   } catch (error) {
     console.error('❌ IME状態取得エラー:', error);
-    return false;
+    return false; 
   }
 }
 

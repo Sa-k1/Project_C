@@ -611,15 +611,12 @@ function createIMEStatusDisplay() {
     
     // スタイルを設定
     Object.assign(imeDisplay.style, {
-        display: 'flex',
         position: 'fixed',
         top: '95%',
         right: '80px',
-        padding: '12px 15px',
+        padding: '0 15px',
         fontSize: '32px',
-        fontFamily: 'monospace',
-        zIndex: '1000',
-        fontWeight: 'bold'
+        zIndex: '1000'
     });
     
     document.body.appendChild(imeDisplay);
