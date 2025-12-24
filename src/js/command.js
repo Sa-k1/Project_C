@@ -218,6 +218,107 @@
             }
         }
 
+        // readコマンド - ファイルの表層を読み取る
+        if (command.toLowerCase().indexOf('read ') === 0) {
+            var args = command.split(/\s+/);
+            var target = args[1] ? args[1].trim().toLowerCase() : '';
+            
+            if (target === 'admin_key.dat' || target === 'admin_key') {
+                await systemLine("[SYSTEM]: admin_key.dat の表層データを読み取っています...", 25);
+                await window.commandHandler.wait(800);
+                
+                // 表層読み取りフラグを設定
+                if (!gameState.adminKeyState) {
+                    gameState.adminKeyState = {};
+                }
+                gameState.adminKeyState.surfaceRead = true;
+                
+                term.writeln("\r");
+                term.writeln("\r  ╔═══════════════════════════════════╗");
+                term.writeln("\r  ║     表層データ読み取り完了        ║");
+                term.writeln("\r  ╚═══════════════════════════════════╝");
+                term.writeln("\r");
+                term.writeln("\r  [表層情報]");
+                term.writeln("\r  ファイル名: admin_key.dat");
+                term.writeln("\r  作成者: SYSTEM");
+                term.writeln("\r  暗号化: 多層暗号");
+                term.writeln("\r");
+                term.writeln("\r  [復号データ]");
+                term.writeln("\r  管理者権限キー: \x1b[33mHYPER\x1b[0m");
+                term.writeln("\r");
+                await systemLine("[WARNING]: 管理者権限キー 'HYPER' を取得しました。", 25);
+                
+                // HYPERフラグメント取得
+                if (!gameState.commandFragments) {
+                    gameState.commandFragments = {};
+                }
+                gameState.commandFragments.hyper = true;
+                return;
+            } else if (target === '') {
+                await errorLine("[ERROR]: ファイル名を指定してください。", 20);
+                await systemLine("[SYSTEM]: 使用方法: read <ファイル名>", 20);
+                return;
+            } else {
+                await errorLine("[ERROR]: '" + target + "' は読み取り対象ではありません。", 20);
+                return;
+            }
+        }
+
+        // Verstehenコマンド - ファイルの深層を読み取る（理解する）
+        if (command.toLowerCase().indexOf('verstehen ') === 0) {
+            var args = command.split(/\s+/);
+            var target = args[1] ? args[1].trim().toLowerCase() : '';
+            
+            if (target === 'admin_key.dat' || target === 'admin_key') {
+                await systemLine("[SYSTEM]: admin_key.dat の深層データを解析しています...", 25);
+                await window.commandHandler.wait(1000);
+                
+                // 深層読み取りフラグを設定
+                if (!gameState.adminKeyState) {
+                    gameState.adminKeyState = {};
+                }
+                gameState.adminKeyState.deepRead = true;
+                
+                term.writeln("\r");
+                term.writeln("\r  ╔═══════════════════════════════════╗");
+                term.writeln("\r  ║     深層データ解析完了            ║");
+                term.writeln("\r  ╚═══════════════════════════════════╝");
+                term.writeln("\r");
+                
+                // 深層データからADMINを取得
+                term.writeln("\r  [深層データ]");
+                term.writeln("\r");
+                term.writeln("\r  管理者権限コマンドを発見...");
+                term.writeln("\r");
+                term.writeln("\r  ┌─────────────────────────────────┐");
+                term.writeln("\r  │  管理者権限コマンド          │");
+                term.writeln("\r  │  \x1b[36mADMIN\x1b[0m                         │");
+                term.writeln("\r  └─────────────────────────────────┘");
+                term.writeln("\r");
+                await systemLine("[WARNING]: 管理者権限コマンドを取得しました。", 25);
+                
+                // ADMINフラグメント取得
+                if (!gameState.commandFragments) {
+                    gameState.commandFragments = {};
+                }
+                gameState.commandFragments.admin = true;
+                return;
+            } else if (target === '') {
+                await errorLine("[ERROR]: ファイル名を指定してください。", 20);
+                await systemLine("[SYSTEM]: 使用方法: Verstehen <ファイル名>", 20);
+                return;
+            } else {
+                await errorLine("[ERROR]: '" + target + "' は解析対象ではありません。", 20);
+                return;
+            }
+        }
+
+        // mergeコマンド - フラグメントの結合
+        if (command.toLowerCase().indexOf('merge ') === 0) {
+            var handled = await window.commandHandler.handleMergeCommand(term, command, gameState, puzzleHelpers);
+            if (handled) return;
+        }
+
         // 不明なコマンド
         await errorLine("[ERROR]: '" + command + "' は認識されないコマンドです。", 20);
         await systemLine("[SYSTEM]: 'help' でコマンド一覧を確認できます。", 20);
@@ -294,6 +395,94 @@
         
         // 警戒度を少し上げる
         gameState.alertLevel = Math.min(100, (gameState.alertLevel || 0) + 1);
+    };
+
+    // -------------------------
+    // mergeコマンド処理
+    // コマンドフラグメントを結合する
+    // merge <fragment1> <fragment2>
+    // -------------------------
+    window.commandHandler.handleMergeCommand = async function(term, command, gameState, puzzleHelpers) {
+        const { systemLine, errorLine, warnLine, wait, slowPrintLine } = puzzleHelpers;
+
+        // mergeコマンド - フラグメントを結合
+        if (command.toLowerCase().indexOf('merge ') === 0) {
+            var args = command.split(/\s+/);
+            var frag1 = args[1] ? args[1].trim().toLowerCase() : '';
+            var frag2 = args[2] ? args[2].trim().toLowerCase() : '';
+            
+            // 引数チェック
+            if (frag1 === '' || frag2 === '') {
+                await errorLine("[ERROR]: 結合するフラグメントを2つ指定してください。", 20);
+                await systemLine("[SYSTEM]: 使用方法: merge <fragment1> <fragment2>", 20);
+                return true;
+            }
+            
+            // フラグメントの所持チェック
+            if (!gameState.commandFragments) {
+                gameState.commandFragments = {};
+            }
+            
+            // hyper と admin の結合
+            if ((frag1 === 'hyper' && frag2 === 'admin') || (frag1 === 'admin' && frag2 === 'hyper')) {
+                // 両方のフラグメントを持っているかチェック
+                if (!gameState.commandFragments.hyper) {
+                    await errorLine("[ERROR]: フラグメント 'HYPER' を所持していません。", 20);
+                    await systemLine("[HINT]: 隠しファイルを探索して表層データを読み取ってください。", 20);
+                    return true;
+                }
+                if (!gameState.commandFragments.admin) {
+                    await errorLine("[ERROR]: フラグメント 'ADMIN' を所持していません。", 20);
+                    await systemLine("[HINT]: 隠しファイルの深層データを解析してください。", 20);
+                    return true;
+                }
+                
+                // 結合実行
+                await systemLine("[SYSTEM]: コマンドを結合しています...", 25);
+                await wait(500);
+                term.writeln("\r");
+                term.writeln("\r  \x1b[33m■■■□□□□□□□\x1b[0m 結合中...");
+                await wait(400);
+                term.writeln("\r  \x1b[33m■■■■■■□□□□\x1b[0m 解析中...");
+                await wait(400);
+                term.writeln("\r  \x1b[33m■■■■■■■■■■\x1b[0m 完了!");
+                await wait(300);
+                term.writeln("\r");
+                
+                term.writeln("\r  ╔═══════════════════════════════════╗");
+                term.writeln("\r  ║        結合完了                   ║");
+                term.writeln("\r  ╚═══════════════════════════════════╝");
+                term.writeln("\r");
+                term.writeln("\r  \x1b[33mHYPER\x1b[0m + \x1b[36mADMIN\x1b[0m = \x1b[32mHYPERADMIN\x1b[0m");
+                term.writeln("\r");
+                term.writeln("\r  ┌─────────────────────────────────┐");
+                term.writeln("\r  │  完全管理者権限コマンド         │");
+                term.writeln("\r  │  \x1b[32mHYPERADMIN\x1b[0m                    │");
+                term.writeln("\r  └─────────────────────────────────┘");
+                term.writeln("\r");
+                
+                await systemLine("[SUCCESS]: 完全管理者権限コマンドを取得しました！", 25);
+                
+                // 完全版取得フラグ
+                if (!gameState.adminKeyState) {
+                    gameState.adminKeyState = {};
+                }
+                gameState.adminKeyState.fullCommand = true;
+                gameState.adminCommand = 'HYPERADMIN';
+                
+                // フラグメントを消費
+                delete gameState.commandFragments.hyper;
+                delete gameState.commandFragments.admin;
+                
+                return true;
+            } else {
+                // 不明な組み合わせ
+                await errorLine("[ERROR]: '" + frag1.toUpperCase() + "' と '" + frag2.toUpperCase() + "' は結合できません。", 20);
+                return true;
+            }
+        }
+        
+        return false; // mergeコマンドではなかった
     };
 
 })();

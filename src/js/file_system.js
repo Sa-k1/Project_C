@@ -66,6 +66,13 @@ class VirtualFileSystem {
                                                                 content: `E.V.E\n\n私はここにいる\n私はあなたを見ている\n\n逃げられない`,
                                                                 editable: false
                                                             },
+                                                            'admin_key.dat': {
+                                                                type: 'file',
+                                                                hidden: true,
+                                                                htmlFile: 'admin_key.html',
+                                                                content: `[admin_key.dat]\n\nこのファイルには複数のデータ層があります。\n表層と深層の両方を読み取る必要があります。\n\n警告: 適切な順序で適切なコマンドを使用してください。\n「表層を理解してから深層へ」`,
+                                                                editable: false
+                                                            },
                                                             'backup': {
                                                                 type: 'folder',
                                                                 hidden: true,
@@ -638,6 +645,16 @@ class VirtualFileSystem {
         
         if (!file) return `指定されたファイルが見つかりません。`;
         if (file.type === 'folder') return this.cmdCd([fileName]);
+        
+        // ツールファイルの場合
+        if (file.isTool) {
+            return { 
+                action: 'acquireTool', 
+                toolName: file.toolName,
+                content: file.content 
+            };
+        }
+        
         if (file.htmlFile) return { action: 'openFile', file: file.htmlFile };
 
         return file.content || '(空のファイル)';
