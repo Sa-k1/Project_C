@@ -184,6 +184,7 @@ body {
     max-height: 120px;
     min-height: 48px;
     font-family: inherit;
+    overflow: hidden;
 }
 
 .chat-input::placeholder {

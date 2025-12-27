@@ -9,6 +9,7 @@ const __dirname = path.dirname(__filename);
 let cliProcess;
 let TitleScreen;
 let splashScreen;
+let BGScreen;
 let imeMonitorInterval = null;
 let lastIMEStatus = false;
 
@@ -109,6 +110,30 @@ function createWindow() {
   win.loadFile(path.join(__dirname, 'src', 'html', 'index.html'));
 }
 
+function createBgWindow() {
+  BGScreen = new BrowserWindow({
+    width: 800,
+    height: 600,
+    frame: false,       // フレームを消す（透明にするために必要）
+    // fullscreen: true,
+    alwaysOnTop: false,  // 常に最前面を無効化
+    show: false,      // 最初は非表示
+    webPreferences: {
+      nodeIntegration: true,  // 既存のコードとの互換性のため維持
+      contextIsolation: false  // 既存のコードとの互換性のため維持
+    },
+    title: ' '
+  });
+  
+  BGScreen.once('ready-to-show', () => {
+    BGScreen.show();
+    // 背面に配置
+    BGScreen.setAlwaysOnTop(false);
+  });
+
+  BGScreen.loadFile(path.join(__dirname, 'src', 'html', 'BG.html'));
+}
+
 function createtitleWindow() {
   TitleScreen = new BrowserWindow({
     width: 800,
@@ -116,6 +141,8 @@ function createtitleWindow() {
     autoHideMenuBar: true,
     transparent: true,  // 透明にする
     frame: false,       // フレームを消す（透明にするために必要）
+    show: true,
+    alwaysOnTop: true,  // Titleを最前面に
     // フルスクリーン表示にする場合は下のコメントアウトを外してください
     // fullscreen: true,
     webPreferences: {
@@ -125,11 +152,20 @@ function createtitleWindow() {
     title: 's'
   });
   TitleScreen.loadFile(path.join(__dirname, 'src', 'html', 'title.html'));
+  
+  // Titleを最前面に、BGを背面に確実に配置
+  TitleScreen.setAlwaysOnTop(true);
+  if (BGScreen) {
+    BGScreen.setAlwaysOnTop(false);
+    BGScreen.blur();
+  }
 }
 
 app.whenReady().then(() => {
   // IME監視プロセスを起動
   startIMEMonitor();
+
+  createBgWindow();
 
   // IME状態取得のIPCハンドラーを登録
   ipcMain.handle('get-ime-status', async () => {
@@ -186,7 +222,7 @@ app.whenReady().then(() => {
     setTimeout(() => {
       splashScreen.close();
       createWindow();
-    }, 0);
+    }, 1500);
     // アニメーションは既に1秒進んでいるので1500msに調整
     // 0を1500に
   });
