@@ -112,10 +112,10 @@ function createWindow() {
 
 function createBgWindow() {
   BGScreen = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 800,  //1920に設定
+    height: 600,  //1080に設定
     frame: false,       // フレームを消す（透明にするために必要）
-    // fullscreen: true,
+    // fullscreenにするとほかのウィンドウが最前面に来れなくなるためウィンドウサイズで対応
     alwaysOnTop: false,  // 常に最前面を無効化
     show: false,      // 最初は非表示
     webPreferences: {
