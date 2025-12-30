@@ -115,33 +115,6 @@
             }
 
             // ギミック1の暗号化ファイル（admin_key.dat含む）
-            if (fileName === 'admin_key.dat') {
-                // admin_key.dat専用ポップアップ表示
-                // key_trace.encと同じようにfilePagesを使う
-                const parentDoc = window.parent ? window.parent.document : document;
-                const filePages = window.parent && window.parent.filePages ? window.parent.filePages : {};
-                // admin_key用のビューア設定
-                let viewerId = 5;
-                let page = 'src/html/admin_key_viewer.html';
-                // filePagesに登録（なければ）
-                if (!filePages['admin_key']) {
-                    filePages['admin_key'] = { viewerId, page };
-                    if (window.parent) window.parent.filePages = filePages;
-                }
-                const container = parentDoc.getElementById('fileViewerContainer' + viewerId);
-                const iframe = parentDoc.getElementById('file-viewer-iframe' + viewerId);
-                const title = parentDoc.getElementById('fileViewerTitle' + viewerId);
-                if (title) title.textContent = 'admin_key.dat';
-                if (iframe) iframe.src = page;
-                if (container) {
-                    container.style.display = 'block';
-                    container.style.visibility = 'visible';
-                    container.style.opacity = '1';
-                    if (window.parent && window.parent.bringToFront) window.parent.bringToFront(container);
-                }
-                await systemLine("[TIP]: ファイルはEVEウィンドウ内に表示されます", 20);
-                return;
-            }
             if (window.puzzleSystem && window.puzzleSystem.isEncryptedFile(fileName)) {
                 await window.puzzleSystem.handleOpenEncryptedCommand(term, gameState, puzzleHelpers, command);
                 return;
