@@ -27,9 +27,30 @@
 - 次回のミーティングは来週月曜日
 - バックアップを忘れずに取る
 
+<span style="color: #888; font-size: 10px;">
+※ 困ったときは「search」コマンドが使えるかも...
+</span>
+
 [EOF]
         </div>
     </div>
+    <script>
+        // searchコマンドを解放するトリガー
+        (function() {
+            try {
+                // 親ウィンドウのgameStateにアクセス
+                var targetWindow = window.parent || window;
+                
+                // terminal.htmlのiframeを探す
+                var terminalFrame = targetWindow.document.querySelector('#terminalViewerContainer iframe');
+                if (terminalFrame && terminalFrame.contentWindow) {
+                    // terminal.htmlにメッセージを送信
+                    terminalFrame.contentWindow.postMessage({ type: 'unlockSearch' }, '*');
+                }
+            } catch (e) {
+                console.log('searchコマンド解放トリガー: ', e);
+            }
+        })();
+    </script>
 </body>
 </html>
-

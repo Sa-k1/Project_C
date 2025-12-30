@@ -168,7 +168,8 @@ const filePages = {
     'file1': { page: 'file1.html', viewerId: 1 },  // 重要なデータ.txt
     'file2': { page: 'file2.html', viewerId: 2 },  // 古いメモ.doc
     'file3': { page: 'file3.html', viewerId: 3 },  // 不要な写真.jpg
-    'file_encrypted': { page: 'file_encrypted.html', viewerId: 4 }  // 暗号化ファイル
+    'file_encrypted': { page: 'file_encrypted.html', viewerId: 4 },  // 暗号化ファイル
+    'key_trace': { page: 'key_trace_viewer.html', viewerId: 4 }
 };
 
 // グローバルに公開（ターミナルからアクセス可能に）

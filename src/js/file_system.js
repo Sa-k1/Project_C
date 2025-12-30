@@ -113,6 +113,20 @@ class VirtualFileSystem {
                                                                         encrypted: true,
                                                                         content: `[暗号化されたファイル]\n\nこのファイルはパスワードで保護されています。\nopenコマンドで開いてパスワードを入力してください。`,
                                                                         editable: false
+                                                                    },
+                                                                    'key_trace.png': {
+                                                                        type: 'image',
+                                                                        hidden: true,
+                                                                        special: 'gimmick3_keytrace',
+                                                                        content: '', // 実際の画像はpublic/pic/などに配置
+                                                                        editable: false
+                                                                    },
+                                                                    'traced_file.enc': {
+                                                                        type: 'file',
+                                                                        hidden: true,
+                                                                        encrypted: true,
+                                                                        content: `[暗号化されたファイル]\n\nこのファイルはパスワードで保護されています。\nopenコマンドで開いてパスワードを入力してください。`,
+                                                                        editable: false
                                                                     }
                                                                 }
                                                             }
@@ -206,6 +220,7 @@ class VirtualFileSystem {
             case 'ls': return this.cmdDir(args);
             case 'type':
             case 'cat': return await this.cmdType(args);
+            case 'read': return await this.cmdRead(args);
             case 'cls':
             case 'clear': return { action: 'clear' };
             case 'pwd': return this.getPathString();
@@ -377,11 +392,6 @@ class VirtualFileSystem {
             }
         }
         
-        // 隠しファイルがあることをヒント表示（隠し表示モードでない場合）
-        if (!showHidden && hiddenCount > 0) {
-            output += `\n[TIP]: 隠しファイルがあるかもしれません。search で確認できます。\n`;
-        }
-
         output += `\n               ${fileCount} 個のファイル\n`;
         output += `               ${dirCount} 個のディレクトリ`;
 
@@ -400,9 +410,45 @@ class VirtualFileSystem {
         
         if (!file) return `指定されたファイルが見つかりません。`;
         if (file.type === 'folder') return `アクセスが拒否されました。`;
+        
+        // ギミック3のkey_trace.log特別処理
+        if (file.special === 'gimmick3_keytrace') {
+            // ギミック2をクリアしていない場合はアクセス拒否
+            if (!this.gameState || !this.gameState.gimmick2Cleared) {
+                return '[ERROR]: このファイルは特殊なフォーマットで暗号化されています。\n[TIP]: 復号ツールが必要です。';
+            }
+            // read コマンドでのみ解読可能
+            return '[ERROR]: このファイルは特殊なフォーマットです。\n[TIP]: read コマンドを使用してください。';
+        }
 
         const content = await this.loadContentFromHtml(file);
         return content || '(空のファイル)';
+    }
+
+    async cmdRead(args) {
+        if (args.length === 0) return '使用法: read <ファイル名>';
+
+        const fileName = args[0];
+        const currentDir = this.getCurrentDir();
+
+        if (!currentDir || !currentDir.children) return 'ファイルが見つかりません。';
+
+        const file = currentDir.children[fileName];
+        
+        if (!file) return `指定されたファイルが見つかりません。`;
+        if (file.type === 'folder') return `アクセスが拒否されました。`;
+
+        // ギミック3のkey_trace.log特別処理
+        if (file.special === 'gimmick3_keytrace') {
+            // ギミック2をクリアしていない場合はアクセス拒否
+            if (!this.gameState || !this.gameState.gimmick2Cleared) {
+                return '[ERROR]: このファイルは特殊なフォーマットで暗号化されています。\n[TIP]: 復号ツールが必要です。';
+            }
+            return { action: 'gimmick3_keytrace', file: fileName };
+        }
+
+        // 通常のファイルはreadできない
+        return '[ERROR]: このファイルは通常のテキストファイルです。\n[TIP]: cat または type コマンドを使用してください。';
     }
 
     async cmdEdit(args) {
@@ -646,13 +692,14 @@ class VirtualFileSystem {
         if (!file) return `指定されたファイルが見つかりません。`;
         if (file.type === 'folder') return this.cmdCd([fileName]);
         
-        // ツールファイルの場合
-        if (file.isTool) {
-            return { 
-                action: 'acquireTool', 
-                toolName: file.toolName,
-                content: file.content 
-            };
+        // ギミック3のkey_trace.log特別処理
+        if (file.special === 'gimmick3_keytrace') {
+            // ギミック2をクリアしていない場合はアクセス拒否
+            if (!this.gameState || !this.gameState.gimmick2Cleared) {
+                return '[ERROR]: このファイルは特殊なフォーマットで暗号化されています。\n[TIP]: 復号ツールが必要です。';
+            }
+            // read コマンドでのみ解読可能
+            return '[ERROR]: このファイルは特殊なフォーマットです。\n[TIP]: read コマンドを使用してください。';
         }
         
         if (file.htmlFile) return { action: 'openFile', file: file.htmlFile };

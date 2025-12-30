@@ -75,29 +75,51 @@
             return;
         }
 
+        // ギミック3の確認モード
+        if (gameState.inputMode === 'gimmick3_confirmation') {
+            if (window.gimmick3System && window.gimmick3System.handleConfirmationInput) {
+                await window.gimmick3System.handleConfirmationInput(term, gameState, puzzleHelpers, command);
+            }
+            return;
+        }
+        
+        // ギミック3のパスワード入力モード
+        if (gameState.inputMode === 'gimmick3_password') {
+            if (window.gimmick3System && window.gimmick3System.handlePasswordInput) {
+                await window.gimmick3System.handlePasswordInput(term, gameState, puzzleHelpers, command);
+            }
+            return;
+        }
+
         // ゴミ箱コマンド
         if (command.toLowerCase().indexOf('trash') === 0) {
             await window.puzzleSystem.handleTrashCommand(term, gameState, puzzleHelpers, command);
             return;
         }
 
-        // 暗号化ファイルを開くコマンド
+        // 暗号化ファイルを開くコマンド（PUZZLE_CONFIG優先）
         if (command.toLowerCase().indexOf('open ') === 0) {
             var args = command.split(/\s+/);
             var fileName = args[1] ? args[1].trim() : '';
-            
+
+            // ギミック3の暗号化ファイル
+            if (window.gimmick3System && window.gimmick3System.isEncryptedFile(fileName)) {
+                await window.gimmick3System.openEncryptedFile(term, gameState, puzzleHelpers, fileName);
+                return;
+            }
+
             // ギミック2の暗号化ファイル
             if (window.gimmick2System && window.gimmick2System.isEncryptedFile(fileName)) {
                 await window.gimmick2System.openEncryptedFile(term, gameState, puzzleHelpers, fileName);
                 return;
             }
-            
-            // ギミック1の暗号化ファイル
+
+            // ギミック1の暗号化ファイル（admin_key.dat含む）
             if (window.puzzleSystem && window.puzzleSystem.isEncryptedFile(fileName)) {
                 await window.puzzleSystem.handleOpenEncryptedCommand(term, gameState, puzzleHelpers, command);
                 return;
             }
-            // 暗号化ファイルでない場合は既存のvfs処理に委ねる
+            // ここまででreturnされなかった場合のみvfsに委ねる
         }
 
         // ファイルシステムコマンドの処理
@@ -118,6 +140,12 @@
                         case "openFile":
                             await systemLine("ファイルを開いています: " + result.file, 20);
                             window.open("../html/" + result.file, "_blank");
+                            return;
+                        case "gimmick3_keytrace":
+                            // ギミック3のキートレース表示
+                            if (window.gimmick3System && window.gimmick3System.displayKeyTrace) {
+                                await window.gimmick3System.displayKeyTrace(term, gameState, puzzleHelpers);
+                            }
                             return;
                     }
                 }
@@ -161,6 +189,15 @@
                 term.writeln("\r  === 特殊コマンド ===");
                 term.writeln("\r  search - 隠されたファイルを探す");
             }
+            
+            // readコマンドが解放されている場合のみ表示
+            if (gameState.hasReadCommand) {
+                if (!gameState.searchUnlocked) {
+                    term.writeln("\r");
+                    term.writeln("\r  === 特殊コマンド ===");
+                }
+                term.writeln("\r  read <ファイル名> - 特殊フォーマットのファイルを解読");
+            }
             return;
         }
 
@@ -177,6 +214,43 @@
             await window.commandHandler.handleSearchCommand(term, gameState, puzzleHelpers, vfs);
             return;
         }
+
+        // readコマンド（ギミック2クリア後のみ使用可能）
+        // 特殊フォーマットのファイルを解読
+        if (command.toLowerCase().indexOf('read ') === 0) {
+            // 解放されていない場合は反応しない
+            if (!gameState.hasReadCommand) {
+                await errorLine("[ERROR]: '" + command.split(' ')[0] + "' は認識されないコマンドです。", 20);
+                await systemLine("[SYSTEM]: 'help' でコマンド一覧を確認できます。", 20);
+                return;
+            }
+            
+            var args = command.split(/\s+/);
+            args.shift(); // 'read'を削除
+            
+            if (vfs && typeof vfs.cmdRead === 'function') {
+                var result = await vfs.cmdRead(args, term, gameState, puzzleHelpers);
+                
+                // gimmick3のキートレース表示
+                if (result && result.action === 'gimmick3_keytrace') {
+                    if (window.gimmick3System && window.gimmick3System.displayKeyTrace) {
+                        await window.gimmick3System.displayKeyTrace(term, gameState, puzzleHelpers);
+                        return;
+                    }
+                }
+                
+                // 通常の出力
+                if (result) {
+                    var lines = String(result).split("\n");
+                    for (var i = 0; i < lines.length; i++) {
+                        term.writeln("\r" + lines[i]);
+                    }
+                }
+            } else {
+                await errorLine("[ERROR]: ファイルシステムが初期化されていません", 20);
+            }
+            return;
+        }   
 
         // clearコマンド
         if (command.toLowerCase() === "clear" || command.toLowerCase() === "cls") {
@@ -317,6 +391,19 @@
         if (command.toLowerCase().indexOf('merge ') === 0) {
             var handled = await window.commandHandler.handleMergeCommand(term, command, gameState, puzzleHelpers);
             if (handled) return;
+        }
+
+        // デバッグ用：ギミック3直行コマンド
+        if (command === 'debug_gimmick3') {
+            gameState.puzzleCleared = true;
+            gameState.gimmick2Cleared = true;
+            gameState.hasReadCommand = true;
+            gameState.searchUnlocked = true;
+            gameState.gimmick3Cleared = false;
+            gameState.inputMode = 'normal';
+            gameState.currentPath = ['system', 'backup'];
+            await systemLine('[DEBUG]: ギミック3直行モード。system/backupに移動し、全前提クリア済み。', 20);
+            return;
         }
 
         // 不明なコマンド

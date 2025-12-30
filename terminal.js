@@ -241,6 +241,7 @@
             composingText = "";
         });
         
+        
         // 右クリックでペースト
         terminalElement.addEventListener("contextmenu", async function(e) {
             e.preventDefault(); // デフォルトのコンテキストメニューを無効化
@@ -315,6 +316,7 @@
             }
         });
     }
+
 
     // 起動メッセージ
     systemPrint("\x1b[0mEVE-OS [Version 10.0.26]\n");
