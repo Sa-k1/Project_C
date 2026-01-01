@@ -225,6 +225,175 @@
     
     // カーソル位置（バッファ内の文字インデックス）
     var cursorPos = 0;
+    
+    // TAB補完用の状態管理
+    var completionState = {
+        originalPattern: "",    // 元の入力パターン
+        wordStart: 0,          // 補完対象の単語の開始位置（文字インデックス）
+        wordEnd: 0,            // 補完対象の単語の終了位置（文字インデックス）
+        candidates: [],        // マッチした候補リスト
+        currentIndex: 0,       // 現在選択中の候補インデックス
+        isActive: false        // 補完モードが有効か
+    };
+
+    // -------------------------
+    // TAB補完ヘルパー関数
+    // -------------------------
+    
+    // カーソル位置の単語を取得
+    function getWordAtCursor() {
+        var bufChars = Array.from(buffer);
+        
+        // カーソル位置から前方にスペースを探す
+        var start = cursorPos;
+        while (start > 0 && bufChars[start - 1] !== ' ') {
+            start--;
+        }
+        
+        // カーソル位置から後方にスペースを探す
+        var end = cursorPos;
+        while (end < bufChars.length && bufChars[end] !== ' ') {
+            end++;
+        }
+        
+        return {
+            word: bufChars.slice(start, end).join(''),
+            start: start,
+            end: end
+        };
+    }
+    
+    // ワイルドカードを正規表現に変換
+    function wildcardToRegex(pattern) {
+        var escaped = pattern
+            .replace(/[.+^${}()|[\]\\]/g, '\\$&')  // 特殊文字をエスケープ
+            .replace(/\*/g, '.*')                   // * → .*
+            .replace(/\?/g, '.');                   // ? → .
+        return new RegExp('^' + escaped, 'i');      // 大文字小文字を区別しない
+    }
+    
+    // 候補を検索
+    function findMatches(pattern) {
+        if (!pattern) return [];
+        
+        try {
+            var regex = wildcardToRegex(pattern);
+            var candidates = [];
+            
+            // コマンド候補を取得
+            if (window.commandHandler && window.commandHandler.getAvailableCommands) {
+                var commands = window.commandHandler.getAvailableCommands(gameState);
+                candidates = commands.filter(function(cmd) {
+                    return regex.test(cmd);
+                });
+            }
+            
+            // 重複を除去してソート
+            candidates = Array.from(new Set(candidates)).sort();
+            
+            return candidates;
+        } catch (e) {
+            console.error("TAB補完エラー:", e);
+            return [];
+        }
+    }
+    
+    // 補完モードをリセット
+    function resetCompletion() {
+        completionState.originalPattern = "";
+        completionState.wordStart = 0;
+        completionState.wordEnd = 0;
+        completionState.candidates = [];
+        completionState.currentIndex = 0;
+        completionState.isActive = false;
+    }
+    
+    // 単語を置き換える
+    function replaceWord(newWord) {
+        var bufChars = Array.from(buffer);
+        
+        // カーソル位置の単語を削除
+        bufChars.splice(completionState.wordStart, completionState.wordEnd - completionState.wordStart);
+        
+        // 新しい単語を挿入
+        var newWordChars = Array.from(newWord);
+        bufChars.splice(completionState.wordStart, 0, ...newWordChars);
+        
+        // バッファを更新
+        buffer = bufChars.join("");
+        
+        // カーソル位置を更新
+        cursorPos = completionState.wordStart + newWordChars.length;
+        
+        // 単語の終了位置を更新
+        completionState.wordEnd = completionState.wordStart + newWordChars.length;
+    }
+    
+    // TABキー処理
+    function handleTabCompletion() {
+        if (completionState.isActive) {
+            // 補完モード中: 次の候補へ
+            completionState.currentIndex = (completionState.currentIndex + 1) % completionState.candidates.length;
+            
+            // 現在行をクリア
+            clearCurrentLine();
+            
+            // 単語を置き換え
+            replaceWord(completionState.candidates[completionState.currentIndex]);
+            
+            // 画面に再描画
+            term.write(buffer);
+            
+            // カーソルを正しい位置に移動
+            var bufChars = Array.from(buffer);
+            var afterCursorWidth = 0;
+            for (var i = cursorPos; i < bufChars.length; i++) {
+                afterCursorWidth += getCharWidth(bufChars[i]);
+            }
+            for (var i = 0; i < afterCursorWidth; i++) {
+                term.write('\x1b[D');
+            }
+        } else {
+            // 新しい補完を開始
+            var wordInfo = getWordAtCursor();
+            
+            if (!wordInfo.word) return; // 単語がない場合は何もしない
+            
+            var matches = findMatches(wordInfo.word);
+            
+            if (matches.length === 0) {
+                // 候補がない場合は何もしない
+                return;
+            }
+            
+            // 補完状態を初期化
+            completionState.originalPattern = wordInfo.word;
+            completionState.wordStart = wordInfo.start;
+            completionState.wordEnd = wordInfo.end;
+            completionState.candidates = matches;
+            completionState.currentIndex = 0;
+            completionState.isActive = true;
+            
+            // 現在行をクリア
+            clearCurrentLine();
+            
+            // 最初の候補に置き換え
+            replaceWord(matches[0]);
+            
+            // 画面に再描画
+            term.write(buffer);
+            
+            // カーソルを正しい位置に移動
+            var bufChars = Array.from(buffer);
+            var afterCursorWidth = 0;
+            for (var i = cursorPos; i < bufChars.length; i++) {
+                afterCursorWidth += getCharWidth(bufChars[i]);
+            }
+            for (var i = 0; i < afterCursorWidth; i++) {
+                term.write('\x1b[D');
+            }
+        }
+    }
 
     // IME入力検知用
     var terminalElement = document.getElementById("terminal");
@@ -326,9 +495,16 @@
     term.onData(async function(data) {
         if (!inputEnabled) return;
         
+        // TABキーの検出
+        if (data === '\t') {
+            handleTabCompletion();
+            return;
+        }
+        
         // 矢印キーのエスケープシーケンス検出
         if (data === '\x1b[A' || data === '\x1bOA') {
             // 上矢印: 履歴を遡る
+            resetCompletion(); // 補完モードをリセット
             if (commandHistory.length > 0) {
                 if (historyIndex === -1) {
                     tempBuffer = buffer; // 現在の入力を保存
@@ -347,6 +523,7 @@
         
         if (data === '\x1b[B' || data === '\x1bOB') {
             // 下矢印: 履歴を進む
+            resetCompletion(); // 補完モードをリセット
             if (historyIndex !== -1) {
                 if (historyIndex < commandHistory.length - 1) {
                     historyIndex++;
@@ -368,6 +545,7 @@
         
         // 右矢印: カーソルを右に移動
         if (data === '\x1b[C' || data === '\x1bOC') {
+            resetCompletion(); // 補完モードをリセット
             var bufChars = Array.from(buffer);
             if (cursorPos < bufChars.length) {
                 var charWidth = getCharWidth(bufChars[cursorPos]);
@@ -382,6 +560,7 @@
         
         // 左矢印: カーソルを左に移動
         if (data === '\x1b[D' || data === '\x1bOD') {
+            resetCompletion(); // 補完モードをリセット
             if (cursorPos > 0) {
                 cursorPos--;
                 var bufChars = Array.from(buffer);
@@ -403,6 +582,8 @@
             if (code === 13) { // Enter
                 // IME変換中のEnterは無視
                 if (isComposing) continue;
+                
+                resetCompletion(); // 補完モードをリセット
                 
                 term.write("\r\n");
                 var userMessage = buffer.trim();
@@ -428,6 +609,7 @@
                     term.write(getPrompt());
                 }
             } else if (code === 127 || code === 8) { // Backspace
+                resetCompletion(); // 補完モードをリセット
                 if (cursorPos > 0) {
                     var bufChars = Array.from(buffer);
                     var delChar = bufChars[cursorPos - 1];
@@ -458,6 +640,7 @@
                 }
             } else if (code >= 32) {
                 // 通常の文字入力（IME確定後の文字も含む）
+                resetCompletion(); // 補完モードをリセット
                 
                 // 入力幅の上限チェック（ターミナル幅 - プロンプト幅 - 余白2文字）
                 var maxInputWidth = term.cols - getStringWidth(getPrompt()) - 2;

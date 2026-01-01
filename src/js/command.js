@@ -571,5 +571,48 @@
         
         return false; // mergeコマンドではなかった
     };
+    
+    // -------------------------
+    // TAB補完用: 利用可能なコマンド一覧を取得
+    // -------------------------
+    window.commandHandler.getAvailableCommands = function(gameState) {
+        var commands = [
+            // 基本コマンド
+            'help',
+            'ls',
+            'dir',
+            'cd',
+            'cat',
+            'type',
+            'open',
+            'clear',
+            'trash',
+            'remnant',
+            // cd用のショートカット
+            '..',
+            // ファイルシステムコマンド引数
+            '-l',
+            '-a'
+        ];
+        
+        // searchコマンドが解放されている場合
+        if (gameState && gameState.searchUnlocked) {
+            commands.push('search');
+        }
+        
+        // readコマンドが解放されている場合
+        if (gameState && gameState.hasReadCommand) {
+            commands.push('read');
+        }
+        
+        // mergeコマンド（フラグメントを持っている場合）
+        if (gameState && gameState.commandFragments) {
+            if (Object.keys(gameState.commandFragments).length > 0) {
+                commands.push('merge');
+            }
+        }
+        
+        return commands;
+    };
 
 })();
