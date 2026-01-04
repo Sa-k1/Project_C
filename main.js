@@ -10,6 +10,7 @@ let cliProcess;
 let TitleScreen;
 let splashScreen;
 let BGScreen;
+let eveIntroScreen;
 let imeMonitorInterval = null;
 let lastIMEStatus = false;
 
@@ -93,21 +94,69 @@ async function getIMEStatus() {
 }
 
 function createWindow() {
-  const win = new BrowserWindow({
+  // まずEVE導入シーンを表示
+  eveIntroScreen = new BrowserWindow({
     width: 800,
     height: 600,
     autoHideMenuBar: true,
-    // フルスクリーン表示にする場合は下のコメントアウトを外してください
-    // fullscreen: true, 
+    // fullscreen: true,
+    frame: false,
+    show: true,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js')
     },
-    title: ''
+    title: 'EVE System'
   });
   
-  win.loadFile(path.join(__dirname, 'src', 'html', 'index.html'));
+  eveIntroScreen.loadFile(path.join(__dirname, 'src', 'html', 'eve_intro.html'));
+  
+  // 18秒後にフェードアウトしてメインゲームへ切り替え
+  setTimeout(() => {
+    // フェードアウト開始
+    if (eveIntroScreen && !eveIntroScreen.isDestroyed()) {
+      eveIntroScreen.webContents.executeJavaScript(`
+        document.body.style.transition = 'opacity 1s ease-out';
+        document.body.style.opacity = '0';
+      `);
+      
+      // フェード完了後にメインウィンドウ作成
+      setTimeout(() => {
+        const mainWin = new BrowserWindow({
+          width: 800,
+          height: 600,
+          autoHideMenuBar: true,
+          show: false,
+          webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+            preload: path.join(__dirname, 'preload.js')
+          },
+          title: ''
+        });
+        
+        mainWin.loadFile(path.join(__dirname, 'src', 'html', 'index.html'));
+        
+        // メインウィンドウの準備完了後にフェードイン
+        mainWin.once('ready-to-show', () => {
+          if (eveIntroScreen && !eveIntroScreen.isDestroyed()) {
+            eveIntroScreen.close();
+            eveIntroScreen = null;
+          }
+          
+          // フェードイン効果
+          mainWin.webContents.executeJavaScript(`
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 1s ease-in';
+            setTimeout(() => { document.body.style.opacity = '1'; }, 50);
+          `);
+          
+          mainWin.show();
+        });
+      }, 1000); // フェードアウト時間
+    }
+  }, 19500); // 18秒 - フェードアウト時間(1秒)
 }
 
 function createBgWindow() {

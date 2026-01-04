@@ -1,0 +1,264 @@
+/* =========================================
+   EVE導入シーン - スタイルシート
+   電脳空間の没入型UI
+   ========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+    background: #000;
+    color: #0ff;
+}
+
+/* メインキャンバス */
+#scene {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* UIオーバーレイ */
+#ui-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 100;
+}
+
+/* EVEメッセージ */
+#eve-message-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 800px;
+}
+
+#eve-message {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: #00ffff;
+    text-shadow: 0 0 10px #00ffff,
+                 0 0 20px #00ffff,
+                 0 0 30px #00ffff;
+    letter-spacing: 4px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    padding: 30px;
+    background: rgba(0, 10, 20, 0.7);
+    border: 3px solid #00ffff;
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.6),
+                inset 0 0 40px rgba(0, 255, 255, 0.1);
+    animation: messageGlow 2s infinite;
+}
+
+@keyframes messageGlow {
+    0%, 100% {
+        box-shadow: 0 0 40px rgba(0, 255, 255, 0.6),
+                    inset 0 0 40px rgba(0, 255, 255, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 60px rgba(0, 255, 255, 0.8),
+                    inset 0 0 60px rgba(0, 255, 255, 0.2);
+    }
+}
+
+.pulse {
+    animation: textPulse 0.5s;
+}
+
+@keyframes textPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* データストリームUI */
+.data-stream {
+    position: absolute;
+    width: 2px;
+    height: 100px;
+    background: linear-gradient(to bottom, 
+        transparent,
+        #00ffff,
+        transparent);
+    animation: streamFlow 2s linear infinite;
+    opacity: 0.6;
+}
+
+.data-stream::before,
+.data-stream::after {
+    content: '';
+    position: absolute;
+    left: -1px;
+    width: 4px;
+    height: 20px;
+    background: #00ffff;
+    box-shadow: 0 0 10px #00ffff;
+}
+
+.data-stream::before {
+    top: 0;
+    animation: streamParticle 2s linear infinite;
+}
+
+.data-stream::after {
+    bottom: 0;
+    animation: streamParticle 2s linear infinite reverse;
+}
+
+@keyframes streamFlow {
+    0% { transform: translateY(-100%); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(100%); opacity: 0; }
+}
+
+@keyframes streamParticle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* グリッチオーバーレイ */
+#glitch-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            rgba(255, 0, 0, 0.1) 0px,
+            transparent 2px,
+            rgba(0, 255, 0, 0.1) 4px,
+            transparent 6px,
+            rgba(0, 0, 255, 0.1) 8px,
+            transparent 10px
+        );
+    opacity: 0;
+    transition: opacity 0.1s;
+    mix-blend-mode: screen;
+    animation: glitchShift 0.1s infinite;
+}
+
+@keyframes glitchShift {
+    0% { transform: translate(0, 0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(2px, -2px); }
+    60% { transform: translate(-2px, -2px); }
+    80% { transform: translate(2px, 2px); }
+    100% { transform: translate(0, 0); }
+}
+
+/* スキャンライン */
+#scanline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1) 0px,
+        transparent 2px
+    );
+    pointer-events: none;
+    animation: scanlineMove 8s linear infinite;
+    opacity: 0.3;
+}
+
+@keyframes scanlineMove {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(100px); }
+}
+
+/* ビネット効果 */
+#vignette {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        ellipse at center,
+        transparent 0%,
+        transparent 40%,
+        rgba(0, 5, 17, 0.5) 80%,
+        rgba(0, 5, 17, 0.9) 100%
+    );
+    pointer-events: none;
+}
+
+/* CRTモニタ風歪み */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(
+            ellipse at center,
+            transparent 0%,
+            rgba(0, 255, 255, 0.03) 100%
+        );
+    pointer-events: none;
+    animation: crtWarp 10s ease-in-out infinite;
+}
+
+@keyframes crtWarp {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.001); }
+}
+
+/* レスポンシブ調整 */
+@media (max-width: 768px) {
+    #eve-message {
+        font-size: 20px;
+        letter-spacing: 2px;
+        padding: 20px;
+    }
+}
+
+/* 没入感を高める追加エフェクト */
+@keyframes environmentPulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+
+/* ローディング時のフェードイン */
+body {
+    animation: fadeIn 2s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* テキスト選択無効化（没入感維持） */
+* {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+/* カーソルを非表示に */
+body {
+    cursor: none;
+}
