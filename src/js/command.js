@@ -147,6 +147,17 @@
                                 await window.gimmick3System.displayKeyTrace(term, gameState, puzzleHelpers);
                             }
                             return;
+                        case "admin_key_view":
+                            if (window.puzzleSystem && window.puzzleSystem.displayAdminKey) {
+                                await window.puzzleSystem.displayAdminKey(term, gameState, puzzleHelpers);
+                            }
+                            return;
+                        case "gimmick3_keytrace":
+                            // ギミック3のキートレース表示
+                            if (window.gimmick3System && window.gimmick3System.displayKeyTrace) {
+                                await window.gimmick3System.displayKeyTrace(term, gameState, puzzleHelpers);
+                            }
+                            return;
                     }
                 }
                 

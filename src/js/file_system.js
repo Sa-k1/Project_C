@@ -691,17 +691,20 @@ class VirtualFileSystem {
         
         if (!file) return `指定されたファイルが見つかりません。`;
         if (file.type === 'folder') return this.cmdCd([fileName]);
-        
-        // ギミック3のkey_trace.log特別処理
+
+        // ギミック3のkey_trace.png特別処理
         if (file.special === 'gimmick3_keytrace') {
-            // ギミック2をクリアしていない場合はアクセス拒否
             if (!this.gameState || !this.gameState.gimmick2Cleared) {
                 return '[ERROR]: このファイルは特殊なフォーマットで暗号化されています。\n[TIP]: 復号ツールが必要です。';
             }
-            // read コマンドでのみ解読可能
-            return '[ERROR]: このファイルは特殊なフォーマットです。\n[TIP]: read コマンドを使用してください。';
+            return { action: 'gimmick3_keytrace', file: fileName };
         }
-        
+
+        // admin_key.datはEVEウィンドウ内で表示
+        if (fileName === 'admin_key.dat') {
+            return { action: 'admin_key_view', file: fileName };
+        }
+
         if (file.htmlFile) return { action: 'openFile', file: file.htmlFile };
 
         return file.content || '(空のファイル)';
