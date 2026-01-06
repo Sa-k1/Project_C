@@ -126,6 +126,8 @@
                 // クリア処理
                 this.isCleared = true;
                 gameState.gimmick2Cleared = true;
+                // === ここでreadコマンドを解放 ===
+                gameState.hasReadCommand = true;
                 gameState.inputMode = 'normal';
                 gameState.passwordTarget_gimmick2 = null;
                 
