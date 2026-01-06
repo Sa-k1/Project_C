@@ -172,6 +172,7 @@ body {
     align-items: center;
     margin-left: 2px; /* 左の隙間を極力詰める */
 }
+
 .tab {
     padding: 8px 12px;
     background: transparent;
@@ -228,10 +229,6 @@ body {
     color: floralwhite;
 }
 
-.window-controls .ctrl:hover {
-    background: rgba(135, 136, 136, 0.39);
-}
-
 .window-controls .ctrl.close:hover{
     background: rgba(255, 0, 0, 0.489);
 }
@@ -259,7 +256,7 @@ body {
 
 .terminal_icon {
     position: absolute;
-    top: 10%;
+    top: 13.5%;
     right: 20px;
 }
 
@@ -663,4 +660,14 @@ body {
     color: #888;
     margin-top: 4px;
     text-align: right;
+}
+
+/* 最大化, 最小化を誤魔化す */
+.no_play {
+    transition: opacity 0.15s ease;
+}
+
+.no_play:hover {
+    cursor: default;
+    opacity: 0;
 }

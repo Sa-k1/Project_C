@@ -613,8 +613,8 @@ function createIMEStatusDisplay() {
     // スタイルを設定
     Object.assign(imeDisplay.style, {
         position: 'fixed',
-        top: '95%',
-        right: '80px',
+        top: '94%',
+        right: '90px',
         padding: '0 15px',
         fontSize: '32px',
         zIndex: '1000'
