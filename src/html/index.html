@@ -82,9 +82,9 @@
   <div class="trash-viewer-container" id="trashViewerContainer" style="display: none; top: 160px; right: 90px;">
     <div class="file-viewer-window" id="trashViewerWindow" style="height: 500px; width: 850px;">
       <div class="box" style=" background-color: aliceblue;">
-        <div class="titlebar" style="background-color: aliceblue;">
+        <div class="titlebar" style="background-color: rgba(240, 248, 255, 0);">
           <div class="tabs" style="background-color: aliceblue;">
-            <div class="tab active" style="background-color: rgb(233 236 239); top: 7px; width: 150px;">
+            <div class="tab active" style="background-color: rgba(233, 236, 239, 0); top: 0px; width: 150px;">
               <span class="tab-label" id="trashViewerTitle" style="color: black;  font-size: 18px;">ごみ箱</span>
             </div>
           </div>
@@ -211,7 +211,7 @@
       <div class="icon_taskb">
         <img src="../pic/win.png" alt="" class="i_task_bar win" title="スタート">
       </div>
-      
+
       <div class="app-pill" title="検索">
         <img src="../pic/icon.png" alt="App Icon" width="20" height="20" title="検索">
         <input type="password" class="search" placeholder="検索">
@@ -235,19 +235,20 @@
     </div>
   </footer>
 
-  <!-- EVE会話パネル -->
+  <!-- EVE会話, 通知パネル -->
   <div class="notification-panel" id="notificationPanel">
     <div class="notification-header">
-      <span class="notification-title">EVE</span>
+      <!-- <span class="notification-title">EVE</span> -->
+      <span class="notification-title">通知</span>
       <button class="notification-close" id="notificationClose">✕</button>
     </div>
     <div class="notification-content" id="notificationContent">
       <!-- 会話がここに表示される -->
     </div>
-    <div class="chat-input-area">
+    <!-- <div class="chat-input-area">
       <input type="text" class="chat-input" id="chatInput" placeholder="メッセージを入力...">
       <button class="chat-send-btn" id="chatSendBtn">送信</button>
-    </div>
+    </div> -->
   </div>
 
   <!-- スクリプト（footer の後） -->
@@ -255,6 +256,7 @@
   <script src="../error_direction/virus.js"></script>
   <script src="../error_direction/red-screen.js"></script>
   <script src="../error_direction/pulse.js"></script>
+  <script src="../js/guide.js"></script>
   <script src="../js/index.js"></script>
   <script src="../error_direction/camera_scare.js"></script>
 </body>

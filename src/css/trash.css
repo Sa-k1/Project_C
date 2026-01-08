@@ -27,12 +27,8 @@ body {
 .nav-btn, .refresh-btn {
     border: none;
     background-color: #e9ecef;
-    cursor: pointer;
+    cursor: default;
     font-size: 18px;
-}
-
-.nav-btn:hover, .refresh-btn:hover {
-    background-color: #e9ecef;
 }
 
 .address-bar {
@@ -56,6 +52,7 @@ body {
 
 .address-bar .path {
     font-size: 12px;
+    cursor: default;
 }
 
 .address-bar {
@@ -70,6 +67,7 @@ body {
 .search {
     outline: none;
     border: none;
+    cursor: default;
 }
 
 .search-box {
@@ -85,7 +83,7 @@ body {
 .search-btn {
     background: none;
     border: none;
-    cursor: pointer;
+    cursor: default;
     font-size: 16px;
 }
 
@@ -100,13 +98,8 @@ body {
     padding: 4px 10px;
     border: 1px solid transparent;
     background-color: transparent;
-    cursor: pointer;
+    cursor: default;
     font-size: 12px;
-}
-
-.menu-bar button:hover {
-    background-color: #e9ecef;
-    border-color: #ccc;
 }
 
 .details-btn {
@@ -131,18 +124,9 @@ body {
 .sidebar-item {
     padding: 6px 10px;
     font-size: 12px;
-    cursor: pointer;
+    cursor: default;
     border-radius: 4px;
     margin-bottom: 2px;
-}
-
-.sidebar-item:hover {
-    background-color: #e9ecef;
-}
-
-.sidebar-item.active {
-    background-color: #0078d4;
-    color: white;
 }
 
 .main-content {
@@ -158,11 +142,7 @@ body {
     border-bottom: 1px solid #f0f0f0;
     align-items: center;
     font-size: 12px;
-    cursor: pointer;
-}
-
-.file-item:hover {
-    background-color: #f8f9fa;
+    cursor: default;
 }
 
 .file-item .file-icon {

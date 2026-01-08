@@ -196,6 +196,7 @@ body {
 .tab .tab-label{
     vertical-align:middle;
     font-size:14px;
+    cursor: default;
 }
 .tab.active {
     background: #0c0c0c; /* アクティブはやや明るい黒 */
@@ -235,7 +236,7 @@ body {
 
 /*     icon     */
 .eve {
-    cursor: grab;
+    cursor: pointer;
     width: 100px;
     text-align: center;
     position: relative;  /* ← 追加 */
@@ -247,7 +248,7 @@ body {
 /* ドラッグ可能なアイテムのスタイル */
 .draggable-item {
     margin: 10px;
-    cursor: grab;
+    cursor: pointer;
     width: 100px;
     text-align: center;
     position: relative;  /* ← 追加 */
@@ -316,10 +317,49 @@ body {
     gap: 5px;
     border: 2px solid transparent;
     border-radius: 10px;
-    cursor: grab;
+    cursor: pointer;
     transition: all 0.2s ease-in-out;
     z-index: 100;  /* ← 変更：-100 から 100 に */
 }
+
+/* カバー */
+.trash-viewer-container::before {
+    content: " ";
+    position: absolute;
+    letter-spacing: 0.1em;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0.9;
+    inset: 0; /* ← ここで全面サイズを維持 */
+    display: flex;
+    background-color: #2e2e2e;
+    border-radius: 10px;
+}
+
+/* 中央で回る円 */
+.trash-viewer-container::after {
+    content: "Loading";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #000;
+    font-size: 36px;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: 0.1em;
+    pointer-events: none;
+    z-index: 10;
+    animation: loading-dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes loading-dots {
+    0%   { content: "Loading"; }
+    25%  { content: "Loading."; }
+    50%  { content: "Loading.."; }
+    75%  { content: "Loading..."; }
+    100% { content: "Loading"; }
+}
+
 
 /* ゴミ箱画像のスタイル */
 #trash-image {
@@ -449,6 +489,8 @@ body {
 .taskbar-clock #clock-time {
     font-weight: 1000;
     font-size: 12px;
+    position: relative;
+    right: -17px;
 }
 
 .taskbar-clock #clock-date {
@@ -492,7 +534,7 @@ body {
     bottom: 60px;
     right: 10px;
     width: 350px;
-    max-height: 500px;
+    height: 500px;
     background: rgba(40, 40, 40, 0.95);
     backdrop-filter: blur(20px);
     border-radius: 10px;
@@ -511,13 +553,24 @@ body {
 
 @keyframes slideIn {
     from {
-        transform: translateY(20px);
-        opacity: 0;
+        transform: translateX(1000px);
     }
     to {
-        transform: translateY(0);
-        opacity: 1;
+        transform: translateX(0);
     }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(1000px);
+    }
+}
+
+.notification-panel.closing {
+    animation: slideOut 0.3s ease-in forwards;
 }
 
 .notification-header {
@@ -532,7 +585,7 @@ body {
 .notification-title {
     color: #fff;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 350;
 }
 
 .notification-close {
@@ -549,6 +602,7 @@ body {
     justify-content: center;
     border-radius: 4px;
     transition: all 0.2s;
+    font-weight: 900;
 }
 
 .notification-close:hover {
@@ -578,7 +632,7 @@ body {
     background: rgba(255, 255, 255, 0.3);
 }
 
-/* チャット入力エリア */
+/* チャット入力エリア
 .chat-input-area {
     padding: 10px;
     background: rgba(60, 60, 60, 0.8);
@@ -627,10 +681,10 @@ body {
     transform: scale(0.95);
 }
 
-/* チャットメッセージ（ユーザー） */
+チャットメッセージ（ユーザー）
 .chat-message-user {
     align-self: flex-end;
-    max-width: 70%;
+    width: 90%;
     background: #4a90e2;
     color: #fff;
     padding: 10px 14px;
@@ -638,28 +692,56 @@ body {
     font-size: 13px;
     line-height: 1.4;
     word-wrap: break-word;
-}
+} */
 
 /* チャットメッセージ（EVE） */
 .chat-message-eve {
     align-self: flex-start;
-    max-width: 70%;
+    width: 90%;
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
     padding: 10px 14px;
-    border-radius: 12px 12px 12px 2px;
+    border-radius: 12px 12px 12px 12px;
     font-size: 13px;
     line-height: 1.4;
     word-wrap: break-word;
-    border-left: 3px solid #00d4ff;
+    border: #ddd solid 2px;
 }
 
+.main-chat-item {
+    margin: 5px 0 0 15px;
+    font-size: 14px;
+    font-weight: 300;
+}
+
+.main-chat-item-up {
+    margin: 0;
+    margin-left: 20px;
+}
+
+.all-main-chat-item {
+    display: flex;
+}
+
+.item-ippai {
+    display: flex;
+    flex-direction: column;
+}
+
+.name-text-item {
+    font-size: 15px;
+    margin: 0;
+    margin-left: -5px;
+    margin-top: 10px;
+    font-weight: 100;
+}
 /* タイムスタンプ */
 .chat-timestamp {
     font-size: 10px;
-    color: #888;
-    margin-top: 4px;
+    color: #ffffff00;
+    margin-top: -5px;
     text-align: right;
+    font-weight: 1000;
 }
 
 /* 最大化, 最小化を誤魔化す */
