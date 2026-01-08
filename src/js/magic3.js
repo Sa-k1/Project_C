@@ -169,12 +169,14 @@
             // クリア処理
             window.gimmick3System.isCleared = true;
             gameState.gimmick3Cleared = true;
+            // === ここでremnantコマンドを解放 ===
+            gameState.hasRemnantCommand = true;
             gameState.inputMode = 'normal';
             gameState.passwordTarget_gimmick3 = null;
-            
-            // 報酬があればここで付与
-            // await systemLine("[SYSTEM]: 新しいコマンドを取得しました「???」", 25);
-            
+
+            // 報酬としてremnantコマンド解放を通知
+            await systemLine("[SYSTEM]: 新しいコマンドを取得しました『remnant』", 25);
+
             return true;
         }
         

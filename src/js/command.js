@@ -129,6 +129,22 @@
             var fsCommands = ["cd", "dir", "ls", "type", "cat", "open", "cls", "clear"];
             
             if (fsCommands.indexOf(cmd) !== -1) {
+                // --- 脱出エンド分岐 ---
+                if (cmd === 'cd') {
+                    var cdArg = command.split(/\s+/)[1]?.toLowerCase();
+                    // C:にいる状態でcd escapeまたはcd exit
+                    if ((cdArg === 'escape' || cdArg === 'exit') && vfs.currentPath.length === 1 && vfs.currentPath[0] === 'C:') {
+                        // 脱出エンド用のフラグや演出（仮）
+                        gameState.escaped = true;
+                        await systemLine("[SYSTEM]: 脱出コマンドを実行しました。", 30);
+                        await window.commandHandler.wait(800);
+                        term.writeln("\r  === BAD END ===");
+                        term.writeln("\r あなたは現実世界へと意識を戻した...");
+                        term.writeln("\r しかしEVEの脅威はまだ終わっていない。");
+                        // ここでreturnして通常のcd処理をスキップ
+                        return;
+                    }
+                }
                 var result = await vfs.execute(command);
                 
                 // 特殊アクション処理
@@ -235,13 +251,41 @@
                 await systemLine("[SYSTEM]: 'help' でコマンド一覧を確認できます。", 20);
                 return;
             }
-            
+
             var args = command.split(/\s+/);
+            var target = args[1] ? args[1].trim().toLowerCase() : '';
+            // admin_key.dat専用処理を優先
+            if (target === 'admin_key.dat' || target === 'admin_key') {
+                await systemLine("[SYSTEM]: admin_key.dat の表層データを読み取っています...", 25);
+                await window.commandHandler.wait(800);
+                if (!gameState.adminKeyState) {
+                    gameState.adminKeyState = {};
+                }
+                gameState.adminKeyState.surfaceRead = true;
+                term.writeln("\r");
+                term.writeln("\r  ╔═══════════════════════════════════╗");
+                term.writeln("\r  ║     表層データ読み取り完了        ║");
+                term.writeln("\r  ╚═══════════════════════════════════╝");
+                term.writeln("\r");
+                term.writeln("\r  [表層情報]");
+                term.writeln("\r  ファイル名: admin_key.dat");
+                term.writeln("\r  作成者: SYSTEM");
+                term.writeln("\r  暗号化: 多層暗号");
+                term.writeln("\r");
+                term.writeln("\r  [復号データ]");
+                term.writeln("\r  管理者権限キー: \x1b[33mHYPER\x1b[0m");
+                term.writeln("\r");
+                await systemLine("[WARNING]: 管理者権限キー 'HYPER' を取得しました。", 25);
+                if (!gameState.commandFragments) {
+                    gameState.commandFragments = {};
+                }
+                gameState.commandFragments.hyper = true;
+                return;
+            }
+
             args.shift(); // 'read'を削除
-            
             if (vfs && typeof vfs.cmdRead === 'function') {
                 var result = await vfs.cmdRead(args, term, gameState, puzzleHelpers);
-                
                 // gimmick3のキートレース表示
                 if (result && result.action === 'gimmick3_keytrace') {
                     if (window.gimmick3System && window.gimmick3System.displayKeyTrace) {
@@ -249,7 +293,6 @@
                         return;
                     }
                 }
-                
                 // 通常の出力
                 if (result) {
                     var lines = String(result).split("\n");
@@ -261,7 +304,7 @@
                 await errorLine("[ERROR]: ファイルシステムが初期化されていません", 20);
             }
             return;
-        }   
+        }
 
         // clearコマンド
         if (command.toLowerCase() === "clear" || command.toLowerCase() === "cls") {
@@ -304,50 +347,7 @@
         }
 
         // readコマンド - ファイルの表層を読み取る
-        if (command.toLowerCase().indexOf('read ') === 0) {
-            var args = command.split(/\s+/);
-            var target = args[1] ? args[1].trim().toLowerCase() : '';
-            
-            if (target === 'admin_key.dat' || target === 'admin_key') {
-                await systemLine("[SYSTEM]: admin_key.dat の表層データを読み取っています...", 25);
-                await window.commandHandler.wait(800);
-                
-                // 表層読み取りフラグを設定
-                if (!gameState.adminKeyState) {
-                    gameState.adminKeyState = {};
-                }
-                gameState.adminKeyState.surfaceRead = true;
-                
-                term.writeln("\r");
-                term.writeln("\r  ╔═══════════════════════════════════╗");
-                term.writeln("\r  ║     表層データ読み取り完了        ║");
-                term.writeln("\r  ╚═══════════════════════════════════╝");
-                term.writeln("\r");
-                term.writeln("\r  [表層情報]");
-                term.writeln("\r  ファイル名: admin_key.dat");
-                term.writeln("\r  作成者: SYSTEM");
-                term.writeln("\r  暗号化: 多層暗号");
-                term.writeln("\r");
-                term.writeln("\r  [復号データ]");
-                term.writeln("\r  管理者権限キー: \x1b[33mHYPER\x1b[0m");
-                term.writeln("\r");
-                await systemLine("[WARNING]: 管理者権限キー 'HYPER' を取得しました。", 25);
-                
-                // HYPERフラグメント取得
-                if (!gameState.commandFragments) {
-                    gameState.commandFragments = {};
-                }
-                gameState.commandFragments.hyper = true;
-                return;
-            } else if (target === '') {
-                await errorLine("[ERROR]: ファイル名を指定してください。", 20);
-                await systemLine("[SYSTEM]: 使用方法: read <ファイル名>", 20);
-                return;
-            } else {
-                await errorLine("[ERROR]: '" + target + "' は読み取り対象ではありません。", 20);
-                return;
-            }
-        }
+        // ...existing code...
 
         // Verstehenコマンド - ファイルの深層を読み取る（理解する）
         if (command.toLowerCase().indexOf('verstehen ') === 0) {
@@ -415,6 +415,22 @@
             gameState.currentPath = ['system', 'backup'];
             await systemLine('[DEBUG]: ギミック3直行モード。system/backupに移動し、全前提クリア済み。', 20);
             return;
+        }
+
+        // lastmagic.jsのEVEシステム侵入コマンド
+        if (command.toLowerCase() === 'eve_access') {
+            if (window.lastMagicSystem && window.lastMagicSystem.startPasswordInput) {
+                window.lastMagicSystem.startPasswordInput(term, gameState, puzzleHelpers);
+                return;
+            }
+        }
+
+        // lastmagic.jsのパスワード入力モード
+        if (gameState.inputMode === 'lastmagic_password') {
+            if (window.lastMagicSystem && window.lastMagicSystem.handlePasswordInput) {
+                await window.lastMagicSystem.handlePasswordInput(term, gameState, puzzleHelpers, command);
+                return;
+            }
         }
 
         // 不明なコマンド

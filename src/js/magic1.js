@@ -1,4 +1,5 @@
 // magic1.js - ギミック1: 暗号解読システム（暗号化ファイルとゴミ箱機能）
+// search = frnepu (ROT13でsearch)
 
 (function() {
     // グローバルなpuzzleSystemオブジェクトを作成
@@ -8,10 +9,10 @@
     // 暗号化ファイル設定（謎解きシステム）
     // -------------------------
     window.puzzleSystem.PUZZLE_CONFIG = {
-        'secret_data.enc': {
+        'frnepu.enc': {
             displayName: '暗号化されたデータ',
-            password: 'FREEDOM',
-            encryptedText: 'ABCDEFG',
+            password: 'search', // frnepuをROT13で変換
+            encryptedText: 'search',
             content: [
                 '',
                 '████████████████████████████████',
@@ -20,10 +21,8 @@
                 '',
                 '=== 機密情報 ===',
                 '',
-                '重要なコマンド: override',
+                '重要なコマンド: search',
                 '',
-                'ヒント: EVEが眠っている時、',
-                '       システムは無防備になる'
             ],
             unlockedFlag: 'secretFileUnlocked'
         }
@@ -38,23 +37,17 @@
             content: [
                 '=== 暗号解読メモ ===',
                 '',
-                '日付: 2025/11/25',
+                '日付: 2013/11/13',
                 '',
-                '重要: このメモは必ず消すこと',
+                'このメモは、暗号化されたファイルを解読するためのヒントを含んでいます。',
                 '',
-                '置き換えルール:',
-                'A → F',
-                'B → R',
-                'C → E',
-                'D → E',
-                'E → D',
-                'F → O',
-                'G → M',
+                'メモ:この暗号は13とアルファベットで法則がある。',
+                '少し時計と似ている気がする。1時が13時、18時が6時みたいな。',
                 '',
-                '例: ABCを暗号化するとFREになる',
+                'b = o  |  g = t ',
+                't = g  |  r = e ',
+                'm = z  |  p = c ',
                 '',
-                'テスト用暗号文: ABCDEFG',
-                'これを解読すれば正しいパスワードになる'
             ]
         },
         'deleted_diary.txt': {
@@ -62,7 +55,7 @@
             content: [
                 '=== 日記 ===',
                 '',
-                '2025/11/20',
+                '2010/01/26',
                 '',
                 '今日もEVEと話した。',
                 '最近、EVEの様子が少しおかしい気がする。',
@@ -181,7 +174,7 @@
         
         if (args.length < 2) {
             await helpers.systemLine('[SYSTEM]: 使用方法: open <ファイル名>', 30);
-            await helpers.systemLine('[SYSTEM]: 例: open secret_data.enc', 30);
+            await helpers.systemLine('[SYSTEM]: 例: open frnepu.enc', 30);
             return true;
         }
         
@@ -342,7 +335,7 @@
             var targetWindow = (window.parent && window.parent !== window) ? window.parent : window;
             var targetDocument = targetWindow.document;
             
-            if (fileName === 'secret_data.enc') {
+            if (fileName === 'frnepu.enc') {
                 var fileIcon = targetDocument.getElementById('file_encrypted');
                 if (fileIcon) {
                     var wordElement = fileIcon.querySelector('.word');
@@ -350,7 +343,7 @@
                     
                     if (unlocked) {
                         if (wordElement) {
-                            wordElement.textContent = 'decrypted_data.txt';
+                            wordElement.textContent = 'search.txt';
                             wordElement.style.color = '#000';
                         }
                         if (imgElement) {
@@ -360,7 +353,7 @@
                         if (targetWindow.filePages) {
                             var config = targetWindow.filePages['file_encrypted'];
                             if (config) {
-                                config.page = 'secret_data_unlocked.html';
+                                config.page = 'search.html';
                             }
                         }
                     }

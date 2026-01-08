@@ -130,12 +130,12 @@
                 gameState.hasReadCommand = true;
                 gameState.inputMode = 'normal';
                 gameState.passwordTarget_gimmick2 = null;
-                
+
                 await systemLine("", 0);
-                
-                // 報酬があればここで付与
-                // await systemLine("[SYSTEM]: 新しいコマンドを取得しました「???」", 25);
-                
+
+                // 報酬としてreadコマンド解放を通知
+                await systemLine("[SYSTEM]: 新しいコマンドを取得しました『read』", 25);
+
                 return true;
             }
             
