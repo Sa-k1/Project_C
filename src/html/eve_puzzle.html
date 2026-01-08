@@ -3,42 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EVE - System Connection</title>
+    <title>EVE - Final Puzzle</title>
     <link rel="stylesheet" href="../css/eve_intro.css">
 </head>
 <body>
-    <!-- メインキャンバス -->
+    <!-- 背景キャンバス -->
     <canvas id="scene"></canvas>
     
-    <!-- UI オーバーレイ -->
-    <div id="ui-overlay">
-        <!-- EVEメッセージ表示エリア -->
-        <div id="eve-message-container">
-            <div id="eve-message" class="eve-text"></div>
-        </div>
-        
-        <!-- データストリームUI -->
-        <div id="data-streams">
-            <div class="data-stream" style="top: 20%; left: 10%;"></div>
-            <div class="data-stream" style="top: 60%; left: 80%;"></div>
-            <div class="data-stream" style="top: 40%; left: 90%;"></div>
-        </div>
-        
-        <!-- グリッチオーバーレイ -->
-        <div id="glitch-overlay"></div>
-        
-        <!-- スキャンライン -->
-        <div id="scanline"></div>
-        
-        <!-- ビネット効果 -->
-        <div id="vignette"></div>
-    </div>
-
     <!-- 謎解きUI -->
-    <div id="puzzle-overlay" style="display: none;">
+    <div id="puzzle-overlay">
         <div class="puzzle-container">
             <h2 class="puzzle-title">[ SYSTEM UNLOCK SEQUENCE ]</h2>
             <p class="puzzle-instruction">すべてのセキュリティを解除してください</p>
+            
+            <!-- タイマー表示 -->
+            <div class="timer-section">
+                <span class="timer-label">TIME REMAINING:</span>
+                <span class="timer-value" id="timer-display">20.0</span>
+                <span class="timer-unit">秒</span>
+            </div>
             
             <!-- ダイヤル要素 -->
             <div class="puzzle-section dial-section">
@@ -104,22 +87,14 @@
             </div>
         </div>
     </div>
+
+    <!-- スキャンライン -->
+    <div id="scanline"></div>
     
-    <!-- Three.js ライブラリ -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
-    <!-- ポストプロセッシング用ライブラリ -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/GlitchPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/DigitalGlitch.js"></script>
-    
-    <!-- メインスクリプト -->
-    <script src="../js/eve_intro.js"></script>
-    <script src="../js/eve_puzzle.js"></script>
+    <!-- ビネット効果 -->
+    <div id="vignette"></div>
+
+    <!-- 謎解きスクリプト（自動開始版） -->
+    <script src="../js/eve_puzzle_auto.js"></script>
 </body>
 </html>

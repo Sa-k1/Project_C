@@ -40,7 +40,8 @@
         secretFileUnlocked: false,
         rmEveUsed: false,
         searchUnlocked: false,          // searchコマンドが解放されたか（magic1クリア報酬）
-        discoveredHidden: []            // searchで発見した隠しファイル/フォルダのパス
+        discoveredHidden: [],           // searchで発見した隠しファイル/フォルダのパス
+        hasAdminCommand: false          // 管理者権限コマンドを入手したか
     };
 
     if (!window.vfs && window.VirtualFileSystem) {

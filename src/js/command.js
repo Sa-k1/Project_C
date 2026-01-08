@@ -102,6 +102,27 @@
             var args = command.split(/\s+/);
             var fileName = args[1] ? args[1].trim() : '';
 
+            // 管理者コマンド入力画面を開く
+            if (fileName.toLowerCase() === 'admin_command' || fileName.toLowerCase() === 'admin_command.html') {
+                // 管理者権限コマンドを入手しているかチェック
+                if (gameState.hasAdminCommand) {
+                    await systemLine("[SYSTEM]: 管理者コマンド入力画面を開いています...", 20);
+                    await window.commandHandler.wait(500);
+                    
+                    // 親ウィンドウ経由で開く（iframeの場合）
+                    if (window.parent && window.parent !== window) {
+                        window.parent.location.href = 'admin_command.html';
+                    } else {
+                        window.location.href = '../html/admin_command.html';
+                    }
+                    return;
+                } else {
+                    await errorLine("[ERROR]: 管理者権限コマンドを入手していません。", 20);
+                    await systemLine("[TIP]: ファイルを探索して管理者権限コマンドの情報を見つけてください。", 20);
+                    return;
+                }
+            }
+
             // ギミック3の暗号化ファイル
             if (window.gimmick3System && window.gimmick3System.isEncryptedFile(fileName)) {
                 await window.gimmick3System.openEncryptedFile(term, gameState, puzzleHelpers, fileName);
@@ -225,6 +246,15 @@
                 }
                 term.writeln("\r  read <ファイル名> - 特殊フォーマットのファイルを解読");
             }
+            
+            // 管理者コマンドが解放されている場合のみ表示
+            if (gameState.hasAdminCommand) {
+                if (!gameState.searchUnlocked && !gameState.hasReadCommand) {
+                    term.writeln("\r");
+                    term.writeln("\r  === 特殊コマンド ===");
+                }
+                term.writeln("\r  open admin_command - 管理者コマンド入力画面を開く");
+            }
             return;
         }
 
@@ -264,18 +294,19 @@
                 gameState.adminKeyState.surfaceRead = true;
                 term.writeln("\r");
                 term.writeln("\r  ╔═══════════════════════════════════╗");
-                term.writeln("\r  ║     表層データ読み取り完了        ║");
+                term.writeln("\r  ║     表層データ解析完了            ║");
                 term.writeln("\r  ╚═══════════════════════════════════╝");
                 term.writeln("\r");
-                term.writeln("\r  [表層情報]");
-                term.writeln("\r  ファイル名: admin_key.dat");
-                term.writeln("\r  作成者: SYSTEM");
-                term.writeln("\r  暗号化: 多層暗号");
+                term.writeln("\r  [表層データ]");
                 term.writeln("\r");
-                term.writeln("\r  [復号データ]");
-                term.writeln("\r  管理者権限キー: \x1b[33mHYPER\x1b[0m");
+                term.writeln("\r  管理者権限キーを発見...");
                 term.writeln("\r");
-                await systemLine("[WARNING]: 管理者権限キー 'HYPER' を取得しました。", 25);
+                term.writeln("\r  ┌─────────────────────────────────┐");
+                term.writeln("\r  │  管理者権限キー                 │");
+                term.writeln("\r  │  \x1b[33mHYPER\x1b[0m                          │");
+                term.writeln("\r  └─────────────────────────────────┘");
+                term.writeln("\r");
+                await systemLine("[WARNING]: 管理者権限キーを取得しました。", 25);
                 if (!gameState.commandFragments) {
                     gameState.commandFragments = {};
                 }
@@ -284,6 +315,23 @@
             }
 
             args.shift(); // 'read'を削除
+            var targetFile = args[0] ? args[0].toLowerCase() : '';
+            
+            // admin_key.datの場合、hasAdminCommandをtrueにする
+            if (targetFile === 'admin_key.dat' || targetFile === 'admin_key') {
+                if (!gameState.hasAdminCommand) {
+                    gameState.hasAdminCommand = true;
+                    await systemLine("[SYSTEM]: admin_key.dat を解読中...", 25);
+                    await window.commandHandler.wait(500);
+                    term.writeln("\r");
+                    term.writeln("\r  [解読データ]");
+                    term.writeln("\r  管理者権限コマンドの一部を発見: \x1b[36mADMIN\x1b[0m");
+                    term.writeln("\r");
+                    await systemLine("[TIP]: 'open admin_command' で管理者コマンド入力画面を開けます。", 25);
+                }
+                return;
+            }
+            
             if (vfs && typeof vfs.cmdRead === 'function') {
                 var result = await vfs.cmdRead(args, term, gameState, puzzleHelpers);
                 // gimmick3のキートレース表示
@@ -376,8 +424,8 @@
                 term.writeln("\r  管理者権限コマンドを発見...");
                 term.writeln("\r");
                 term.writeln("\r  ┌─────────────────────────────────┐");
-                term.writeln("\r  │  管理者権限コマンド          │");
-                term.writeln("\r  │  \x1b[36mADMIN\x1b[0m                         │");
+                term.writeln("\r  │  管理者権限コマンド            │");
+                term.writeln("\r  │  \x1b[36mADMIN\x1b[0m                          │");
                 term.writeln("\r  └─────────────────────────────────┘");
                 term.writeln("\r");
                 await systemLine("[WARNING]: 管理者権限コマンドを取得しました。", 25);
@@ -387,6 +435,10 @@
                     gameState.commandFragments = {};
                 }
                 gameState.commandFragments.admin = true;
+                
+                // 管理者コマンド入力画面を開けるようにする
+                gameState.hasAdminCommand = true;
+                await systemLine("[TIP]: 'open admin_command' で管理者コマンド入力画面を開けます。", 25);
                 return;
             } else if (target === '') {
                 await errorLine("[ERROR]: ファイル名を指定してください。", 20);
@@ -414,6 +466,44 @@
             gameState.inputMode = 'normal';
             gameState.currentPath = ['system', 'backup'];
             await systemLine('[DEBUG]: ギミック3直行モード。system/backupに移動し、全前提クリア済み。', 20);
+            return;
+        }
+
+        // デバッグ用：完全管理者コマンド取得済み状態
+        if (command === 'debug_admin') {
+            gameState.puzzleCleared = true;
+            gameState.gimmick2Cleared = true;
+            gameState.gimmick3Cleared = true;
+            gameState.hasReadCommand = true;
+            gameState.searchUnlocked = true;
+            gameState.hasAdminCommand = true;
+            gameState.inputMode = 'normal';
+            // adminKeyState設定
+            if (!gameState.adminKeyState) {
+                gameState.adminKeyState = {};
+            }
+            gameState.adminKeyState.surfaceRead = true;
+            gameState.adminKeyState.deepRead = true;
+            gameState.adminKeyState.fullCommand = true;
+            // 完全管理者コマンド取得済み
+            gameState.adminCommand = 'HYPERADMIN';
+            // フラグメントは結合済みなので消費
+            gameState.commandFragments = {};
+            
+            await systemLine('[DEBUG]: 完全管理者コマンド取得済み状態', 20);
+            term.writeln("\r");
+            term.writeln("\r  ╔═══════════════════════════════════╗");
+            term.writeln("\r  ║     DEBUG MODE ACTIVATED          ║");
+            term.writeln("\r  ╚═══════════════════════════════════╝");
+            term.writeln("\r");
+            term.writeln("\r  ✓ ギミック1 クリア済み");
+            term.writeln("\r  ✓ ギミック2 クリア済み");
+            term.writeln("\r  ✓ ギミック3 クリア済み");
+            term.writeln("\r  ✓ searchコマンド 解放済み");
+            term.writeln("\r  ✓ readコマンド 解放済み");
+            term.writeln("\r  ✓ 完全管理者コマンド: \x1b[32mHYPERADMIN\x1b[0m");
+            term.writeln("\r");
+            await systemLine("[TIP]: 'open admin_command' で管理者コマンド入力画面を開けます。", 20);
             return;
         }
 
