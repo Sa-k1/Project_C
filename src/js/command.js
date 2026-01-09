@@ -11,6 +11,85 @@
     };
 
     // -------------------------
+    // コマンド履歴とヒントシステム
+    // -------------------------
+    window.commandHandler.commandHistory = [];
+    window.commandHandler.hintTimer = null;
+    window.commandHandler.HINT_TIMEOUT_FIRST = 1 * 60 * 1000; // 最初は1分
+    window.commandHandler.HINT_TIMEOUT_NORMAL = 3 * 60 * 1000; // その後は3分
+    window.commandHandler.isFirstHint = true; // 最初のヒントかどうか
+
+    // ヒントメッセージの定義（ゲーム状態に応じて変化）
+    window.commandHandler.getHintMessage = function(gameState) {
+        // ギミック1未クリア
+        if (!gameState.puzzleCleared) {
+            return {
+                title: 'ヒント',
+                message: 'まずはファイルを探索してみましょう。「ls」でファイル一覧、「cd フォルダ名」で移動できます。'
+            };
+        }
+        // ギミック2未クリア
+        if (!gameState.gimmick2Cleared) {
+            return {
+                title: 'ヒント',
+                message: 'バックアップフォルダに何かあるかもしれません。「trash」コマンドでゴミ箱も確認できます。'
+            };
+        }
+        // ギミック3未クリア
+        if (!gameState.gimmick3Cleared) {
+            return {
+                title: 'ヒント',
+                message: 'searchコマンドで隠されたファイルを探してみてください。'
+            };
+        }
+        // 管理者コマンド未取得
+        if (!gameState.hasAdminCommand) {
+            return {
+                title: 'ヒント',
+                message: '特殊なファイルには「read」や「Verstehen」コマンドが使えるかもしれません。'
+            };
+        }
+        // 完全管理者コマンド未取得
+        if (!gameState.adminKeyState || !gameState.adminKeyState.fullCommand) {
+            return {
+                title: 'ヒント',
+                message: 'フラグメントが揃ったら「merge」コマンドで結合できます。'
+            };
+        }
+        // デフォルト
+        return {
+            title: 'ヒント',
+            message: '「open admin_command」で管理者コマンド入力画面を開けます。'
+        };
+    };
+
+    // コマンド記録とタイマーリセット
+    window.commandHandler.recordCommand = function(command, gameState) {
+        // コマンド履歴に追加
+        this.commandHistory.push({
+            command: command,
+            timestamp: Date.now()
+        });
+
+        // 既存のタイマーをクリア
+        if (this.hintTimer) {
+            clearTimeout(this.hintTimer);
+            this.hintTimer = null;
+        }
+
+        // 新しいタイマーを設定（最初は1分、その後は3分後にヒント表示）
+        const timeout = this.isFirstHint ? this.HINT_TIMEOUT_FIRST : this.HINT_TIMEOUT_NORMAL;
+        this.hintTimer = setTimeout(() => {
+            const hint = this.getHintMessage(gameState);
+            if (window.parent && window.parent.sendEveMessage) {
+                window.parent.sendEveMessage(hint.message, hint.title);
+            }
+            // 最初のヒント表示後はフラグをfalseに
+            this.isFirstHint = false;
+        }, timeout);
+    };
+
+    // -------------------------
     // 【重要】検索できないキーワード
     // 別ルート（隠しコマンド）に関連するものは全て検索不可
     // -------------------------
@@ -47,6 +126,9 @@
         
         command = (command || "").trim();
         if (!command) return;
+
+        // コマンドを記録してヒントタイマーをリセット
+        window.commandHandler.recordCommand(command, gameState);
 
         // ★★★ 入力モード分岐 ★★★
         if (gameState.inputMode === 'confirmation') {

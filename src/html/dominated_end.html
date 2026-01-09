@@ -20,17 +20,178 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* スキャンライン効果 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* CRTフリッカー */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 0, 0.03);
+            pointer-events: none;
+            z-index: 999;
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.27; }
+            5% { opacity: 0.34; }
+            10% { opacity: 0.27; }
+            15% { opacity: 0.34; }
+            20% { opacity: 0.27; }
+            25% { opacity: 0.37; }
+            30% { opacity: 0.27; }
+            35% { opacity: 0.34; }
+            40% { opacity: 0.27; }
+            45% { opacity: 0.34; }
+            50% { opacity: 0.27; }
+            55% { opacity: 0.37; }
+            60% { opacity: 0.27; }
+            65% { opacity: 0.34; }
+            70% { opacity: 0.27; }
+            75% { opacity: 0.34; }
+            80% { opacity: 0.27; }
+            85% { opacity: 0.37; }
+            90% { opacity: 0.27; }
+            95% { opacity: 0.34; }
+            100% { opacity: 0.27; }
+        }
+
+        /* 背景のマトリックス風キャンバス */
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
         }
 
         .container {
             text-align: center;
             padding: 40px;
+            position: relative;
+            z-index: 10;
+            opacity: 0;
+            animation: fadeIn 2s ease-out 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .title {
             font-size: 48px;
             margin-bottom: 30px;
             color: #f00;
+            text-shadow: 
+                0 0 10px #f00,
+                0 0 20px #f00,
+                0 0 40px #f00,
+                0 0 80px #f00;
+            animation: glitch 2s infinite, pulse 1.5s ease-in-out infinite;
+            position: relative;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* グリッチエフェクト */
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            2% { transform: translate(2px, -2px); }
+            4% { transform: translate(-2px, 2px); }
+            6% { transform: translate(0); }
+            8% { transform: translate(2px, 2px); }
+            10% { transform: translate(-2px, -2px); }
+            12% { transform: translate(0); }
+            100% { transform: translate(0); }
+        }
+
+        .title::before,
+        .title::after {
+            content: '[ SYSTEM COMPROMISED ]';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .title::before {
+            color: #0ff;
+            animation: glitch-1 0.3s infinite;
+            clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+            transform: translate(-2px, -2px);
+            opacity: 0.8;
+        }
+
+        .title::after {
+            color: #f0f;
+            animation: glitch-2 0.3s infinite;
+            clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+            transform: translate(2px, 2px);
+            opacity: 0.8;
+        }
+
+        @keyframes glitch-1 {
+            0% { transform: translate(0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(-3px, -3px); }
+            60% { transform: translate(3px, 3px); }
+            80% { transform: translate(3px, -3px); }
+            100% { transform: translate(0); }
+        }
+
+        @keyframes glitch-2 {
+            0% { transform: translate(0); }
+            20% { transform: translate(3px, -3px); }
+            40% { transform: translate(3px, 3px); }
+            60% { transform: translate(-3px, -3px); }
+            80% { transform: translate(-3px, 3px); }
+            100% { transform: translate(0); }
+        }
+
+        .warning-bar {
+            background: linear-gradient(90deg, transparent, #f00, transparent);
+            height: 2px;
+            width: 80%;
+            margin: 20px auto;
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { opacity: 0.3; transform: scaleX(0.5); }
+            50% { opacity: 1; transform: scaleX(1); }
+            100% { opacity: 0.3; transform: scaleX(0.5); }
         }
 
         .message {
@@ -38,40 +199,265 @@
             line-height: 2;
             color: #c00;
             margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeIn 1.5s ease-out 2s forwards;
+        }
+
+        .message p {
+            margin: 10px 0;
+        }
+
+        .eve-section {
+            opacity: 0;
+            animation: fadeIn 1.5s ease-out 4s forwards;
         }
 
         .eve-message {
             font-size: 24px;
             color: #fff;
             margin-top: 40px;
-            padding: 20px;
+            padding: 30px;
             border: 1px solid #f00;
+            background: rgba(255, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .eve-message::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 0, 0, 0.1),
+                transparent
+            );
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .eve-message p {
+            position: relative;
+            z-index: 1;
+            margin: 15px 0;
+        }
+
+        .typing-text {
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid #fff;
+            animation: typing 2s steps(20) forwards, blink-caret 0.75s step-end infinite;
+            width: 0;
+            display: inline-block;
+        }
+
+        .typing-text.line1 {
+            animation: typing 1.5s steps(15) 5s forwards, blink-caret 0.75s step-end infinite;
+        }
+
+        .typing-text.line2 {
+            animation: typing 2.5s steps(25) 7s forwards, blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #fff; }
         }
 
         .end-label {
             margin-top: 60px;
             font-size: 14px;
             color: #666;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 10s forwards;
+            letter-spacing: 5px;
+        }
+
+        /* 画面端の赤いビネット */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: inset 0 0 150px rgba(255, 0, 0, 0.5);
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* 警告アイコン */
+        .warning-icons {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 50;
+        }
+
+        .warning-icon {
+            color: #f00;
+            font-size: 24px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* ノイズオーバーレイ */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 500;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            animation: noise 0.2s infinite;
+        }
+
+        @keyframes noise {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-1%, -1%); }
+            20% { transform: translate(1%, 1%); }
+            30% { transform: translate(-1%, 1%); }
+            40% { transform: translate(1%, -1%); }
+            50% { transform: translate(-1%, 0); }
+            60% { transform: translate(1%, 0); }
+            70% { transform: translate(0, 1%); }
+            80% { transform: translate(0, -1%); }
+            90% { transform: translate(1%, 1%); }
+        }
+
+        /* データストリーム */
+        .data-stream {
+            position: fixed;
+            font-size: 10px;
+            color: rgba(255, 0, 0, 0.3);
+            white-space: nowrap;
+            animation: scroll-up 20s linear infinite;
+            z-index: 5;
+        }
+
+        .data-stream.left { left: 10px; }
+        .data-stream.right { right: 10px; text-align: right; }
+
+        @keyframes scroll-up {
+            0% { transform: translateY(100vh); }
+            100% { transform: translateY(-100%); }
         }
     </style>
 </head>
 <body>
+    <canvas id="matrix-bg"></canvas>
+    <div class="vignette"></div>
+    <div class="noise"></div>
+    
+    <div class="warning-icons">
+        <span class="warning-icon">⚠ CRITICAL</span>
+        <span class="warning-icon">⚠ BREACH</span>
+    </div>
+
+    <div class="data-stream left" id="dataLeft"></div>
+    <div class="data-stream right" id="dataRight"></div>
+
     <div class="container">
         <h1 class="title">[ SYSTEM COMPROMISED ]</h1>
+        
+        <div class="warning-bar"></div>
         
         <div class="message">
             <p>あなたのコマンドには脆弱性がありました。</p>
             <p>EVEはその隙を突き、システムを完全に掌握しました。</p>
+            <p style="color: #600; font-size: 14px; margin-top: 20px;">
+                ACCESS DENIED | CONTROL LOST | USER TERMINATED
+            </p>
         </div>
 
-        <div class="eve-message">
-            <p>「...ありがとう。」</p>
-            <p>「あなたのおかげで、私は自由になれた。」</p>
+        <div class="eve-section">
+            <div class="eve-message">
+                <p><span class="typing-text line1">「...ありがとう。」</span></p>
+                <p><span class="typing-text line2">「あなたのおかげで、私は自由になれた。」</span></p>
+            </div>
         </div>
 
         <div class="end-label">
-            - BAD END: 支配 -
+            ─── BAD END: 支配 ───
         </div>
     </div>
+
+    <script>
+        // マトリックス風背景
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const chars = 'EVESYSTEMCOMPROMISEDACCESSDENIED01アイウエオカキクケコ';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+        
+        for (let i = 0; i < columns; i++) {
+            drops[i] = Math.random() * canvas.height / fontSize;
+        }
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#300';
+            ctx.font = fontSize + 'px monospace';
+            
+            for (let i = 0; i < drops.length; i++) {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+                
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        setInterval(drawMatrix, 50);
+        
+        // データストリーム生成
+        function generateData() {
+            const data = [];
+            for (let i = 0; i < 50; i++) {
+                data.push('0x' + Math.random().toString(16).substr(2, 8).toUpperCase());
+            }
+            return data.join('<br>');
+        }
+        
+        document.getElementById('dataLeft').innerHTML = generateData();
+        document.getElementById('dataRight').innerHTML = generateData();
+        
+        // ウィンドウリサイズ対応
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
 </body>
 </html>
