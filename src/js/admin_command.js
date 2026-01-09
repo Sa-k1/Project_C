@@ -120,10 +120,10 @@
         // 親ウィンドウ経由で遷移する場合
         if (window.parent && window.parent !== window) {
             // iframe内の場合
-            window.parent.postMessage({ type: 'navigate', destination: 'eve_puzzle' }, '*');
+            window.parent.postMessage({ type: 'navigate', destination: 'last_nazo' }, '*');
         } else {
             // 直接開いている場合
-            window.location.href = 'eve_puzzle.html';
+            window.location.href = 'last_nazo.html';
         }
     }
 
