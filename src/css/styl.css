@@ -330,7 +330,7 @@ body {
     letter-spacing: 0.1em;
     pointer-events: none;
     z-index: 10;
-    opacity: 0.9;
+    opacity: 0.8;
     inset: 0; /* ← ここで全面サイズを維持 */
     display: flex;
     background-color: #2e2e2e;
@@ -344,7 +344,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: #000;
+    color: #fff;
     font-size: 36px;
     font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     letter-spacing: 0.1em;

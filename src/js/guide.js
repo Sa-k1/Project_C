@@ -33,7 +33,8 @@ function clearUnread() {
 // 時計エリアをクリックで会話パネルの表示/非表示
 const taskbarClock = document.querySelector('.taskbar-clock');
 if (taskbarClock) {
-    taskbarClock.addEventListener('click', () => {
+    taskbarClock.addEventListener('click', (e) => {
+        e.stopPropagation(); // イベントの伝播を停止
         if (notificationPanel.classList.contains('show')) {
             // パネルが開いている場合はアニメーション付きで閉じる
             notificationPanel.classList.add('closing');
@@ -47,6 +48,28 @@ if (taskbarClock) {
             // chatInput.focus();
             clearUnread(); // パネルを開いたら未読をクリア
         }
+    });
+}
+
+// パネルの外側をクリックしたら閉じる
+document.addEventListener('click', (e) => {
+    // パネルが開いている場合のみ処理
+    if (notificationPanel.classList.contains('show')) {
+        // クリックされた要素がパネル内部でない場合は閉じる
+        if (!notificationPanel.contains(e.target) && !taskbarClock.contains(e.target)) {
+            notificationPanel.classList.add('closing');
+            setTimeout(() => {
+                notificationPanel.classList.remove('show');
+                notificationPanel.classList.remove('closing');
+            }, 300);
+        }
+    }
+});
+
+// パネル内部のクリックでイベントの伝播を停止
+if (notificationPanel) {
+    notificationPanel.addEventListener('click', (e) => {
+        e.stopPropagation();
     });
 }
 
@@ -68,8 +91,13 @@ if (notificationClose) {
 function addEveMessage(message, title = '') {
     const time = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
     
+    // メッセージ受信時にパネルを開く
+    if (!notificationPanel.classList.contains('show')) {
+        notificationPanel.classList.add('show');
+    }
+    
     const messageDiv = document.createElement('div');
-    messageDiv.className = 'chat-message-eve';
+    messageDiv.className = 'chat-message-eve message-slide-in';
     messageDiv.innerHTML = `
     <div class="all-main-chat-item">
             <div class="item-ippai">
@@ -83,18 +111,20 @@ function addEveMessage(message, title = '') {
             <div>
         <div class="chat-timestamp">${time}</div>
     `;
-    
+
     notificationContent.appendChild(messageDiv);
     notificationContent.scrollTop = notificationContent.scrollHeight;
+    
+    // アニメーション終了後にクラスを削除
+    setTimeout(() => {
+        messageDiv.classList.remove('message-slide-in');
+    }, 300);
     
     // メッセージカウントを増やす
     messageCount++;
     
-    // 自動メッセージの場合、パネルが閉じていたら未読カウントを増やす
-    if (!notificationPanel.classList.contains('show')) {
-        unreadCount++;
-        updateChatBadge();
-    }
+    // パネルが開いたので未読はクリア
+    clearUnread();
 }
 
 // EVEから自動的にメッセージを送る関数（グローバルで使用可能）
@@ -109,7 +139,7 @@ window.sendEveMessage = function(message, title = '') {
 // 例1: 起動から10秒後にメッセージ（他のメッセージがない場合のみ）
 setTimeout(() => {
     if (messageCount === 0) {
-        window.sendEveMessage('まだそこにいますか？', 'システムチェック');
+        window.sendEveMessage('私と一緒にここから脱出しましょう<br>まずはターミナル開いてみましょう', 'こんにちは');
     }
-}, 10000);
+}, 5000);
 

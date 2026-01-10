@@ -226,8 +226,14 @@ if (terminalIcon) {
         if (!terminalFirstOpened && typeof window.sendEveMessage === 'function') {
             terminalFirstOpened = true;
             setTimeout(() => {
-                window.sendEveMessage('ターミナルを開いたんですね。何か手がかりが見つかるといいのですが...', 'ターミナルを開けてヤッター');
-            }, 1000);
+                window.sendEveMessage('言い忘れていましたがこちら側からあまり詳細な画面が見えないので、注意してください', 'ターミナルを開けましたね');
+                    setTimeout(() => {
+                    window.sendEveMessage('試しにhelpコマンドを打ってみましょう。<br>helpコマンドが打てたら何か手がかりになるものを探すために色々なコマンドを打ってください。<br>何かわかったら連絡します。', 'helpコマンドについて');
+                        setTimeout(() => {
+                        window.sendEveMessage('そして、簡単な操作説明です。<br>TABキー：<br>　入力途中で候補を自動表示<br>上下左右キー：<br>　入力履歴やカーソル位置を操作<br>右クリック：<br>　内容を貼り付けること', '頑張ってください');
+                        }, 5000)
+                    }, 10000)
+            }, 5000);
         }
     });
 }
