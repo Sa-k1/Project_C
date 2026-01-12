@@ -2,14 +2,15 @@ const mini = document.getElementById('miniWindow');
 const windowContainer = document.getElementById('windowContainer');
 let offsetX, offsetY, isDragging = false;
 
-// ファイルビューア用の変数(3つのウィンドウ + ゴミ箱 + ターミナル)
+// ファイルビューア用の変数(3つのウィンドウ + ゴミ箱 + ターミナル + チュートリアル)
 const fileViewerContainers = {
     1: document.getElementById('fileViewerContainer1'),
     2: document.getElementById('fileViewerContainer2'),
     3: document.getElementById('fileViewerContainer3'),
     4: document.getElementById('fileViewerContainer4'),
     'trash': document.getElementById('trashViewerContainer'),
-    'terminal': document.getElementById('terminalViewerContainer')
+    'terminal': document.getElementById('terminalViewerContainer'),
+    'tutorial': document.getElementById('tutorialViewerContainer')
 };
 let fileViewerDragState = { id: null, offsetX: 0, offsetY: 0 };
 
@@ -96,6 +97,9 @@ function bringToFront(element) {
     element.style.zIndex = topZIndex;
 }
 
+// グローバルに公開（guide.jsから使えるように）
+window.bringToFront = bringToFront;
+
 document.addEventListener('mouseup', () => {
     isDragging = false;
     fileViewerDragState.id = null;
@@ -117,15 +121,17 @@ document.addEventListener('mousemove', (e) => {
     }
 });
 
-// ファイルビューアの閉じるボタン(3つのウィンドウ + ゴミ箱 + ターミナルに対応)
+// ファイルビューアの閉じるボタン(3つのウィンドウ + ゴミ箱 + ターミナル + チュートリアルに対応)
 document.querySelectorAll('.file-viewer-container .ctrl.close, .trash-viewer-container .ctrl.close, .terminal-viewer-container .ctrl.close').forEach(btn => {
     btn.addEventListener('click', (e) => {
         const viewerId = e.target.dataset.viewer;
         let container;
         
-        // viewerIdが'trash'や'terminal'や特殊な値の場合、直接取得
+        // viewerIdが'trash'や'terminal'や'tutorial'や特殊な値の場合、直接取得
         if (viewerId === 'terminal') {
             container = document.getElementById('terminalViewerContainer');
+        } else if (viewerId === 'tutorial') {
+            container = document.getElementById('tutorialViewerContainer');
         } else if (viewerId === '3' && e.target.closest('.trash-viewer-container')) {
             container = document.getElementById('trashViewerContainer');
         } else {
@@ -225,15 +231,33 @@ if (terminalIcon) {
         // 初回のみEVEからメッセージを送る
         if (!terminalFirstOpened && typeof window.sendEveMessage === 'function') {
             terminalFirstOpened = true;
-            setTimeout(() => {
-                window.sendEveMessage('言い忘れていましたがこちら側からあまり詳細な画面が見えないので、注意してください', 'ターミナルを開けましたね');
-                    setTimeout(() => {
-                    window.sendEveMessage('試しにhelpコマンドを打ってみましょう。<br>helpコマンドが打てたら何か手がかりになるものを探すために色々なコマンドを打ってください。<br>何かわかったら連絡します。', 'helpコマンドについて');
-                        setTimeout(() => {
-                        window.sendEveMessage('そして、簡単な操作説明です。<br>TABキー：<br>　入力途中で候補を自動表示<br>上下左右キー：<br>　入力履歴やカーソル位置を操作<br>右クリック：<br>　内容を貼り付けること', '頑張ってください');
-                        }, 5000)
-                    }, 10000)
-            }, 5000);
+            // setTimeout(() => {
+            //     window.sendEveMessage('言い忘れていましたがこちら側からあまり詳細な画面が見えないので、注意してください', 'ターミナルを開けましたね');
+            //         setTimeout(() => {
+            //         window.sendEveMessage('試しにhelpコマンドを打ってみましょう。<br>helpコマンドが打てたら何か手がかりになるものを探すために色々なコマンドを打ってください。<br>何かわかったら連絡します。', 'helpコマンドについて');
+            //         }, 10000)
+            // }, 5000);
+        }
+    });
+}
+
+// チュートリアルアイコンのダブルクリック処理
+const tutorialIcon = document.getElementById('tutorialIcon');
+if (tutorialIcon) {
+    tutorialIcon.addEventListener('dblclick', (e) => {
+        const container = fileViewerContainers['tutorial'];
+        const iframe = document.getElementById('tutorial-viewer-iframe');
+        
+        // iframeにtutorial.htmlを読み込み
+        if (iframe && !iframe.dataset.loaded) {
+            iframe.src = 'tutorial.html';
+            iframe.dataset.loaded = 'true';
+        }
+        
+        // ウィンドウを表示して前面に
+        if (container) {
+            container.style.display = 'block';
+            bringToFront(container);
         }
     });
 }

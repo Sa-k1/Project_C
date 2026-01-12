@@ -136,10 +136,20 @@ window.sendEveMessage = function(message, title = '') {
 // 特定条件でEVEからメッセージを送る例
 // ========================
 
-// 例1: 起動から10秒後にメッセージ（他のメッセージがない場合のみ）
+// 例1: 起動から5秒後に最初のメッセージ
 setTimeout(() => {
     if (messageCount === 0) {
-        window.sendEveMessage('私と一緒にここから脱出しましょう<br>まずはターミナル開いてみましょう', 'こんにちは');
+        window.sendEveMessage('私と一緒にここから脱出しましょう', 'こんにちは');
+        
+        // 3秒後にチュートリアル開始のメッセージとアイコンを表示
+        setTimeout(() => {
+            window.sendEveMessage('まずこの世界の操作に慣れましょう<br>デスクトップのREADME.txtを開こう', '操作説明');
+            
+            // チュートリアルアイコンを表示
+            const tutorialIcon = document.getElementById('tutorialIcon');
+            if (tutorialIcon) {
+                tutorialIcon.style.display = 'block';
+            }
+        }, 10);
     }
-}, 5000);
-
+}, 1000);

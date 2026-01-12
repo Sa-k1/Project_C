@@ -72,6 +72,12 @@
     <h1 class="word">terminal</h1>
   </div>
 
+  <!-- チュートリアルアイコン（最初は非表示） -->
+  <div class="draggable-item" draggable="true" id="tutorialIcon" style="display: none; top: 30%; position: absolute; right: 15px;">
+    <img src="../pic/tyu.png" alt="" class="all_img">  
+    <h1 class="word">README.txt</h1>
+  </div>
+
       <!-- 暗号化ファイルアイコン -->
   <div class="draggable-item" draggable="true" id="file_encrypted">
     <img src="../pic/_-removebg-preview.png" alt="" class="all_img" style="filter: hue-rotate(180deg);">
@@ -201,6 +207,27 @@
         </div>
       </div>
       <iframe id="terminal-viewer-iframe" frameborder="0"></iframe>
+    </div>
+  </div>
+
+  <!-- チュートリアル用ウィンドウコンテナ -->
+  <div class="file-viewer-container" id="tutorialViewerContainer" style="display: none; top: 120px; left: 300px;">
+    <div class="file-viewer-window" id="tutorialViewerWindow" style="height: 550px; width: 700px; border: 2px solid #fff; background-color: #393939;">
+      <div class="box" style="background-color: #00000000;">
+        <div class="titlebar">
+          <div class="tabs">
+            <div class="tab active" style="background-color: #393939; border: none; width: 0;">
+              <span class="tab-label" id="tutorialViewerTitle">README.txt</span>
+            </div>
+          </div>
+          <div class="window-controls">
+            <!-- <button class="ctrl minimize no_play"  style="cursor: default;">一</button>
+            <button class="ctrl maximize no_play"  style="cursor: default;">☐</button> -->
+            <button class="ctrl close" data-viewer="tutorial" title="閉じる">✕</button>
+          </div>
+        </div>
+      </div>
+      <iframe id="tutorial-viewer-iframe" frameborder="0" style="width: 100%; height: calc(100% - 40px); border-top: 2px solid #fff;"></iframe>
     </div>
   </div>
 

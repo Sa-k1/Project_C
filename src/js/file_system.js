@@ -25,11 +25,10 @@ class VirtualFileSystem {
                                                     'data': {
                                                         type: 'folder',
                                                         children: {
-                                                            'memo.txt': {
+                                                            'memo.txt': {   //ここ使うから触んな
                                                                 type: 'file',
                                                                 htmlFile: 'file1.html',
-                                                                contentSelector: '.content',
-                                                                content: null,
+                                                                content: `cd .. を使用して最初にいた階層に戻りましょう`, 
                                                                 editable: true
                                                             },
                                                             'log.txt': {

@@ -1,0 +1,47 @@
+@charset "UTF-8";
+
+body {
+    background-color: #393939;
+    color: #ffffff;
+    font-family: 'Courier New', monospace;
+    padding: 20px;
+    margin: 0;
+    overflow: auto;
+}
+
+body::-webkit-scrollbar {
+    width: 6px;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: #393939;
+    border-radius: 4px;
+    border-right: 4px solid transparent; /* 透明なボーダーをつける */
+    border-left: 4px solid transparent; /* 透明なボーダーをつける */
+    background-clip: padding-box; /* 背景を切り取る */
+}
+
+h2 {
+    color: #ffffff;
+    border-bottom: 2px solid #ffffff;
+    padding-bottom: 10px;
+    margin-top: 0;
+    text-align: center;
+}
+
+pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.command {
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.section {
+    margin-bottom: 20px;
+    font-size: 15px;
+}
