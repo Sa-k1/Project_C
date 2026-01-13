@@ -1,5 +1,5 @@
 /* =========================================
-   最終謎解き - スタイルシート
+    最終謎解き - スタイルシート
    ========================================= */
 
 * {
@@ -10,13 +10,12 @@
 
 body {
     overflow: hidden;
-    font-family: 'Courier New', monospace;
-    background: #000;
-    color: #0ff;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #050505;
 }
 
 /* =========================================
-   謎解きUI スタイル
+    謎解きUI スタイル
    ========================================= */
 
 .all {
@@ -38,51 +37,25 @@ body {
     cursor: default;
 }
 
-.puzzle-container {
-    width: 90%;
-    max-width: 900px;
-    padding: 30px;
-    background: rgba(0, 20, 40, 0.95);
-    border: 2px solid #0ff;
-    border-radius: 10px;
-    box-shadow: 0 0 50px rgba(0, 255, 255, 0.3),
-                inset 0 0 30px rgba(0, 255, 255, 0.1);
-}
-
 .puzzle-title {
     text-align: center;
     font-size: 28px;
-    color: #0ff;
-    text-shadow: 0 0 20px #0ff;
+    color: rgb(255, 255, 255);
     margin-bottom: 10px;
-}
-
-.puzzle-instruction {
-    text-align: center;
-    font-size: 14px;
-    color: #088;
-    margin-bottom: 30px;
 }
 
 /* タイマー表示 */
 .timer-section {
-    position: fixed;
-    top: 20px;
-    right: 20px;
     text-align: center;
     padding: 20px 40px;
     margin-bottom: 20px;
-    background: rgba(0, 0, 0, 0.85);
-    border: 3px solid #0ff;
-    border-radius: 10px;
     z-index: 300;
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.5),
-                inset 0 0 20px rgba(0, 255, 255, 0.2);
+    align-items: center;
 }
 
 .timer-label {
-    font-size: 16px;
-    color: #0ff;
+    font-size: 32px;
+    color: rgb(255, 255, 255);
     margin-right: 15px;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -90,15 +63,12 @@ body {
 
 .timer-value {
     font-size: 48px;
-    font-weight: bold;
-    color: #0ff;
-    text-shadow: 0 0 30px #0ff, 0 0 60px #0ff;
+    color: rgb(255, 255, 255);
     font-family: 'Courier New', monospace;
 }
 
 .timer-value.danger {
     color: #f00;
-    text-shadow: 0 0 30px #f00, 0 0 60px #f00;
     animation: timerBlink 0.3s infinite;
 }
 
@@ -108,22 +78,19 @@ body {
 }
 
 .timer-unit {
-    font-size: 18px;
-    color: #0ff;
+    font-size: 32px;
+    color: rgb(255, 255, 255);
     margin-left: 8px;
 }
 
 .puzzle-section {
-    background: rgba(0, 30, 50, 0.5);
-    border: 1px solid #066;
-    border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
 }
 
 .puzzle-section h3 {
-    font-size: 16px;
-    color: #0aa;
+    font-size: 18px;
+    color: #a3a3a3;
     margin-bottom: 15px;
     text-align: center;
 }
@@ -136,11 +103,13 @@ body {
     border-radius: 4px;
     background: rgba(255, 0, 0, 0.2);
     color: #f55;
+    border: solid 1px #ff3232;
 }
 
 .section-status.complete {
     background: rgba(0, 255, 0, 0.2);
     color: #0f0;
+    border: solid 1px #32ff8b;
 }
 
 /* ダイヤル要素 */
@@ -158,41 +127,34 @@ body {
 }
 
 .dial {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(145deg, #0a1a2a, #051015);
-    border: 3px solid #0aa;
+    width: 100px;
+    height: 100px;
+    border: 3px solid #3c8888;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3),
-                inset 0 0 15px rgba(0, 0, 0, 0.8);
 }
 
 .dial-value {
     font-size: 28px;
     font-weight: bold;
-    color: #0ff;
-    text-shadow: 0 0 10px #0ff;
+    color: #3c8888;
 }
 
 .dial-btn {
     width: 60px;
     height: 30px;
-    background: linear-gradient(145deg, #0a2a3a, #051520);
-    border: 2px solid #066;
-    color: #0ff;
+    color: #ffffff;
     font-size: 16px;
     cursor: pointer;
     transition: all 0.2s;
-    border-radius: 4px;
+    background-color: #00000000;
+    border: #ffffff;
 }
 
 .dial-btn:hover {
-    background: #0a3a4a;
-    border-color: #0ff;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    background: #ffffff4f;
 }
 
 .dial-btn:active {
@@ -219,23 +181,18 @@ body {
 }
 
 .click-target {
-    width: 120px;
-    height: 120px;
-    background: linear-gradient(145deg, #1a0a2a, #100515);
-    border: 3px solid #a0f;
+    width: 160px;
+    height: 160px;
+    border: 3px solid #84378c;
     border-radius: 50%;
-    color: #f0f;
+    color: #a660a4;
     font-size: 18px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.1s;
-    text-shadow: 0 0 10px #f0f;
-    box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+    background-color: #ffffff00;
 }
 
-.click-target:hover {
-    box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
-}
 
 .click-target:active {
     transform: scale(0.95);
@@ -245,17 +202,14 @@ body {
 .click-target.complete {
     border-color: #0f0;
     color: #0f0;
-    text-shadow: 0 0 10px #0f0;
-    box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+    border: solid 1px #32ff8b;
 }
 
 .click-progress {
     width: 80%;
     max-width: 300px;
     height: 20px;
-    background: #0a0a1a;
     border: 1px solid #606;
-    border-radius: 10px;
     margin: 15px auto 10px;
     overflow: hidden;
 }
@@ -263,9 +217,8 @@ body {
 .click-bar {
     width: 0%;
     height: 100%;
-    background: linear-gradient(90deg, #a0f, #f0f);
+    background-color: darkmagenta;
     transition: width 0.1s;
-    box-shadow: 0 0 10px #f0f;
 }
 
 .click-counter {
@@ -279,54 +232,48 @@ body {
 }
 
 .hold-target {
-    width: 150px;
-    height: 60px;
-    background: linear-gradient(145deg, #2a1a0a, #151005);
-    border: 3px solid #fa0;
+    width: 200px;
+    height: 90px;
+    border: 3px solid #aa920a;
     border-radius: 10px;
-    color: #ff0;
+    color: #bbbb2c;
     font-size: 20px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s;
-    text-shadow: 0 0 10px #ff0;
-    box-shadow: 0 0 20px rgba(255, 170, 0, 0.3);
-}
-
-.hold-target:hover {
-    box-shadow: 0 0 30px rgba(255, 170, 0, 0.5);
+    margin-top: 30px;
+    background-color: #ffffff00;
 }
 
 .hold-target.holding {
     background: linear-gradient(145deg, #3a2a1a, #201510);
     border-color: #ff0;
     transform: scale(1.05);
+    
 }
 
 .hold-target.complete {
     border-color: #0f0;
     color: #0f0;
-    text-shadow: 0 0 10px #0f0;
-    box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+    border: solid 1px #32ff8b;
 }
 
 .hold-progress {
     width: 80%;
     max-width: 300px;
     height: 25px;
-    background: #0a0a1a;
     border: 1px solid #660;
     border-radius: 12px;
     margin: 15px auto 10px;
     overflow: hidden;
+
 }
 
 .hold-bar {
     width: 0%;
     height: 100%;
-    background: linear-gradient(90deg, #fa0, #ff0);
+    background-color: #fa0;
     transition: width 0.05s linear;
-    box-shadow: 0 0 15px #ff0;
 }
 
 .hold-timer {
@@ -336,13 +283,10 @@ body {
 
 /* 最終ステータス */
 .puzzle-final-status {
-    text-align: center;
+text-align: center;
     font-size: 20px;
-    color: #0ff;
+    color: #ffffff;
     padding: 15px;
-    border: 2px solid #066;
-    border-radius: 8px;
-    background: rgba(0, 50, 70, 0.3);
 }
 
 #security-status {
@@ -352,5 +296,4 @@ body {
 
 #security-status.unlocked {
     color: #0f0;
-    text-shadow: 0 0 20px #0f0;
 }

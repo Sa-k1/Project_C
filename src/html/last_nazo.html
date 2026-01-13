@@ -9,12 +9,11 @@
 <!-- 謎解きUI -->
     <div id="puzzle-overlay">
         <div class="puzzle-container">
-            <h2 class="puzzle-title">[ SYSTEM UNLOCK SEQUENCE ]</h2>
-            <p class="puzzle-instruction">すべてのセキュリティを解除してください</p>
+            <h2 class="puzzle-title">【 解除プロセス開始 】</h2>
             
             <!-- タイマー表示 -->
             <div class="timer-section">
-                <span class="timer-label">TIME REMAINING:</span>
+                <span class="timer-label">残り時間：</span>
                 <span class="timer-value" id="timer-display">40.0</span>
                 <span class="timer-unit">秒</span>
             </div>
@@ -22,7 +21,7 @@
             <div class="all">
                 <!-- ダイヤル要素 -->
                 <div class="puzzle-section dial-section">
-                    <h3>DIAL LOCK</h3>
+                    <h3>ロック制御</h3>
                     <div class="dials-container">
                         <div class="dial-wrapper">
                             <button class="dial-btn dial-up" data-dial="0" data-dir="up">▲</button>
@@ -49,42 +48,42 @@
                             <div class="dial-status" data-dial="2"></div>
                         </div>
                     </div>
-                    <div class="section-status" id="dial-complete">❌ LOCKED</div>
+                    <div class="section-status" id="dial-complete" style="    margin: 43px 0 0 25%; width: 50%;">✕</div>
                 </div>
 
                 <!-- クリック連打要素 -->
                 <div class="puzzle-section click-section">
-                    <h3>RAPID ACCESS</h3>
+                    <h3>強制アクセス</h3>
                     <button class="click-target" id="click-target">
-                        <span>CLICK</span>
+                        <span>信号送信</span>
                     </button>
                     <div class="click-progress">
                         <div class="click-bar" id="click-bar"></div>
                     </div>
                     <div class="click-counter"><span id="click-count">0</span> / 20</div>
-                    <div class="section-status" id="click-complete">❌ LOCKED</div>
+                    <div class="section-status" id="click-complete">✕</div>
                 </div>
 
                 <!-- 長押し要素 -->
                 <div class="puzzle-section hold-section">
-                    <h3>AUTHORIZATION</h3>
+                    <h3>権限認証</h3>
                     <button class="hold-target" id="hold-target">
-                        <span>HOLD</span>
+                        <span>信号維持</span>
                     </button>
                     <div class="hold-progress">
                         <div class="hold-bar" id="hold-bar"></div>
                     </div>
                     <div class="hold-timer"><span id="hold-time">0.0</span> / 5.0 秒</div>
-                    <div class="section-status" id="hold-complete">❌ LOCKED</div>
+                    <div class="section-status" id="hold-complete" style="margin: 45px 0 0 25%; width: 50%;">✕</div>
                 </div>
             </div>
 
             <!-- 全体ステータス -->
             <div class="puzzle-final-status" id="final-status">
-                SECURITY STATUS: <span id="security-status">LOCKED</span>
+                セキュリティ: <span id="security-status">アクセス不可</span>
             </div>
         </div>
-        <script src="../js/eve_puzzle_auto.js"></script>
     </div>
+    <script src="../js/eve_puzzle_auto.js"></script>
 </body>
 </html>

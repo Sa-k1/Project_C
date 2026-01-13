@@ -99,7 +99,8 @@ function createWindow() {
     width: 800,
     height: 600,
     autoHideMenuBar: true,
-    // fullscreen: true,
+    // フルスクリーン表示にする場合は下のコメントアウトを外してください
+    //fullscreen: true,
     frame: false,
     show: true,
     webPreferences: {
@@ -127,6 +128,7 @@ function createWindow() {
           width: 800,
           height: 600,
           autoHideMenuBar: true,
+          // fullscreen: true,
           show: false,
           webPreferences: {
             nodeIntegration: false,
@@ -164,7 +166,7 @@ function createBgWindow() {
     width: 800,  //1920に設定
     height: 600,  //1080に設定
     frame: false,       // フレームを消す（透明にするために必要）
-    // fullscreenにするとほかのウィンドウが最前面に来れなくなるためウィンドウサイズで対応
+    // fullscreenにするとほかのウィンドウが最前面に来れなくなる可能性があるためウィンドウサイズで対応
     alwaysOnTop: false,  // 常に最前面を無効化
     show: false,      // 最初は非表示
     webPreferences: {
@@ -193,7 +195,7 @@ function createtitleWindow() {
     show: true,
     alwaysOnTop: true,  // Titleを最前面に
     // フルスクリーン表示にする場合は下のコメントアウトを外してください
-    // fullscreen: true,
+    //fullscreen: true,
     webPreferences: {
       nodeIntegration: true,  // 既存のコードとの互換性のため維持
       contextIsolation: false  // 既存のコードとの互換性のため維持
@@ -225,7 +227,8 @@ app.whenReady().then(() => {
   splashScreen = new BrowserWindow({
     width: 800,
     height: 600,
-    // fullscreen: true,
+    // フルスクリーン表示にする場合は下のコメントアウトを外してください
+    //fullscreen: true,
     frame: false,
     alwaysOnTop: true,
     transparent: true,

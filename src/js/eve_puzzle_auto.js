@@ -17,7 +17,7 @@
         // 長押し目標秒数
         holdTarget: 5.0,
         // 時間制限（秒）
-        timeLimit: 6000,
+        timeLimit: 60,
         // 成功後の遷移先
         successDestination: 'true_end.html',
         // 失敗後の遷移先（時間切れ）
@@ -242,12 +242,12 @@
             // 3つ全て正解！
             state.dialComplete = true;
             state.dialLocked = [true, true, true]; // 全てロック
-            statusEl.textContent = '✓ UNLOCKED';
+            statusEl.textContent = '〇';
             statusEl.classList.add('complete');
             playLockSound();
         } else if (!allCorrect) {
             state.dialComplete = false;
-            statusEl.textContent = '❌ LOCKED';
+            statusEl.textContent = '✕';
             statusEl.classList.remove('complete');
         }
         checkFinalStatus();
@@ -295,9 +295,9 @@
         if (state.clickCount >= PUZZLE_CONFIG.clickTarget) {
             state.clickComplete = true;
             btn.classList.add('complete');
-            btn.querySelector('span').textContent = 'DONE';
+            btn.querySelector('span').textContent = '完了';
             const statusEl = document.getElementById('click-complete');
-            statusEl.textContent = '✓ UNLOCKED';
+            statusEl.textContent = '〇';
             statusEl.classList.add('complete');
             playLockSound();
             checkFinalStatus();
@@ -360,10 +360,10 @@
         const btn = document.getElementById('hold-target');
         btn.classList.remove('holding');
         btn.classList.add('complete');
-        btn.querySelector('span').textContent = 'DONE';
+        btn.querySelector('span').textContent = '完了';
         
         const statusEl = document.getElementById('hold-complete');
-        statusEl.textContent = '✓ UNLOCKED';
+        statusEl.textContent = '〇';
         statusEl.classList.add('complete');
         
         playLockSound();
@@ -385,7 +385,7 @@
             state.gameOver = true;
             stopTimer();
             
-            statusEl.textContent = 'UNLOCKED';
+            statusEl.textContent = '〇';
             statusEl.classList.add('unlocked');
             playSuccessSound();
             setTimeout(() => {

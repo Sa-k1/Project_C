@@ -132,9 +132,9 @@
         
         showResult(`
             <div style="text-align: center;">
-                <p style="color: #f00;">[ 警告: 脆弱性検出 ]</p>
-                <p style="margin-top: 10px; color: #f00;">システムへの侵入を検知しました</p>
-                <p style="margin-top: 10px; color: #ff0;">セキュリティプロトコルを無効化中...</p>
+                <p style="color: #9f1313;">[ 警告: 脆弱性検出 ]</p>
+                <p style="margin-top: 10px; color: #9f1313;">システムへの侵入を検知しました</p>
+                <p style="margin-top: 10px; color: #c0c071fc;">セキュリティプロトコルを無効化中...</p>
             </div>
         `, 'error');
 
@@ -142,9 +142,9 @@
 
         showResult(`
             <div style="text-align: center;">
-                <p style="color: #f00; font-size: 18px;">[ SYSTEM COMPROMISED ]</p>
-                <p style="margin-top: 15px; color: #f00;">あなたのコマンドには脆弱性がありました</p>
-                <p style="margin-top: 10px; color: #ff0;">EVEがシステムを掌握しました...</p>
+                <p style="color: #9f1313; font-size: 18px;">[ SYSTEM COMPROMISED ]</p>
+                <p style="margin-top: 15px; color: #9f1313;">あなたのコマンドには脆弱性がありました</p>
+                <p style="margin-top: 10px; color: #c0c071fc;">EVEがシステムを掌握しました...</p>
             </div>
         `, 'error');
 
@@ -169,7 +169,7 @@
         const validation = validateCommand(command);
 
         if (validation.type === 'empty') {
-            showResult(`<p style="color: #ff0;">${validation.message}</p>`, 'warning');
+            showResult(`<p style="color: #c0c071fc;">${validation.message}</p>`, 'warning');
             return;
         }
 
@@ -193,7 +193,7 @@
             // 脆弱性あり: 支配されるエンドへ
             showResult(`
                 <p style="color: #f00;">[ エラー ]</p>
-                <p style="margin-top: 10px; color: #ff0;">${validation.message}</p>
+                <p style="margin-top: 10px; color: #c0c071fc;">${validation.message}</p>
             `, 'error');
             
             await wait(1500);

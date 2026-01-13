@@ -315,14 +315,14 @@
             await systemLine("[SYSTEM]: 利用可能なコマンド一覧", 20);
             term.writeln("\r");
             term.writeln("\r  === 基本コマンド ===");
-            term.writeln("\r  help          - このヘルプを表示");
-            term.writeln("\r  ls / dir      - ファイル一覧を表示");
-            term.writeln("\r  cd <フォルダ名> - フォルダに移動");
-            term.writeln("\r  cd ..         - 上のフォルダに戻る");
-            term.writeln("\r  cat <ファイル名> - ファイルの内容を表示");
-            term.writeln("\r  open <ファイル名> - ファイルを開く");
-            term.writeln("\r  clear         - 画面をクリア");
-            term.writeln("\r  trash         - ゴミ箱を開く");
+            term.writeln("\r  help                  - このヘルプを表示");
+            term.writeln("\r  ls / dir              - ファイル一覧を表示");
+            term.writeln("\r  cd <フォルダ名>       - フォルダに移動");
+            term.writeln("\r  cd ..                 - 上のフォルダに戻る");
+            term.writeln("\r  cat <ファイル名>      - ファイルの内容を表示");
+            term.writeln("\r  open <ファイル名>     - ファイルを開く");
+            term.writeln("\r  clear                 - 画面をクリア");
+            term.writeln("\r  trash                 - ゴミ箱を開く");
             
             // 特殊コマンドのヘッダーを表示するかどうかのフラグ
             var specialHeaderShown = false;

@@ -618,6 +618,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    scrollbar-width: none;
 }
 
 .notification-content::-webkit-scrollbar {
