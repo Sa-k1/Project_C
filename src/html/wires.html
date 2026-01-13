@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>通信プロトコル修正</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { 
+      background: #0a0a12; 
+      color: #e0e0e0; 
+      font-family: 'Consolas', 'monospace'; 
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100vh;
+    }
+    
+    .main-container {
+      display: flex;
+      height: 100%;
+      padding: 10px;
+      gap: 10px;
+    }
+    
+    /* 左側：情報パネル */
+    .info-panel {
+      width: 200px;
+      background: #12121e;
+      border-radius: 10px;
+      padding: 12px;
+      border: 1px solid #2a2a4a;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .panel-title {
+      font-size: 1em;
+      color: #ff6666;
+      text-align: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #333;
+    }
+    .panel-title.success {
+      color: #7fffd4;
+    }
+    
+    .error-box {
+      background: rgba(255, 100, 100, 0.1);
+      border: 1px solid #ff6666;
+      border-radius: 6px;
+      padding: 8px;
+      color: #ff6666;
+      font-size: 0.75em;
+    }
+    .error-box.success {
+      background: rgba(127, 255, 212, 0.1);
+      border-color: #7fffd4;
+      color: #7fffd4;
+    }
+    
+    .status-log {
+      background: #0a0a12;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 0.7em;
+      line-height: 1.5;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .status-log .log-line {
+      margin-bottom: 4px;
+      padding: 2px 0;
+      border-bottom: 1px solid #222;
+    }
+    .status-log .error { color: #ff6666; }
+    .status-log .success { color: #7fffd4; }
+    .status-log .info { color: #00bcd4; }
+    .status-log .warning { color: #f1c40f; }
+    
+    .status-panel {
+      background: #1a1a2e;
+      border-radius: 6px;
+      padding: 10px;
+      text-align: center;
+    }
+    .status-panel .label {
+      font-size: 0.7em;
+      color: #888;
+      margin-bottom: 4px;
+    }
+    .status-panel .value {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #ff6666;
+    }
+    .status-panel.complete .value {
+      color: #2ecc71;
+      animation: pulse-text 1s infinite;
+    }
+    @keyframes pulse-text {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    .reset-btn {
+      width: 100%;
+      background: #333;
+      color: #fff;
+      border: 1px solid #555;
+      border-radius: 5px;
+      padding: 8px;
+      cursor: pointer;
+      font-size: 0.8em;
+      transition: all 0.2s;
+    }
+    .reset-btn:hover {
+      background: #444;
+      border-color: #7fffd4;
+    }
+    
+    /* 右側：パズルエリア */
+    .puzzle-wrapper {
+      flex: 1;
+      background: #12121e;
+      border-radius: 12px;
+      border: 1px solid #2a2a4a;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .puzzle-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: 
+        linear-gradient(rgba(127, 255, 212, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(127, 255, 212, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+    
+    /* ヘッダーラベル */
+    .column-header {
+      position: absolute;
+      top: 10px;
+      font-size: 0.85em;
+      font-weight: bold;
+      padding: 5px 12px;
+      border-radius: 4px;
+      background: rgba(0,0,0,0.5);
+    }
+    .column-header.left {
+      left: 80px;
+      color: #00bcd4;
+      border: 1px solid #00bcd4;
+    }
+    .column-header.right {
+      right: 80px;
+      color: #9b59b6;
+      border: 1px solid #9b59b6;
+    }
+    
+    /* 端子カラム */
+    .terminal-column {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+    .terminal-column.left { left: 60px; }
+    .terminal-column.right { right: 60px; }
+    
+    .terminal {
+      width: 130px;
+      height: 48px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.85em;
+      color: #fff;
+      text-shadow: 1px 1px 2px #000;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 2px solid rgba(255,255,255,0.3);
+      position: relative;
+      letter-spacing: 1px;
+    }
+    
+    /* 左側（VR）の端子 */
+    .terminal.vr {
+      background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+    }
+    .terminal.vr::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 6px;
+      background: #00bcd4;
+      top: 50%;
+      right: -18px;
+      transform: translateY(-50%);
+      border-radius: 0 3px 3px 0;
+    }
+    
+    /* 右側（PC）の端子 */
+    .terminal.pc {
+      background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+    }
+    .terminal.pc::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 6px;
+      background: #9b59b6;
+      top: 50%;
+      left: -18px;
+      transform: translateY(-50%);
+      border-radius: 3px 0 0 3px;
+    }
+    
+    .terminal:hover:not(.connected) {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px currentColor;
+    }
+    .terminal.selected {
+      transform: scale(1.08);
+      box-shadow: 0 0 20px currentColor, 0 0 30px currentColor;
+      animation: terminal-pulse 0.8s infinite;
+    }
+    @keyframes terminal-pulse {
+      0%, 100% { box-shadow: 0 0 20px currentColor; }
+      50% { box-shadow: 0 0 30px currentColor, 0 0 40px currentColor; }
+    }
+    .terminal.connected {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: scale(1);
+    }
+    .terminal.connected.correct::before {
+      content: '✓';
+      position: absolute;
+      font-size: 1.2em;
+      color: #2ecc71;
+    }
+    .terminal.connected.wrong::before {
+      content: '✗';
+      position: absolute;
+      font-size: 1.2em;
+      color: #ff6666;
+    }
+    
+    /* SVGワイヤー */
+    #wire-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .wire {
+      fill: none;
+      stroke-width: 4;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 3px currentColor);
+      transition: stroke 0.3s;
+    }
+    .wire.correct {
+      stroke: #2ecc71 !important;
+      filter: drop-shadow(0 0 6px #2ecc71);
+    }
+    .wire.wrong {
+      stroke: #ff6666 !important;
+      filter: drop-shadow(0 0 6px #ff6666);
+    }
+    .wire.pending {
+      stroke: #888;
+      stroke-dasharray: 8, 4;
+      animation: dash-flow 0.5s linear infinite;
+    }
+    @keyframes dash-flow {
+      to { stroke-dashoffset: -12; }
+    }
+    
+    /* エラーフラッシュ */
+    .error-flash {
+      animation: error-shake 0.5s;
+    }
+    @keyframes error-shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+    
+    /* 完了演出 */
+    .complete-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(46, 204, 113, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      animation: fade-in 0.5s;
+    }
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .complete-message {
+      background: rgba(0, 0, 0, 0.9);
+      border: 2px solid #2ecc71;
+      border-radius: 12px;
+      padding: 30px 50px;
+      text-align: center;
+    }
+    .complete-message h2 {
+      color: #2ecc71;
+      margin: 0 0 10px 0;
+      font-size: 1.5em;
+    }
+    .complete-message p {
+      color: #7fffd4;
+      margin: 0;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <!-- 左パネル：情報表示 -->
+    <div class="info-panel">
+      <div class="panel-title" id="panelTitle">
+        ⚠ 接続エラー
+      </div>
+      
+      <div class="error-box" id="errorBox">
+        <strong>ERROR 0x8007</strong><br>
+        通信プロトコル不一致<br>
+        ケーブル接続を確認してください
+      </div>
+      
+      <div class="status-log" id="statusLog">
+        <div class="log-line info">[SYSTEM] 起動中...</div>
+        <div class="log-line info">[SYSTEM] VR接続開始</div>
+        <div class="log-line error">[ERROR] プロトコル検証失敗</div>
+        <div class="log-line warning">[WARN] 接続不安定</div>
+        <div class="log-line info">[INFO] 手動修正が必要です</div>
+      </div>
+      
+      <div class="status-panel" id="statusPanel">
+        <div class="label">接続状態</div>
+        <div class="value" id="connectionStatus">0 / 5</div>
+      </div>
+      
+      <button class="reset-btn" id="resetBtn">リセット</button>
+    </div>
+    
+    <!-- 右側：パズルエリア -->
+    <div class="puzzle-wrapper" id="puzzleWrapper">
+      <div class="column-header left">VR</div>
+      <div class="column-header right">PC</div>
+      
+      <svg id="wire-svg"></svg>
+      
+      <div class="terminal-column left" id="leftColumn"></div>
+      <div class="terminal-column right" id="rightColumn"></div>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    // プロトコルペア定義（左 + 右 + 2 = 100000000）
+    // VR + PC = 11111110 (254)、それに2を足すと100000000 (256)
+    const protocolPairs = [
+      { vr: '10110001', pc: '01001101', id: 0 },  // 177 + 77 = 254
+      { vr: '11001010', pc: '00110100', id: 1 },  // 202 + 52 = 254
+      { vr: '10101100', pc: '01010010', id: 2 },  // 172 + 82 = 254
+      { vr: '11100011', pc: '00011011', id: 3 },  // 227 + 27 = 254
+      { vr: '10011110', pc: '01100000', id: 4 }   // 158 + 96 = 254
+    ];
+    
+    let vrTerminals = [];
+    let pcTerminals = [];
+    let connections = []; // { vrId, pcId, wireEl, correct }
+    let selectedVr = null;
+    let correctCount = 0;
+    
+    const puzzleWrapper = document.getElementById('puzzleWrapper');
+    const wireSvg = document.getElementById('wire-svg');
+    const leftColumn = document.getElementById('leftColumn');
+    const rightColumn = document.getElementById('rightColumn');
+    const statusLog = document.getElementById('statusLog');
+    const connectionStatus = document.getElementById('connectionStatus');
+    const statusPanel = document.getElementById('statusPanel');
+    const panelTitle = document.getElementById('panelTitle');
+    const errorBox = document.getElementById('errorBox');
+    const resetBtn = document.getElementById('resetBtn');
+    
+    // 配列シャッフル
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+    
+    // ログ追加
+    function addLog(message, type = 'info') {
+      const line = document.createElement('div');
+      line.className = `log-line ${type}`;
+      line.textContent = message;
+      statusLog.appendChild(line);
+      statusLog.scrollTop = statusLog.scrollHeight;
+    }
+    
+    // 初期化
+    function init() {
+      leftColumn.innerHTML = '';
+      rightColumn.innerHTML = '';
+      wireSvg.innerHTML = '';
+      connections = [];
+      selectedVr = null;
+      correctCount = 0;
+      
+      // 端子作成
+      vrTerminals = shuffle([...protocolPairs]);
+      pcTerminals = shuffle([...protocolPairs]);
+      
+      vrTerminals.forEach((pair, index) => {
+        const terminal = document.createElement('div');
+        terminal.className = 'terminal vr';
+        terminal.textContent = pair.vr;
+        terminal.dataset.id = pair.id;
+        terminal.dataset.index = index;
+        terminal.addEventListener('click', () => selectVr(terminal, pair));
+        leftColumn.appendChild(terminal);
+      });
+      
+      pcTerminals.forEach((pair, index) => {
+        const terminal = document.createElement('div');
+        terminal.className = 'terminal pc';
+        terminal.textContent = pair.pc;
+        terminal.dataset.id = pair.id;
+        terminal.dataset.index = index;
+        terminal.addEventListener('click', () => selectPc(terminal, pair));
+        rightColumn.appendChild(terminal);
+      });
+      
+      updateStatus();
+      
+      // ログリセット
+      statusLog.innerHTML = '';
+      addLog('[SYSTEM] 起動中...', 'info');
+      addLog('[SYSTEM] VR接続開始', 'info');
+      addLog('[ERROR] プロトコル検証失敗', 'error');
+      addLog('[WARN] 接続不安定', 'warning');
+      addLog('[INFO] 手動修正が必要です', 'info');
+      
+      panelTitle.textContent = '⚠ 接続エラー';
+      panelTitle.classList.remove('success');
+      errorBox.innerHTML = '<strong>ERROR 0x8007</strong><br>通信プロトコル不一致<br>ケーブル接続を確認してください';
+      errorBox.classList.remove('success');
+      statusPanel.classList.remove('complete');
+      
+      // 完了オーバーレイ削除
+      const overlay = puzzleWrapper.querySelector('.complete-overlay');
+      if (overlay) overlay.remove();
+    }
+    
+    // VR端子選択
+    function selectVr(terminal, pair) {
+      if (terminal.classList.contains('connected')) return;
+      
+      // 既存選択解除
+      document.querySelectorAll('.terminal.selected').forEach(t => t.classList.remove('selected'));
+      
+      terminal.classList.add('selected');
+      selectedVr = { terminal, pair };
+      addLog(`[SELECT] VR: ${pair.vr}`, 'info');
+    }
+    
+    // PC端子選択
+    function selectPc(terminal, pair) {
+      if (terminal.classList.contains('connected')) return;
+      if (!selectedVr) {
+        addLog('[WARN] 先にVR端子を選択してください', 'warning');
+        return;
+      }
+      
+      const vrPair = selectedVr.pair;
+      const vrTerminal = selectedVr.terminal;
+      
+      // 接続判定
+      const isCorrect = vrPair.id === pair.id;
+      
+      // ワイヤー描画
+      const wire = drawWire(vrTerminal, terminal, isCorrect);
+      
+      // 接続記録
+      connections.push({
+        vrId: vrPair.id,
+        pcId: pair.id,
+        wireEl: wire,
+        correct: isCorrect
+      });
+      
+      // 端子状態更新
+      vrTerminal.classList.add('connected');
+      terminal.classList.add('connected');
+      
+      if (isCorrect) {
+        vrTerminal.classList.add('correct');
+        terminal.classList.add('correct');
+        correctCount++;
+        addLog(`[SUCCESS] 接続成功: ${vrPair.vr} ↔ ${pair.pc}`, 'success');
+      } else {
+        vrTerminal.classList.add('wrong');
+        terminal.classList.add('wrong');
+        addLog(`[ERROR] 接続失敗: ${vrPair.vr} ↔ ${pair.pc}`, 'error');
+        puzzleWrapper.classList.add('error-flash');
+        setTimeout(() => puzzleWrapper.classList.remove('error-flash'), 500);
+      }
+      
+      selectedVr.terminal.classList.remove('selected');
+      selectedVr = null;
+      
+      updateStatus();
+      
+      // 全接続完了チェック
+      if (connections.length === protocolPairs.length) {
+        checkComplete();
+      }
+    }
+    
+    // ワイヤー描画
+    function drawWire(vrEl, pcEl, isCorrect) {
+      const vrRect = vrEl.getBoundingClientRect();
+      const pcRect = pcEl.getBoundingClientRect();
+      const wrapperRect = puzzleWrapper.getBoundingClientRect();
+      
+      const x1 = vrRect.right - wrapperRect.left;
+      const y1 = vrRect.top + vrRect.height / 2 - wrapperRect.top;
+      const x2 = pcRect.left - wrapperRect.left;
+      const y2 = pcRect.top + pcRect.height / 2 - wrapperRect.top;
+      
+      const midX = (x1 + x2) / 2;
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`);
+      path.classList.add('wire');
+      
+      if (isCorrect) {
+        path.classList.add('correct');
+      } else {
+        path.classList.add('wrong');
+      }
+      
+      wireSvg.appendChild(path);
+      return path;
+    }
+    
+    // ステータス更新
+    function updateStatus() {
+      connectionStatus.textContent = `${correctCount} / ${protocolPairs.length}`;
+    }
+    
+    // 完了チェック
+    function checkComplete() {
+      if (correctCount === protocolPairs.length) {
+        // 全正解
+        addLog('[SYSTEM] 全接続成功！', 'success');
+        addLog('[SYSTEM] プロトコル検証完了', 'success');
+        addLog('[SYSTEM] VR接続を確立しました', 'success');
+        
+        panelTitle.textContent = '✓ 接続成功';
+        panelTitle.classList.add('success');
+        errorBox.innerHTML = '<strong>STATUS: OK</strong><br>通信プロトコル正常<br>VR接続が確立されました';
+        errorBox.classList.add('success');
+        statusPanel.classList.add('complete');
+        
+        // 完了演出
+        const overlay = document.createElement('div');
+        overlay.className = 'complete-overlay';
+        overlay.innerHTML = `
+          <div class="complete-message">
+            <h2>✓ 通信確立</h2>
+            <p>VR接続が正常に回復しました</p>
+          </div>
+        `;
+        puzzleWrapper.appendChild(overlay);
+        
+        // 親ウィンドウに通知
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ type: 'wiresComplete', success: true }, '*');
+        }
+      } else {
+        // 不正解あり
+        addLog('[ERROR] 接続エラーがあります', 'error');
+        addLog('[INFO] リセットして再接続してください', 'warning');
+      }
+    }
+    
+    // リセット
+    resetBtn.addEventListener('click', () => {
+      addLog('[SYSTEM] リセット実行...', 'info');
+      init();
+    });
+    
+    // 初期化実行
+    init();
+  })();
+  </script>
+</body>
+</html>

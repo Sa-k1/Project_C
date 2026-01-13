@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>セッション終了プロトコル修正</title>
+  <style>
+    body {
+      background: #0a0a12;
+      color: #e0e0e0;
+      font-family: 'Consolas', 'monospace';
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .exit-container {
+      background: #181828;
+      border-radius: 16px;
+      border: 2px solid #7fffd4;
+      padding: 36px 48px;
+      box-shadow: 0 0 32px #000a;
+      min-width: 420px;
+      max-width: 90vw;
+    }
+    .exit-title {
+      font-size: 1.3em;
+      color: #7fffd4;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+    .exit-desc {
+      font-size: 0.95em;
+      color: #ccc;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+    .exit-protocol-box {
+      background: #22223a;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 18px 16px;
+      margin-bottom: 18px;
+      font-size: 1.1em;
+      letter-spacing: 2px;
+      text-align: center;
+      color: #ff6666;
+    }
+    .exit-input-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .exit-input {
+      width: 120px;
+      font-size: 1.1em;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #7fffd4;
+      background: #181828;
+      color: #7fffd4;
+      text-align: center;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .exit-input:focus {
+      border: 1.5px solid #2ecc71;
+    }
+    .exit-btn {
+      width: 100%;
+      background: linear-gradient(90deg, #7fffd4 0%, #2ecc71 100%);
+      color: #181828;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: background 0.2s;
+    }
+    .exit-btn:hover {
+      background: linear-gradient(90deg, #2ecc71 0%, #7fffd4 100%);
+    }
+    .exit-log {
+      min-height: 1.5em;
+      text-align: center;
+      font-size: 0.95em;
+      color: #ff6666;
+      margin-bottom: 8px;
+    }
+    .exit-log.success {
+      color: #2ecc71;
+    }
+  </style>
+</head>
+<body>
+  <div class="exit-container">
+    <div class="exit-title">セッション終了プロトコル修正</div>
+    <div class="exit-desc">
+      通信回復後、正しい終了プロトコルを送信する必要があります。<br>
+      <span style="color:#f1c40f;">ヒント: 2つの値を足して <b>11111111</b> (255) になる組み合わせを入力してください。</span>
+    </div>
+    <div class="exit-protocol-box" id="protocolBox">
+      終了プロトコル: <span id="exitVr">???????</span> + <span id="exitPc">???????</span> = <b>11111111</b>
+    </div>
+    <div class="exit-input-row">
+      <input class="exit-input" id="inputVr" maxlength="8" placeholder="VR側 8bit" autocomplete="off">
+      <span style="color:#7fffd4; font-size:1.2em;">+</span>
+      <input class="exit-input" id="inputPc" maxlength="8" placeholder="PC側 8bit" autocomplete="off">
+    </div>
+    <button class="exit-btn" id="sendBtn">終了プロトコル送信</button>
+    <div class="exit-log" id="exitLog"></div>
+  </div>
+  <script>
+    // 正解例: 10011001 + 01100110 = 11111111
+    const correctPairs = [
+      { vr: '10011001', pc: '01100110' },
+      { vr: '11000011', pc: '00111100' },
+      { vr: '10101010', pc: '01010101' },
+      { vr: '11110000', pc: '00001111' },
+      { vr: '11111111', pc: '00000000' }
+    ];
+    function isValidBin(str) {
+      return /^[01]{8}$/.test(str);
+    }
+    function checkPair(vr, pc) {
+      if (!isValidBin(vr) || !isValidBin(pc)) return false;
+      const sum = parseInt(vr,2) + parseInt(pc,2);
+      return sum === 255;
+    }
+    const inputVr = document.getElementById('inputVr');
+    const inputPc = document.getElementById('inputPc');
+    const sendBtn = document.getElementById('sendBtn');
+    const exitLog = document.getElementById('exitLog');
+    const protocolBox = document.getElementById('protocolBox');
+    const exitVr = document.getElementById('exitVr');
+    const exitPc = document.getElementById('exitPc');
+    sendBtn.onclick = function() {
+      const vr = inputVr.value.trim();
+      const pc = inputPc.value.trim();
+      exitVr.textContent = vr || '???????';
+      exitPc.textContent = pc || '???????';
+      if (!isValidBin(vr) || !isValidBin(pc)) {
+        exitLog.textContent = '8桁の2進数で入力してください';
+        exitLog.className = 'exit-log';
+        return;
+      }
+      if (checkPair(vr, pc)) {
+        exitLog.textContent = '終了プロトコル送信成功！セッションが安全に終了しました。';
+        exitLog.className = 'exit-log success';
+        sendBtn.disabled = true;
+        inputVr.disabled = true;
+        inputPc.disabled = true;
+        protocolBox.style.color = '#2ecc71';
+        // 親ウィンドウに通知
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ type: 'exitProtocolComplete', success: true }, '*');
+        }
+      } else {
+        exitLog.textContent = 'プロトコル不一致。正しい組み合わせを入力してください。';
+        exitLog.className = 'exit-log';
+        protocolBox.style.color = '#ff6666';
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+/* fragments_popup.css - 断片データポップアップ用CSS */
+/* サイバー×ホラー演出: 範囲選択で隠しテキストが見える */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0a0a0a;
+    font-family: 'Courier New', 'MS Gothic', monospace;
+    color: #00ff00;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* ポップアップコンテナ */
+.popup-container {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #0d0d0d 0%, #050505 100%);
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    position: relative;
+    overflow: auto;
+}
+
+/* グリッチオーバーレイ */
+.glitch-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        transparent 0%,
+        rgba(0, 255, 0, 0.03) 50%,
+        transparent 100%
+    );
+    pointer-events: none;
+    opacity: 0;
+    z-index: 10;
+}
+
+/* ヘッダー */
+.popup-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    background: #111;
+    border-bottom: 1px solid #333;
+}
+
+.file-icon {
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+.file-name {
+    flex: 1;
+    font-size: 14px;
+    color: #00ff00;
+}
+
+.close-btn {
+    background: transparent;
+    border: 1px solid #ff0000;
+    color: #ff0000;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    transition: all 0.2s;
+}
+
+.close-btn:hover {
+    background: #ff0000;
+    color: #000;
+}
+
+/* コンテンツ */
+.popup-content {
+    padding: 30px;
+    position: relative;
+}
+
+.section {
+    margin-bottom: 15px;
+}
+
+.section-title {
+    color: #00ff00;
+    font-size: 16px;
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+
+/* 断片ライン */
+.fragments {
+    padding-left: 10px;
+}
+
+.fragment-line {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    height: 24px;
+}
+
+.fragment-num {
+    color: #00ff00;
+    margin-right: 20px;
+    font-size: 18px;
+    min-width: 50px;
+}
+
+/* ========================================
+   隠しテキスト - 範囲選択で見える演出
+   ======================================== */
+
+.invisible-text {
+    /* 背景と同色で通常時は見えない */
+    color: #0a0a0a;
+    background: #0a0a0a;
+    padding: 4px 12px;
+    font-size: 20px;
+    letter-spacing: 4px;
+    user-select: text;
+    cursor: text;
+    transition: none;
+}
+
+/* 範囲選択時に色が現れる */
+.invisible-text::selection {
+    background: #222;
+}
+
+.frag-1::selection {
+    color: #00ffff; /* 残響: シアン */
+}
+
+.frag-2::selection {
+    color: #ff00ff; /* 歪曲: マゼンタ */
+}
+
+.frag-3::selection {
+    color: #666666; /* 虚無: グレー */
+}
+
+.frag-4::selection {
+    color: #ff0000; /* 影: 赤 */
+}
+
+/* ヒントテキスト - 普通に表示 */
+.hint-text {
+    color: #ffff00;
+    background: transparent;
+    padding: 10px 15px;
+    line-height: 2.0;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+    font-style: italic;
+}
+
+/* 区切り線 */
+.divider {
+    text-align: center;
+    color: #333;
+    margin: 15px 0;
+    font-size: 12px;
+}
+
+/* ヒントセクション */
+.hint-section {
+    margin-top: 10px;
+}
+
+.hint-text {
+    font-style: italic;
+}
+
+.hint-answer {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #888;
+}
+
+/* 警告テキスト */
+.warning-text {
+    margin-top: 20px;
+    padding: 10px;
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid #ff0000;
+    color: #ff6666;
+    font-size: 11px;
+    text-align: center;
+    animation: warning-blink 2s infinite;
+}
+
+@keyframes warning-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* フッター */
+.popup-footer {
+    padding: 8px 15px;
+    background: #111;
+    border-top: 1px solid #333;
+    text-align: right;
+}
+
+.status {
+    color: #ff0000;
+    font-size: 10px;
+    letter-spacing: 1px;
+    animation: status-flicker 3s infinite;
+}
+
+@keyframes status-flicker {
+    0%, 100% { opacity: 1; }
+    92% { opacity: 1; }
+    93% { opacity: 0.3; }
+    94% { opacity: 1; }
+    96% { opacity: 0.5; }
+    97% { opacity: 1; }
+}
+
+/* スキャンライン効果 */
+.popup-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.1) 2px,
+        rgba(0, 0, 0, 0.1) 4px
+    );
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* ホバーヒント */
+.invisible-text:hover,
+.invisible-hint:hover {
+    cursor: text;
+}
+
+/* 全選択時のスタイル */
+::selection {
+    background: #333;
+}

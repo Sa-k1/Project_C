@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>断片データ - fragments.memo</title>
+    <link rel="stylesheet" href="../css/fragments_popup.css">
+</head>
+<body>
+    <div class="popup-container" id="fragmentsPopup">
+        <div class="popup-header" id="popupHeader">
+            <span class="file-name">fragments.memo</span>
+            <button class="close-btn" id="closeBtn">✕</button>
+        </div>
+        <div class="popup-content">
+            <div class="glitch-overlay"></div>
+            <div class="section fragment-section">
+                <div class="section-title">[記憶の断片]</div>
+                <div class="fragments">
+                    <div class="fragment-line">
+                        <span class="fragment-num">1:O</span>
+                        <span class="invisible-text frag-1">虚無</span>
+                    </div>
+                    <div class="fragment-line">
+                        <span class="fragment-num">2:E</span>
+                        <span class="invisible-text frag-2">歪曲</span>
+                    </div>
+                    <div class="fragment-line">
+                        <span class="fragment-num">3:P</span>
+                        <span class="invisible-text frag-3">残響</span>
+                    </div>
+                    <div class="fragment-line">
+                        <span class="fragment-num">4:H</span>
+                        <span class="invisible-text frag-4">影</span>
+                    </div>
+                </div>
+            </div>
+            <div class="divider">
+                <span>───────────────</span>
+            </div>
+            <div class="section hint-section">
+                <div class="section-title">[順序のヒント]</div>
+                <div class="hint-text">
+                    『闇より現れし影は、虚無を越え、歪みを抜け、最後に残響となる。<br>
+                    その順に記憶を繋げ。』
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // グリッチエフェクト
+        setInterval(() => {
+            const overlay = document.querySelector('.glitch-overlay');
+            if (Math.random() > 0.95) {
+                overlay.style.opacity = '0.1';
+                setTimeout(() => {
+                    overlay.style.opacity = '0';
+                }, 50);
+            }
+        }, 100);
+
+        // ✕ボタンで閉じる
+        document.getElementById('closeBtn').onclick = function() {
+            // iframeで読み込まれている場合は親ウィンドウの該当コンテナを閉じる
+            if (window.parent && window.parent !== window) {
+                // viewerId=6で固定
+                const container = window.parent.document.getElementById('fileViewerContainer6');
+                if (container) {
+                    container.style.display = 'none';
+                }
+            } else {
+                // 単体表示時は自身を非表示
+                document.getElementById('fragmentsPopup').style.display = 'none';
+            }
+        };
+
+        // ドラッグ移動
+        (function() {
+            const popup = document.getElementById('fragmentsPopup');
+            const header = document.getElementById('popupHeader');
+            let offsetX = 0, offsetY = 0, isDown = false;
+            header.style.cursor = 'move';
+            header.onmousedown = function(e) {
+                isDown = true;
+                offsetX = e.clientX - popup.offsetLeft;
+                offsetY = e.clientY - popup.offsetTop;
+                document.onmousemove = function(e) {
+                    if (!isDown) return;
+                    popup.style.position = 'absolute';
+                    popup.style.left = (e.clientX - offsetX) + 'px';
+                    popup.style.top = (e.clientY - offsetY) + 'px';
+                    popup.style.margin = '0';
+                };
+                document.onmouseup = function() {
+                    isDown = false;
+                    document.onmousemove = null;
+                    document.onmouseup = null;
+                };
+            };
+        })();
+    </script>
+</body>
+</html>

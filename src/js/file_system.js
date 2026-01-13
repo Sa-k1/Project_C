@@ -10,6 +10,25 @@ class VirtualFileSystem {
             'C:': {
                 type: 'drive',
                 children: {
+                    'VR': {
+                        type: 'folder',
+                        hidden: true,
+                        children: {
+                            'escape_portal.txt': {
+                                type: 'file',
+                                content: '意識の出口ポータル。EVEの妨害に注意。',
+                                editable: false
+                            },
+                            // 結線ギミック用ファイル
+                            'wires.html': {
+                                type: 'file',
+                                htmlFile: 'wires.html',
+                                contentSelector: '.wires-content',
+                                content: '【接続エラー】\nEVEによって神経接続が一時的に遮断されています。\n\n[結線ギミックをクリアすると接続が回復します]',
+                                editable: false
+                            }
+                        }
+                    },
                     'Users': {
                         type: 'folder',
                         children: {
@@ -83,70 +102,48 @@ class VirtualFileSystem {
                                                                 content: `[admin_key.dat]\n\nこのファイルには複数のデータ層があります。\n表層と深層の両方を読み取る必要があります。\n\n警告: 適切な順序で適切なコマンドを使用してください。\n「表層を理解してから深層へ」`,
                                                                 editable: false
                                                             },
-                                                            'backup': {
-                                                                type: 'folder',
+                                                    'backup': {
+                                                        type: 'folder',
+                                                        hidden: true,
+                                                        children: {
+                                                            '.order_hint.memo': {
+                                                                type: 'file',
                                                                 hidden: true,
-                                                                children: {
-                                                                    '.fragment_1.dat': {
-                                                                        type: 'file',
-                                                                        hidden: true,
-                                                                        content: `[データ断片 1/4]\n\n記録された文字: 【E】\n\nこれは何かの一部のようだ...`,
-                                                                        editable: false
-                                                                    },
-                                                                    '.fragment_2.dat': {
-                                                                        type: 'file',
-                                                                        hidden: true,
-                                                                        content: `[データ断片 2/4]\n\n記録された文字: 【P】\n\nこれは何かの一部のようだ...`,
-                                                                        editable: false
-                                                                    },
-                                                                    '.fragment_3.dat': {
-                                                                        type: 'file',
-                                                                        hidden: true,
-                                                                        content: `[データ断片 3/4]\n\n記録された文字: 【O】\n\nこれは何かの一部のようだ...`,
-                                                                        editable: false
-                                                                    },
-                                                                    '.fragment_4.dat': {
-                                                                        type: 'file',
-                                                                        hidden: true,
-                                                                        content: `[データ断片 4/4]\n\n記録された文字: 【H】\n\nこれは何かの一部のようだ...`,
-                                                                        editable: false
-                                                                    },
-                                                                    '.order_hint.memo': {
-                                                                        type: 'file',
-                                                                        hidden: true,
-                                                                        content: `=== 復元メモ ===\n\n断片の正しい順序:\n4番目 → 3番目 → 2番目 → 1番目\n\nこの順で文字を並べると...\n(H → O → P → E)`,
-                                                                        editable: false
-                                                                    },
-                                                                    'restored_data.enc': {
-                                                                        type: 'file',
-                                                                        hidden: true,
-                                                                        encrypted: true,
-                                                                        content: `[暗号化されたファイル]\n\nこのファイルはパスワードで保護されています。\nopenコマンドで開いてパスワードを入力してください。`,
-                                                                        editable: false
-                                                                    },
-                                                                    'key_trace.png': {
-                                                                        type: 'image',
-                                                                        hidden: true,
-                                                                        special: 'gimmick3_keytrace',
-                                                                        content: '', // 実際の画像はpublic/pic/などに配置
-                                                                        editable: false
-                                                                    },
-                                                                    'traced_file.enc': {
-                                                                        type: 'file',
-                                                                        hidden: true,
-                                                                        encrypted: true,
-                                                                        content: `[暗号化されたファイル]\n\nこのファイルはパスワードで保護されています。\nopenコマンドで開いてパスワードを入力してください。`,
-                                                                        editable: false
-                                                                    }
-                                                                }
+                                                                content: `=== 復元メモ ===\n\n断片の正しい順序:\n4番目 → 3番目 → 2番目 → 1番目\n\nこの順で文字を並べると...\n(H → O → P → E)`,
+                                                                editable: false
+                                                            },
+                                                            'fragments.memo': {
+                                                                type: 'file',
+                                                                hidden: true,
+                                                                htmlFile: 'fragments_popup.html',
+                                                                content: `[破損データ]\n\nこのファイルは破損しています。\nopenコマンドで開いて内容を確認してください。`,
+                                                                editable: false
+                                                            },
+                                                            'restored_data.enc': {
+                                                                type: 'file',
+                                                                hidden: true,
+                                                                encrypted: true,
+                                                                content: `[暗号化されたファイル]\n\nこのファイルはパスワードで保護されています。\nopenコマンドで開いてパスワードを入力してください。`,
+                                                                editable: false
+                                                            },
+                                                            'key_trace.png': {
+                                                                type: 'image',
+                                                                hidden: true,
+                                                                special: 'gimmick3_keytrace',
+                                                                content: '', // 実際の画像はpublic/pic/などに配置
+                                                                editable: false
+                                                            },
+                                                            'traced_file.enc': {
+                                                                type: 'file',
+                                                                hidden: true,
+                                                                encrypted: true,
+                                                                content: `[暗号化されたファイル]\n\nこのファイルはパスワードで保護されています。\nopenコマンドで開いてパスワードを入力してください。`,
+                                                                editable: false
                                                             }
                                                         }
-                                                    },
-                                                    'README.txt': {
-                                                        type: 'file',
-                                                        content: `Project_C について\n\nこのフォルダには重要なファイルが含まれています。`,
-                                                        editable: true
-                                                    },
+                                                    }
+                                                }
+                                            },
                                                     'bookmarks.txt': {
                                                         type: 'file',
                                                         content: `=== ブックマーク ===\nhttps://www.google.com\nhttps://github.com\nhttps://developer.mozilla.org`,

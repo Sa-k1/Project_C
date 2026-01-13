@@ -81,7 +81,7 @@
       <!-- 暗号化ファイルアイコン -->
   <div class="draggable-item" draggable="true" id="file_encrypted">
     <img src="../pic/_-removebg-preview.png" alt="" class="all_img" style="filter: hue-rotate(180deg);">
-    <h1 class="word">secret_data.enc</h1>
+    <h1 class="word">frnepu.enc</h1>
   </div>
 
     <!-- ファイルビューア用ウィンドウコンテナ（ゴミ箱用） -->
@@ -175,7 +175,7 @@
         <div class="titlebar" style="background: linear-gradient(180deg, #0a1a0a 0%, #163e16 100%);">
           <div class="tabs">
             <div class="tab active" style="background-color: #0d1b0d;">
-              <span class="tab-label" id="fileViewerTitle4" style="color: #00ff00;">🔒 secret_data.enc</span>
+              <span class="tab-label" id="fileViewerTitle4" style="color: #00ff00;">🔒 frnepu.enc</span>
             </div>
           </div>
           <div class="window-controls">
@@ -186,6 +186,48 @@
         </div>
       </div>
       <iframe id="file-viewer-iframe4" frameborder="0"></iframe>
+    </div>
+  </div>
+
+  <!-- wires.html専用ウィンドウコンテナ（大画面） -->
+  <div class="file-viewer-container" id="fileViewerContainer5" style="display: none; top: 30px; left: 30px;">
+    <div class="file-viewer-window" id="fileViewerWindow5" style="height: 720px; width: 1280px; border: 2px solid #333;">
+      <div class="box">
+        <div class="titlebar" style="background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);">
+          <div class="tabs">
+            <div class="tab active" style="background-color: #0d1b2e;">
+              <span class="tab-label" id="fileViewerTitle5" style="color: #7fffd4;">⚡ wires.html</span>
+            </div>
+          </div>
+          <div class="window-controls">
+            <button class="ctrl minimize" title="最小化">一</button>
+            <button class="ctrl maximize" title="最大化">☐</button>
+            <button class="ctrl close" data-viewer="5" title="閉じる">✕</button>
+          </div>
+        </div>
+      </div>
+      <iframe id="file-viewer-iframe5" frameborder="0"></iframe>
+    </div>
+  </div>
+
+  <!-- fragments.memo専用ウィンドウコンテナ -->
+  <div class="file-viewer-container" id="fileViewerContainer6" style="display: none; top: 50px; right: 50px;">
+    <div class="file-viewer-window" id="fileViewerWindow6" style="height: 550px; width: 550px; border: 2px solid #00ff00;">
+      <div class="box">
+        <div class="titlebar" style="background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);">
+          <div class="tabs">
+            <div class="tab active" style="background-color: #0d0d0d;">
+              <span class="tab-label" id="fileViewerTitle6" style="color: #00ff00;">📄 fragments.memo</span>
+            </div>
+          </div>
+          <div class="window-controls">
+            <button class="ctrl minimize" title="最小化">一</button>
+            <button class="ctrl maximize" title="最大化">☐</button>
+            <button class="ctrl close" data-viewer="6" title="閉じる">✕</button>
+          </div>
+        </div>
+      </div>
+      <iframe id="file-viewer-iframe6" frameborder="0"></iframe>
     </div>
   </div>
 

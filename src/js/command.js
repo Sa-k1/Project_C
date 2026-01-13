@@ -205,6 +205,18 @@
                 }
             }
 
+            // wires.html専用ビューア表示（EVEウィンドウ内）
+            if (fileName === 'wires.html' && window.puzzleSystem && window.puzzleSystem.displayWires) {
+                await window.puzzleSystem.displayWires(term, gameState, puzzleHelpers);
+                return;
+            }
+
+            // fragments.memo専用ビューア表示（EVEウィンドウ内）
+            if (window.gimmick2System && window.gimmick2System.isFragmentsFile(fileName)) {
+                await window.gimmick2System.displayFragments(term, gameState, puzzleHelpers);
+                return;
+            }
+
             // ギミック3の暗号化ファイル
             if (window.gimmick3System && window.gimmick3System.isEncryptedFile(fileName)) {
                 await window.gimmick3System.openEncryptedFile(term, gameState, puzzleHelpers, fileName);
