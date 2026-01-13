@@ -311,29 +311,44 @@
             term.writeln("\r  open <ファイル名> - ファイルを開く");
             term.writeln("\r  clear         - 画面をクリア");
             term.writeln("\r  trash         - ゴミ箱を開く");
-            term.writeln("\r  remnant <ファイル名> - ファイルの履歴を復元");
+            
+            // 特殊コマンドのヘッダーを表示するかどうかのフラグ
+            var specialHeaderShown = false;
             
             // searchコマンドが解放されている場合のみ表示
             if (gameState.searchUnlocked) {
                 term.writeln("\r");
                 term.writeln("\r  === 特殊コマンド ===");
+                specialHeaderShown = true;
                 term.writeln("\r  search - 隠されたファイルを探す");
+            }
+            
+            // remnantコマンドが解放されている場合のみ表示
+            if (gameState.hasRemnantCommand) {
+                if (!specialHeaderShown) {
+                    term.writeln("\r");
+                    term.writeln("\r  === 特殊コマンド ===");
+                    specialHeaderShown = true;
+                }
+                term.writeln("\r  remnant <ファイル名> - ファイルの履歴を復元");
             }
             
             // readコマンドが解放されている場合のみ表示
             if (gameState.hasReadCommand) {
-                if (!gameState.searchUnlocked) {
+                if (!specialHeaderShown) {
                     term.writeln("\r");
                     term.writeln("\r  === 特殊コマンド ===");
+                    specialHeaderShown = true;
                 }
                 term.writeln("\r  read <ファイル名> - 特殊フォーマットのファイルを解読");
             }
             
             // 管理者コマンドが解放されている場合のみ表示
             if (gameState.hasAdminCommand) {
-                if (!gameState.searchUnlocked && !gameState.hasReadCommand) {
+                if (!specialHeaderShown) {
                     term.writeln("\r");
                     term.writeln("\r  === 特殊コマンド ===");
+                    specialHeaderShown = true;
                 }
                 term.writeln("\r  open admin_command - 管理者コマンド入力画面を開く");
             }
@@ -442,8 +457,15 @@
             return;
         }
 
-        // remnantコマンド - ファイルの履歴を復元
-        if (command.toLowerCase().indexOf('remnant ') === 0) {
+        // remnantコマンド - ファイルの履歴を復元（解放後のみ使用可能）
+        if (command.toLowerCase().indexOf('remnant ') === 0 || command.toLowerCase() === 'remnant') {
+            // 解放されていない場合は反応しない
+            if (!gameState.hasRemnantCommand) {
+                await errorLine("[ERROR]: '" + command.split(/\s+/)[0] + "' は認識されないコマンドです。", 20);
+                await systemLine("[SYSTEM]: 'help' でコマンド一覧を確認できます。", 20);
+                return;
+            }
+            
             var args = command.split(/\s+/);
             var target = args[1] ? args[1].trim() : '';
             
@@ -559,6 +581,7 @@
             gameState.hasReadCommand = true;
             gameState.searchUnlocked = true;
             gameState.hasAdminCommand = true;
+            gameState.hasRemnantCommand = true;
             gameState.inputMode = 'normal';
             // adminKeyState設定
             if (!gameState.adminKeyState) {
@@ -583,6 +606,7 @@
             term.writeln("\r  ✓ ギミック3 クリア済み");
             term.writeln("\r  ✓ searchコマンド 解放済み");
             term.writeln("\r  ✓ readコマンド 解放済み");
+            term.writeln("\r  ✓ remnantコマンド 解放済み");
             term.writeln("\r  ✓ 完全管理者コマンド: \x1b[32mHYPERADMIN\x1b[0m");
             term.writeln("\r");
             await systemLine("[TIP]: 'open admin_command' で管理者コマンド入力画面を開けます。", 20);

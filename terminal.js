@@ -41,7 +41,8 @@
         rmEveUsed: false,
         searchUnlocked: false,          // searchコマンドが解放されたか（magic1クリア報酬）
         discoveredHidden: [],           // searchで発見した隠しファイル/フォルダのパス
-        hasAdminCommand: false          // 管理者権限コマンドを入手したか
+        hasAdminCommand: false,         // 管理者権限コマンドを入手したか
+        hasRemnantCommand: false        // remnantコマンドが解放されたか（magic3クリア報酬）
     };
 
     if (!window.vfs && window.VirtualFileSystem) {
