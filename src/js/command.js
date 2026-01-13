@@ -24,41 +24,41 @@
         // ギミック1未クリア
         if (!gameState.puzzleCleared) {
             return {
-                title: 'ヒント',
-                message: 'まずはファイルを探索してみましょう。「ls」でファイル一覧、「cd フォルダ名」で移動できます。'
+                title: '進行状況の確認',
+                message: 'もし、行き詰っているのであれば\nまずはファイルを探索しましょう。「dir」でファイル一覧\n「cd フォルダ名」で移動できます。'
             };
         }
         // ギミック2未クリア
         if (!gameState.gimmick2Cleared) {
             return {
-                title: 'ヒント',
+                title: '時間が空いているので',
                 message: 'バックアップフォルダに何かあるかもしれません。「trash」コマンドでゴミ箱も確認できます。'
             };
         }
         // ギミック3未クリア
         if (!gameState.gimmick3Cleared) {
             return {
-                title: 'ヒント',
+                title: 'こちらから案内を送ります',
                 message: 'searchコマンドで隠されたファイルを探してみてください。'
             };
         }
         // 管理者コマンド未取得
         if (!gameState.hasAdminCommand) {
             return {
-                title: 'ヒント',
+                title: '大丈夫ですか？',
                 message: '特殊なファイルには「read」や「Verstehen」コマンドが使えるかもしれません。'
             };
         }
         // 完全管理者コマンド未取得
         if (!gameState.adminKeyState || !gameState.adminKeyState.fullCommand) {
             return {
-                title: 'ヒント',
+                title: '心配しないでください。',
                 message: 'フラグメントが揃ったら「merge」コマンドで結合できます。'
             };
         }
         // デフォルト
         return {
-            title: 'ヒント',
+            title: '安心してください！',
             message: '「open admin_command」で管理者コマンド入力画面を開けます。'
         };
     };

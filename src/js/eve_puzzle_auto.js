@@ -17,7 +17,7 @@
         // 長押し目標秒数
         holdTarget: 5.0,
         // 時間制限（秒）
-        timeLimit: 60,
+        timeLimit: 6000,
         // 成功後の遷移先
         successDestination: 'true_end.html',
         // 失敗後の遷移先

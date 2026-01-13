@@ -231,12 +231,12 @@ if (terminalIcon) {
         // 初回のみEVEからメッセージを送る
         if (!terminalFirstOpened && typeof window.sendEveMessage === 'function') {
             terminalFirstOpened = true;
-            // setTimeout(() => {
-            //     window.sendEveMessage('言い忘れていましたがこちら側からあまり詳細な画面が見えないので、注意してください', 'ターミナルを開けましたね');
+            setTimeout(() => {
+                window.sendEveMessage('こちらの場所ではコマンドを使って色々な場所に行くことができます。', 'ターミナルを開けましたね');
             //         setTimeout(() => {
             //         window.sendEveMessage('試しにhelpコマンドを打ってみましょう。<br>helpコマンドが打てたら何か手がかりになるものを探すために色々なコマンドを打ってください。<br>何かわかったら連絡します。', 'helpコマンドについて');
             //         }, 10000)
-            // }, 5000);
+            }, 5000);
         }
     });
 }

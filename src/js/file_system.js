@@ -16,9 +16,20 @@ class VirtualFileSystem {
                             'Student': {
                                 type: 'folder',
                                 children: {
-                                    'Desktop': {
+                                    'Downloads': {
                                         type: 'folder',
                                         children: {
+                                            'admin_2_temp': {
+                                                type: 'folder',
+                                                children:{
+                                                    'temp.txt': {
+                                                        type: 'file',
+                                                        content: `いいですね\nこれであなたは基礎的な動きができます。\nそして困った時にはhelpコマンドを使って色々なコマンドを確認し使ってみるのも良いでしょう`,
+                                                        editable: true
+                                                    }
+                                                }
+                                            },
+
                                             'Project_C': {
                                                 type: 'folder',
                                                 children: {
@@ -28,7 +39,7 @@ class VirtualFileSystem {
                                                             'memo.txt': {   //ここ使うから触んな
                                                                 type: 'file',
                                                                 htmlFile: 'file1.html',
-                                                                content: `cd .. を使用して最初にいた階層に戻りましょう`, 
+                                                                content: `admin_2_tempを探してみてください\nそしてそのフォルダ内のファイルの中を確認してください\nまず、cd .. を使用して最初にいた階層に戻りましょう`, 
                                                                 editable: true
                                                             },
                                                             'log.txt': {
@@ -36,11 +47,11 @@ class VirtualFileSystem {
                                                                 content: `[2025-11-27 10:23:45] システム起動\n[2025-11-27 10:30:15] 不明なプロセス検出...`,
                                                                 editable: true
                                                             },
-                                                            'memoO.txt': {
-                                                                type: 'file',
-                                                                content: `メモ:\n- パスワードを変更する\n- バックアップを取る`,
-                                                                editable: true
-                                                            },
+                                                            // 'memoO.txt': {
+                                                            //     type: 'file',
+                                                            //     content: `メモ:\n- パスワードを変更する\n- バックアップを取る`,
+                                                            //     editable: true
+                                                            // },
                                                             '不要な写真.png': {
                                                                 type: 'file',
                                                                 htmlFile: 'file3.html',
@@ -153,7 +164,7 @@ class VirtualFileSystem {
             }
         };
 
-        this.currentPath = ['C:', 'Users', 'Student', 'Desktop', 'Project_C'];
+        this.currentPath = ['C:', 'Users', 'Student', 'Downloads', 'Project_C'];
         this.customCommands = {};
         this.editMode = false;
         this.editingFile = null;

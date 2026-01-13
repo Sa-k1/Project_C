@@ -59,7 +59,7 @@
         if (window.vfs) {
             return window.vfs.getPathString() + "> ";
         }
-        return "C:\\Users\\Student\\Desktop\\Project_C> ";
+        return "C:\\Users\\Student\\Downloads\\Project_C> ";
     }
 
     // -------------------------
@@ -139,15 +139,15 @@
         // CJK（日本語中国語韓国語）、全角記号、全角英数字など
         if (code >= 0x1100 && 
             (code <= 0x115F ||
-             code === 0x2329 || code === 0x232A ||
-             (code >= 0x2E80 && code <= 0xA4CF && code !== 0x303F) ||
-             (code >= 0xAC00 && code <= 0xD7A3) ||
-             (code >= 0xF900 && code <= 0xFAFF) ||
-             (code >= 0xFE10 && code <= 0xFE1F) ||
-             (code >= 0xFE30 && code <= 0xFE6F) ||
-             (code >= 0xFF00 && code <= 0xFF60) ||
-             (code >= 0xFFE0 && code <= 0xFFE6) ||
-             (code >= 0x20000 && code <= 0x2FFFF))) {
+            code === 0x2329 || code === 0x232A ||
+            (code >= 0x2E80 && code <= 0xA4CF && code !== 0x303F) ||
+            (code >= 0xAC00 && code <= 0xD7A3) ||
+            (code >= 0xF900 && code <= 0xFAFF) ||
+            (code >= 0xFE10 && code <= 0xFE1F) ||
+            (code >= 0xFE30 && code <= 0xFE6F) ||
+            (code >= 0xFF00 && code <= 0xFF60) ||
+            (code >= 0xFFE0 && code <= 0xFFE6) ||
+            (code >= 0x20000 && code <= 0x2FFFF))) {
             return 2;
         }
         // 日本語ひらがなカタカナ (U+3040 ～ U+30FF)

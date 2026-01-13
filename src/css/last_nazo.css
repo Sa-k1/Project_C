@@ -19,6 +19,10 @@ body {
    謎解きUI スタイル
    ========================================= */
 
+.all {
+    display: flex;
+}
+
 #puzzle-overlay {
     position: fixed;
     top: 0;
