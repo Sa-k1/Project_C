@@ -613,6 +613,42 @@
             return;
         }
 
+        // 隠しコマンド: テトリス
+        if (command.toLowerCase() === 'tetris') {
+            try {
+                const targetWindow = window.parent || window;
+                const targetDocument = targetWindow.document;
+                
+                // ファイルビューア3を使ってtetris.htmlを最大画面で開く
+                const container = targetDocument.getElementById('fileViewerContainer3');
+                const iframe = targetDocument.getElementById('file-viewer-iframe3');
+                const title = targetDocument.getElementById('fileViewerTitle3');
+                const viewerWindow = targetDocument.getElementById('fileViewerWindow3');
+                
+                if (container && iframe) {
+                    container.style.display = 'flex';
+                    container.style.top = '0';
+                    container.style.right = '0';
+                    container.style.left = '0';
+                    container.style.bottom = '0';
+                    container.style.width = '100%';
+                    container.style.height = '100%';
+                    container.style.zIndex = '9999';
+                    
+                    if (viewerWindow) {
+                        viewerWindow.style.width = '100%';
+                        viewerWindow.style.height = '100%';
+                    }
+                    
+                    iframe.src = 'tetris.html';
+                    if (title) title.textContent = 'TETRIS';
+                }
+            } catch(e) {
+                console.log('Could not open tetris:', e);
+            }
+            return;
+        }
+
         // lastmagic.jsのEVEシステム侵入コマンド
         if (command.toLowerCase() === 'eve_access') {
             if (window.lastMagicSystem && window.lastMagicSystem.startPasswordInput) {

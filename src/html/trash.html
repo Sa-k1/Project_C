@@ -64,9 +64,38 @@
             </div>
         </div>
         <div class="status-bar">
-            <span>2 個の項目</span>
+            <span id="itemCount">2 個の項目</span>
         </div>
     </div>
     <script src="../js/trash.js"></script>
+    <script>
+        // 親ウィンドウから削除された写真のフラグを確認
+        (function() {
+            try {
+                const parentWindow = window.parent || window;
+                if (parentWindow.photoMovedToTrash) {
+                    const mainContent = document.querySelector('.main-content');
+                    const itemCount = document.getElementById('itemCount');
+                    
+                    // 不要な写真.pngを追加
+                    const photoItem = document.createElement('div');
+                    photoItem.className = 'file-item';
+                    photoItem.innerHTML = `
+                        <img src="../pic/all-file.png" alt="" class="file-icon">
+                        <div class="file-name">不要な写真.png</div>
+                        <div class="file-location">C:\\Users\\Student\\Desktop\\Project_C</div>
+                        <div class="file-date">2009/06/15 15:32</div>
+                        <div class="file-size">87 KB</div>
+                    `;
+                    mainContent.appendChild(photoItem);
+                    
+                    // 項目数を更新
+                    itemCount.textContent = '3 個の項目';
+                }
+            } catch(e) {
+                console.log('Could not check parent window:', e);
+            }
+        })();
+    </script>
 </body>
 </html>

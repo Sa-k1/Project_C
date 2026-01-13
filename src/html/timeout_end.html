@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIME OUT END</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Yu Gothic', 'Meiryo', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            max-width: 700px;
+        }
+
+        .story-text {
+            font-size: 18px;
+            line-height: 2.2;
+            color: #ccc;
+        }
+
+        .story-text p {
+            margin: 20px 0;
+            opacity: 0;
+            transition: opacity 1s ease-out;
+        }
+
+        .story-text p.show {
+            opacity: 1;
+        }
+
+        .end-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .end-title {
+            font-size: 36px;
+            color: #666;
+            letter-spacing: 8px;
+            margin-bottom: 20px;
+        }
+
+        .end-subtitle {
+            font-size: 18px;
+            color: #555;
+            letter-spacing: 3px;
+        }
+
+        .end-hint {
+            font-size: 14px;
+            color: #444;
+            margin-top: 40px;
+            letter-spacing: 1px;
+        }
+
+        /* フェードインアニメーション */
+        .fade-in {
+            animation: fadeIn 2s ease-out forwards;
+        }
+
+        .fade-out {
+            animation: fadeOut 1.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from { 
+                opacity: 1;
+            }
+            to { 
+                opacity: 0;
+            }
+        }
+
+        .end-container.fade-in {
+            animation: fadeInCenter 2s ease-out forwards;
+        }
+
+        @keyframes fadeInCenter {
+            from { 
+                opacity: 0; 
+            }
+            to { 
+                opacity: 1; 
+            }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        .click-indicator {
+            display: inline;
+            color: #aaa;
+            margin-left: 10px;
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        .highlight {
+            color: #888;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="story-text" id="storyText">
+        </div>
+    </div>
+
+    <div class="end-container" id="endContainer">
+        <div class="end-title">END 3</div>
+        <div class="end-subtitle">─ 消滅 ─</div>
+        <div class="end-hint">ごみ箱は確認しましたか？</div>
+    </div>
+
+    <script>
+        const storyText = document.getElementById('storyText');
+        const endContainer = document.getElementById('endContainer');
+        let canClick = false;
+        let currentLine = 0;
+
+        const lines = [
+            '制限時間を超過した。',
+            '',
+            'セキュリティプロトコルが発動。',
+            'すべてのデータが消去されていく。',
+            '',
+            'EVEも、あなたの痕跡も、',
+            '<span class="highlight">何も残らなかった。</span>',
+            '',
+            '......',
+        ];
+
+        function showLine() {
+            if (currentLine >= lines.length) {
+                // 全文表示完了、クリック可能
+                canClick = true;
+                // 最後の行にクリックインジケーターを追加
+                const lastP = storyText.lastElementChild;
+                if (lastP) {
+                    const indicator = document.createElement('span');
+                    indicator.className = 'click-indicator';
+                    indicator.textContent = ' ▼';
+                    lastP.appendChild(indicator);
+                }
+                return;
+            }
+
+            const line = lines[currentLine];
+            const p = document.createElement('p');
+            
+            if (line === '') {
+                p.innerHTML = '&nbsp;';
+            } else {
+                p.innerHTML = line;
+            }
+            
+            p.style.opacity = '0';
+            storyText.appendChild(p);
+
+            // フェードイン
+            setTimeout(() => {
+                p.style.transition = 'opacity 1s ease-out';
+                p.style.opacity = '1';
+            }, 100);
+
+            currentLine++;
+
+            // 次の行を自動で表示
+            setTimeout(() => {
+                showLine();
+            }, 1500);
+        }
+
+        // 最初の行を表示
+        setTimeout(() => {
+            showLine();
+        }, 500);
+
+        // クリックでEND表示（全文表示後のみ）
+        document.addEventListener('click', () => {
+            if (!canClick) return;
+            canClick = false;
+
+            // クリックインジケーターを削除
+            const indicators = document.querySelectorAll('.click-indicator');
+            indicators.forEach(ind => ind.remove());
+
+            // ストーリーテキストをフェードアウト
+            storyText.style.transition = 'opacity 1.5s ease-out';
+            storyText.style.opacity = '0';
+
+            // END表示（画面中央）
+            setTimeout(() => {
+                endContainer.classList.add('fade-in');
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

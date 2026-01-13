@@ -208,7 +208,7 @@
         <div class="image-info">
             <p><span class="label">ファイル名:</span> 不要な写真.png</p>
             <p><span class="label">サイズ:</span> 1920 x 1080 px</p>
-            <p><span class="label">ファイルサイズ:</span> 2.4 MB</p>
+            <p><span class="label">ファイルサイズ:</span> 87 KB</p>
             <p><span class="label">作成日:</span> 2024年6月10日</p>
             <p><span class="label">ステータス:</span> <span style="color: #f48771;">削除予定</span></p>
         </div>
@@ -620,15 +620,39 @@
                     if (iframe) iframe.src = '';
                 }
                 
-                // file3（不要な写真.jpg）を消す
+                // file3（不要な写真.png）をゴミ箱に移動
                 const file3 = targetDocument.getElementById('file3');
                 if (file3) {
                     file3.remove();
+                    
+                    // 親ウィンドウにフラグを設定（ゴミ箱表示用）
+                    targetWindow.photoMovedToTrash = true;
+                    
+                    // ターミナルのTRASH_FILESにも追加
+                    const terminalIframe = targetDocument.getElementById('terminal-viewer-iframe');
+                    if (terminalIframe && terminalIframe.contentWindow && 
+                        terminalIframe.contentWindow.puzzleSystem && 
+                        terminalIframe.contentWindow.puzzleSystem.TRASH_FILES) {
+                        terminalIframe.contentWindow.puzzleSystem.TRASH_FILES['不要な写真.png'] = {
+                            displayName: '不要な写真.png',
+                            content: [
+                                '=== 画像ファイル ===',
+                                '',
+                                'ファイル名: 不要な写真.png',
+                                'サイズ: 87 KB',
+                                '作成日: 2009/06/15',
+                                '',
+                                '[バイナリデータのため表示できません]',
+                                '',
+                                '※ この写真には何かが写り込んでいた...'
+                            ]
+                        };
+                    }
                 }
                 
                 
             } catch(e) {
-                console.log('Could not close parent file viewer');
+                console.log('Could not close parent file viewer:', e);
             }
         }
         

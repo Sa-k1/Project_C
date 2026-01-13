@@ -11,7 +11,7 @@
     // =========================================
     const PUZZLE_CONFIG = {
         // ダイヤルの正解（0-100の3つの数字）
-        dialAnswers: [33, 66, 99],
+        dialAnswers: [24, 43, 87],
         // クリック目標回数
         clickTarget: 20,
         // 長押し目標秒数
@@ -20,8 +20,8 @@
         timeLimit: 6000,
         // 成功後の遷移先
         successDestination: 'true_end.html',
-        // 失敗後の遷移先
-        failDestination: 'dominated_end.html'
+        // 失敗後の遷移先（時間切れ）
+        failDestination: 'timeout_end.html'
     };
 
     // =========================================
