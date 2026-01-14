@@ -86,38 +86,28 @@
     }
 
     async function slowPrintLine(line, charDelay) {
-        if (charDelay === undefined) charDelay = 30;
         if (line == null) line = "";
         else if (typeof line !== "string") line = String(line);
-        
-        for (var i = 0; i < line.length; i++) {
-            term.write(line[i]);
-            await wait(charDelay);
-        }
-        term.write("\r\n");
+        term.write(line + "\r\n");
     }
 
     // -------------------------
     // Terminal print helpers (colorized wrappers)
     // -------------------------
     async function systemLine(line, charDelay) {
-        if (charDelay === undefined) charDelay = 30;
-        await slowPrintLine(COLORS.gray + line + COLORS.reset, charDelay);
+        await slowPrintLine(COLORS.gray + line + COLORS.reset);
     }
 
     async function eveLine(line, charDelay) {
-        if (charDelay === undefined) charDelay = 30;
-        await slowPrintLine(COLORS.cyan + line + COLORS.reset, charDelay);
+        await slowPrintLine(COLORS.cyan + line + COLORS.reset);
     }
 
     async function errorLine(line, charDelay) {
-        if (charDelay === undefined) charDelay = 30;
-        await slowPrintLine(COLORS.red + line + COLORS.reset, charDelay);
+        await slowPrintLine(COLORS.red + line + COLORS.reset);
     }
 
     async function warnLine(line, charDelay) {
-        if (charDelay === undefined) charDelay = 30;
-        await slowPrintLine(COLORS.yellow + line + COLORS.reset, charDelay);
+        await slowPrintLine(COLORS.yellow + line + COLORS.reset);
     }
 
     // lightweight synchronous system print for startup logs
