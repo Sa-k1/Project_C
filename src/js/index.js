@@ -2,12 +2,14 @@ const mini = document.getElementById('miniWindow');
 const windowContainer = document.getElementById('windowContainer');
 let offsetX, offsetY, isDragging = false;
 
-// ファイルビューア用の変数(3つのウィンドウ + ゴミ箱 + ターミナル + チュートリアル)
+// ファイルビューア用の変数(3つのウィンドウ + ゴミ箱 + ターミナル + チュートリアル + fragments.memo)
 const fileViewerContainers = {
     1: document.getElementById('fileViewerContainer1'),
     2: document.getElementById('fileViewerContainer2'),
     3: document.getElementById('fileViewerContainer3'),
     4: document.getElementById('fileViewerContainer4'),
+    5: document.getElementById('fileViewerContainer5'),
+    6: document.getElementById('fileViewerContainer6'),
     'trash': document.getElementById('trashViewerContainer'),
     'terminal': document.getElementById('terminalViewerContainer'),
     'tutorial': document.getElementById('tutorialViewerContainer')

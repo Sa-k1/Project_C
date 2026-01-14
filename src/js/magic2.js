@@ -272,15 +272,9 @@
             const iframe = parentDoc.getElementById('file-viewer-iframe' + fileConfig.viewerId);
             const title = parentDoc.getElementById('fileViewerTitle' + fileConfig.viewerId);
             
-            // すでに表示中ならiframeのsrc再設定はせず、ウィンドウを前面に出すだけ（重複防止）
-            if (container && container.style.display === 'block') {
-                if (window.parent.bringToFront) window.parent.bringToFront(container);
-                return;
-            }
-
             if (title) title.textContent = 'fragments.memo';
             if (iframe) iframe.src = fileConfig.page;
-
+            
             if (container) {
                 container.style.display = 'block';
                 container.style.visibility = 'visible';
