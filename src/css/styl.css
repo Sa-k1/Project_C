@@ -337,9 +337,8 @@ body {
     border-radius: 10px;
 }
 
-/* 中央で回る円 */
 .trash-viewer-container::after {
-    content: "Loading";
+    content: "応答していません";
     position: absolute;
     top: 50%;
     left: 50%;
@@ -350,17 +349,7 @@ body {
     letter-spacing: 0.1em;
     pointer-events: none;
     z-index: 10;
-    animation: loading-dots 1.5s steps(4, end) infinite;
 }
-
-@keyframes loading-dots {
-    0%   { content: "Loading"; }
-    25%  { content: "Loading."; }
-    50%  { content: "Loading.."; }
-    75%  { content: "Loading..."; }
-    100% { content: "Loading"; }
-}
-
 
 /* ゴミ箱画像のスタイル */
 #trash-image {
