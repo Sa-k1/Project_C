@@ -142,14 +142,14 @@
                 // クリア処理
                 this.isCleared = true;
                 gameState.gimmick2Cleared = true;
-                // readコマンドと隠しコマンドを解放
+                // readコマンドとstealthコマンド両方を解放
                 gameState.hasReadCommand = true;
-                gameState.hasRevealCommand = true;
+                gameState.hasStealthCommand = true;
                 gameState.inputMode = 'normal';
                 gameState.passwordTarget_gimmick2 = null;
                 await systemLine("", 0);
                 await systemLine("[SYSTEM]: 新しいコマンドを取得しました『read』", 25);
-                await systemLine("[SYSTEM]: 隠しコマンドを取得しました『reveal』", 25);
+                await systemLine("[SYSTEM]: 隠しコマンドを取得しました『stealth』", 25);
                 return true;
             }
             // 通常正解
@@ -182,7 +182,7 @@
                 // クリア処理
                 this.isCleared = true;
                 gameState.gimmick2Cleared = true;
-                // === ここでreadコマンドを解放 ===
+                // readコマンドのみ解放
                 gameState.hasReadCommand = true;
                 gameState.inputMode = 'normal';
                 gameState.passwordTarget_gimmick2 = null;

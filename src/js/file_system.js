@@ -161,7 +161,7 @@ class VirtualFileSystem {
             }
         };
 
-        this.currentPath = ['C:', 'Users', 'Student', 'Downloads', 'Project_C'];
+        this.currentPath = ['C:', 'Users', 'Student', 'Downloads'];
         this.customCommands = {};
         this.editMode = false;
         this.editingFile = null;
