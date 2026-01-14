@@ -394,6 +394,8 @@
             var args = command.split(/\s+/);
             var target = args[1] ? args[1].trim().toLowerCase() : '';
             // admin_key.dat専用処理を優先
+            window.parent.sendEveMessage("me", "t");
+
             if (target === 'admin_key.dat' || target === 'admin_key') {
                 await systemLine("[SYSTEM]: admin_key.dat の表層データを読み取っています...", 25);
                 await window.commandHandler.wait(800);
