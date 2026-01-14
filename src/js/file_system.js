@@ -49,7 +49,7 @@ class VirtualFileSystem {
                                                 }
                                             },
 
-                                            'Project_C': {
+                                            'Desktop': {
                                                 type: 'folder',
                                                 children: {
                                                     'data': {
@@ -81,6 +81,21 @@ class VirtualFileSystem {
                                                             }
                                                         }
                                                     },
+                                                                                                        // Desktop直下にfragments.memo/restored_data.encを移動
+                                                                                                        'fragments.memo': {
+                                                                                                            type: 'file',
+                                                                                                            hidden: true,
+                                                                                                            htmlFile: 'fragments_popup.html',
+                                                                                                            content: `[破損データ]\n\nこのファイルは破損しています。\nopenコマンドで開いて内容を確認してください。`,
+                                                                                                            editable: false
+                                                                                                        },
+                                                                                                        'restored_data.enc': {
+                                                                                                            type: 'file',
+                                                                                                            hidden: true,
+                                                                                                            encrypted: true,
+                                                                                                            content: `[暗号化されたファイル]\n\nこのファイルはパスワードで保護されています。\nopenコマンドで開いてパスワードを入力してください。`,
+                                                                                                            editable: false
+                                                                                                        },
                                                     'system': {
                                                         type: 'folder',
                                                         children: {
@@ -89,41 +104,11 @@ class VirtualFileSystem {
                                                                 content: `[SYSTEM]\nVERSION=1.0.0`,
                                                                 editable: true
                                                             },
-                                                            'eve.dat': {
-                                                                type: 'file',
-                                                                hidden: true,
-                                                                content: `E.V.E\n\n私はここにいる\n私はあなたを見ている\n\n逃げられない`,
-                                                                editable: false
-                                                            },
                                                             'admin_key.dat': {
                                                                 type: 'file',
                                                                 hidden: true,
                                                                 htmlFile: 'admin_key.html',
                                                                 content: `[admin_key.dat]\n\nこのファイルには複数のデータ層があります。\n表層と深層の両方を読み取る必要があります。\n\n警告: 適切な順序で適切なコマンドを使用してください。\n「表層を理解してから深層へ」`,
-                                                                editable: false
-                                                            },
-                                                    'backup': {
-                                                        type: 'folder',
-                                                        hidden: true,
-                                                        children: {
-                                                            '.order_hint.memo': {
-                                                                type: 'file',
-                                                                hidden: true,
-                                                                content: `=== 復元メモ ===\n\n断片の正しい順序:\n4番目 → 3番目 → 2番目 → 1番目\n\nこの順で文字を並べると...\n(H → O → P → E)`,
-                                                                editable: false
-                                                            },
-                                                            'fragments.memo': {
-                                                                type: 'file',
-                                                                hidden: true,
-                                                                htmlFile: 'fragments_popup.html',
-                                                                content: `[破損データ]\n\nこのファイルは破損しています。\nopenコマンドで開いて内容を確認してください。`,
-                                                                editable: false
-                                                            },
-                                                            'restored_data.enc': {
-                                                                type: 'file',
-                                                                hidden: true,
-                                                                encrypted: true,
-                                                                content: `[暗号化されたファイル]\n\nこのファイルはパスワードで保護されています。\nopenコマンドで開いてパスワードを入力してください。`,
                                                                 editable: false
                                                             },
                                                             'key_trace.png': {
@@ -141,9 +126,7 @@ class VirtualFileSystem {
                                                                 editable: false
                                                             }
                                                         }
-                                                    }
-                                                }
-                                            },
+                                                    },
                                                     'bookmarks.txt': {
                                                         type: 'file',
                                                         content: `=== ブックマーク ===\nhttps://www.google.com\nhttps://github.com\nhttps://developer.mozilla.org`,
@@ -161,7 +144,7 @@ class VirtualFileSystem {
             }
         };
 
-        this.currentPath = ['C:', 'Users', 'Student', 'Downloads'];
+        this.currentPath = ['C:', 'Users', 'Student', 'Downloads', 'Desktop'];
         this.customCommands = {};
         this.editMode = false;
         this.editingFile = null;
@@ -225,6 +208,7 @@ class VirtualFileSystem {
             case 'cd': return this.cmdCd(args, this.gameState);
             case 'dir':
             case 'ls': return this.cmdDir(args);
+            case 'search': return this.cmdSearch(args);
             case 'type':
             case 'cat': return await this.cmdType(args);
             case 'read': return await this.cmdRead(args);
@@ -403,6 +387,11 @@ class VirtualFileSystem {
         output += `               ${dirCount} 個のディレクトリ`;
 
         return output;
+    }
+
+    // searchコマンド: 隠しファイルも含めて全て表示
+    cmdSearch(args) {
+        return this.cmdDir(['-a']);
     }
 
     async cmdType(args) {

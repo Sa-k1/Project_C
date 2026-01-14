@@ -684,18 +684,19 @@
 
     // -------------------------
     // searchコマンド処理
-    // 現在のフォルダの隠しファイル/フォルダを発見する
-    // search = 隠しファイル発見コマンド
+    // 現在のフォルダの全ファイル/フォルダを表示（隠しファイルも含む）
+    // search = ファイル一覧表示コマンド（lsと同等＋隠しファイル）
     // -------------------------
     window.commandHandler.handleSearchCommand = async function(term, gameState, puzzleHelpers, vfs) {
-        const { systemLine, warnLine, wait, slowPrintLine } = puzzleHelpers;
+        const { systemLine, warnLine, wait } = puzzleHelpers;
 
-        await systemLine("[SYSTEM]: 周囲を調査中...", 30);
-        await wait(800);
+        term.writeln("\r  [SYSTEM]: 周囲を調査中...");
+        await wait(500);
         
-        // 現在のフォルダから隠しファイルを取得
+        // 現在のフォルダからファイル一覧を取得
         const currentDir = vfs ? vfs.getCurrentDir() : null;
         const currentPath = vfs ? vfs.getPathString() : '';
+        let normalFiles = [];
         let hiddenFiles = [];
         
         // discoveredHiddenの初期化
@@ -706,11 +707,13 @@
         if (currentDir && currentDir.children) {
             for (const name in currentDir.children) {
                 const node = currentDir.children[name];
+                const fileInfo = {
+                    name: name,
+                    type: node.type === 'folder' ? 'folder' : 'file'
+                };
+                
                 if (node.hidden) {
-                    hiddenFiles.push({
-                        name: name,
-                        type: node.type === 'folder' ? 'folder' : 'file'
-                    });
+                    hiddenFiles.push(fileInfo);
                     
                     // 発見したパスを記録（フォルダの場合）
                     if (node.type === 'folder') {
@@ -720,36 +723,46 @@
                             gameState.discoveredHidden.push(normalizedPath);
                         }
                     }
+                } else {
+                    normalFiles.push(fileInfo);
                 }
             }
         }
         
-        await systemLine("", 0);
-        await systemLine("╔════════════════════════════════════╗", 5);
-        await systemLine("║          調査結果                  ║", 5);
-        await systemLine("╚════════════════════════════════════╝", 5);
-        await systemLine("", 0);
+        term.writeln("\r");
+        term.writeln("\r  ╔════════════════════════════════════╗");
+        term.writeln("\r  ║          調査結果                  ║");
+        term.writeln("\r  ╚════════════════════════════════════╝");
+        term.writeln("\r");
         
-        if (hiddenFiles.length > 0) {
-            // 隠しファイルが見つかった
-            await warnLine("  ！ 隠されたものを発見しました ！", 25);
-            await systemLine("", 0);
-            
-            for (var i = 0; i < hiddenFiles.length; i++) {
-                var file = hiddenFiles[i];
+        // 通常ファイル一覧を表示
+        if (normalFiles.length > 0) {
+            term.writeln("\r  [通常ファイル]");
+            for (var i = 0; i < normalFiles.length; i++) {
+                var file = normalFiles[i];
                 var icon = file.type === 'folder' ? '📁' : '📄';
-                await slowPrintLine("    " + icon + " " + file.name, 20);
+                term.writeln("\r    " + icon + " " + file.name);
             }
-            
-            await systemLine("", 0);
-            await systemLine("[TIP]: open <ファイル名> で中身を確認できます", 20);
-            
-        } else {
-            // 隠しファイルがない
-            await slowPrintLine("  この場所には隠されたものはないようです...", 25);
-            await systemLine("", 0);
-            await systemLine("[TIP]: 他のフォルダを探索してみてください", 20);
+            term.writeln("\r");
         }
+        
+        // 隠しファイル一覧を表示
+        if (hiddenFiles.length > 0) {
+            term.writeln("\r  \x1b[33m[隠しファイル発見！]\x1b[0m");
+            for (var j = 0; j < hiddenFiles.length; j++) {
+                var hfile = hiddenFiles[j];
+                var hicon = hfile.type === 'folder' ? '📁' : '📄';
+                term.writeln("\r    " + hicon + " " + hfile.name + " \x1b[33m[隠し]\x1b[0m");
+            }
+            term.writeln("\r");
+        }
+        
+        if (normalFiles.length === 0 && hiddenFiles.length === 0) {
+            term.writeln("\r  この場所にはファイルがありません...");
+        }
+        
+        term.writeln("\r");
+        term.writeln("\r  [TIP]: open <ファイル名> で中身を確認できます");
         
         // 警戒度を少し上げる
         gameState.alertLevel = Math.min(100, (gameState.alertLevel || 0) + 1);
