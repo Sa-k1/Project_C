@@ -126,11 +126,6 @@ class VirtualFileSystem {
                                                                 editable: false
                                                             }
                                                         }
-                                                    },
-                                                    'bookmarks.txt': {
-                                                        type: 'file',
-                                                        content: `=== ブックマーク ===\nhttps://www.google.com\nhttps://github.com\nhttps://developer.mozilla.org`,
-                                                        editable: true
                                                     }
                                                 }
                                             }

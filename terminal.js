@@ -272,8 +272,17 @@
             var regex = wildcardToRegex(pattern);
             var candidates = [];
             
-            // コマンド候補を取得
-            if (window.commandHandler && window.commandHandler.getAvailableCommands) {
+            // 現在のバッファから入力行全体を取得
+            var inputLine = buffer || "";
+            
+            // 全ての補完候補を取得（コマンド + ファイル/フォルダ）
+            if (window.commandHandler && window.commandHandler.getAllCompletionCandidates) {
+                var allCandidates = window.commandHandler.getAllCompletionCandidates(gameState, vfs, inputLine);
+                candidates = allCandidates.filter(function(candidate) {
+                    return regex.test(candidate);
+                });
+            } else if (window.commandHandler && window.commandHandler.getAvailableCommands) {
+                // フォールバック: 旧メソッドを使用（後方互換性）
                 var commands = window.commandHandler.getAvailableCommands(gameState);
                 candidates = commands.filter(function(cmd) {
                     return regex.test(cmd);

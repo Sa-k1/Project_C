@@ -13,7 +13,7 @@
 <body>
   <div class="fade"></div>
   
-  <!-- ターミナルと小窓をまとめるコンテナ -->
+  <!-- AI chat -->
   <div class="window-container" id="windowContainer" style="display: none;">
     <!-- メインのターミナルウィンドウ - 右側 -->
     <div class="mini-window" id="miniWindow" style="width: 815px; height: 500px;">
@@ -66,7 +66,7 @@
     <h1 class="word">不要な写真.png</h1>
   </div>
 
-  <!-- AIチャットターミナルアイコン -->
+  <!-- ターミナルアイコン -->
   <div class="draggable-item terminal_icon" draggable="true" id="terminalIcon">
     <img src="../pic/gcfhjkl-removebg-preview.png" alt="" class="all_img">  
     <h1 class="word">terminal</h1>
@@ -231,13 +231,13 @@
     </div>
   </div>
 
-  <!-- AIチャットターミナル用ウィンドウコンテナ -->
+  <!-- terminal window -->
   <div class="terminal-viewer-container" id="terminalViewerContainer" style="display: none; top: 100px; left: 100px;">
     <div class="file-viewer-window" id="terminalViewerWindow" style="height: 450px; width: 800px; border: 2px solid #333;">
       <div class="box">
         <div class="titlebar" style="background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%); position: absolute; left: -1px;">
           <div class="tabs">
-            <div class="tab active" style="background-color: #00000000;">
+            <div class="tab active" style="background-color: #00000000; border: none;">
               <span class="tab-label" id="terminalViewerTitle" style="color: rgb(255, 255, 255); ">Console / Terminal</span>
             </div>
           </div>

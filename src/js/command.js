@@ -901,4 +901,79 @@
         return commands;
     };
 
+    // -------------------------
+    // TAB補完用: 現在のディレクトリのファイル/フォルダ一覧を取得
+    // -------------------------
+    window.commandHandler.getCurrentDirItems = function(vfs, showHidden) {
+        if (!vfs || !vfs.getCurrentDir) {
+            return [];
+        }
+        
+        try {
+            var currentDir = vfs.getCurrentDir();
+            if (!currentDir || !currentDir.children) {
+                return [];
+            }
+            
+            var items = [];
+            var children = currentDir.children;
+            
+            for (var key in children) {
+                var item = children[key];
+                // 隠しファイルの処理
+                if (item.hidden && !showHidden) {
+                    // searchコマンドで発見されたファイルは表示
+                    if (vfs.gameState && vfs.gameState.discoveredHiddenFiles) {
+                        if (vfs.gameState.discoveredHiddenFiles.indexOf(key) === -1) {
+                            continue;
+                        }
+                    } else {
+                        continue;
+                    }
+                }
+                
+                items.push(key);
+
+            }
+            
+            return items.sort();
+        } catch (e) {
+            console.error("ディレクトリ一覧取得エラー:", e);
+            return [];
+        }
+    };
+
+    // -------------------------
+    // TAB補完用: 全ての補完候補を取得（コマンド + ファイル/フォルダ）
+    // -------------------------
+    window.commandHandler.getAllCompletionCandidates = function(gameState, vfs, inputLine) {
+        var candidates = [];
+        
+        // 入力行を解析
+        var parts = (inputLine || '').trim().split(/\s+/);
+        var firstWord = parts[0] || '';
+        var isFirstWord = parts.length <= 1;
+        
+        // 最初の単語（コマンド部分）の場合
+        if (isFirstWord || inputLine.trim() === firstWord) {
+            // コマンド候補を追加
+            candidates = candidates.concat(this.getAvailableCommands(gameState));
+        }
+        
+        // 2番目以降の単語（引数部分）の場合、またはスペースで終わっている場合
+        if (!isFirstWord || (inputLine.length > 0 && inputLine[inputLine.length - 1] === ' ')) {
+            var command = firstWord.toLowerCase();
+            
+            // ファイル/フォルダを引数に取るコマンドの場合
+            var fileCommands = ['cd', 'cat', 'type', 'open', 'read'];
+            if (fileCommands.indexOf(command) !== -1) {
+                // ファイル/フォルダ候補を追加
+                var items = this.getCurrentDirItems(vfs, false);
+                candidates = candidates.concat(items);
+            }
+        }
+        
+        return candidates;
+    };
+
 })();
