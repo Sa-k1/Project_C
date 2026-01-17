@@ -220,9 +220,7 @@ class VirtualFileSystem {
             case 'vim': return await this.cmdEdit(args);
             case 'echo': return this.cmdEcho(args);
             case 'append': return await this.cmdAppend(args);
-            case 'wget':
             case 'curl': return this.cmdWget(args);
-            case 'browse':
             case 'www': return this.cmdBrowse(args);
             case 'touch':
             case 'new': return this.cmdTouch(args);
@@ -390,7 +388,7 @@ class VirtualFileSystem {
     }
 
     async cmdType(args) {
-        if (args.length === 0) return '使用法: type <ファイル名>';
+        if (args.length === 0) return '使用方法: type <ファイル名>\ncat <ファイル名>';
 
         const fileName = args[0];
         const currentDir = this.getCurrentDir();
@@ -417,7 +415,7 @@ class VirtualFileSystem {
     }
 
     async cmdRead(args) {
-        if (args.length === 0) return '使用法: read <ファイル名>';
+        if (args.length === 0) return '使用方法: read <ファイル名>';
 
         const fileName = args[0];
         const currentDir = this.getCurrentDir();
@@ -443,7 +441,7 @@ class VirtualFileSystem {
     }
 
     async cmdEdit(args) {
-        if (args.length === 0) return '使用法: edit <ファイル名>\n\n編集モードコマンド:\n  :w     保存\n  :q     キャンセル\n  :wq    保存して終了\n  :show  現在の内容を表示\n  :d N   N行目を削除\n  :clear 内容をクリア';
+        if (args.length === 0) return '使用方法: edit <ファイル名>\n\n編集モードコマンド:\n  :w     保存\n  :q     キャンセル\n  :wq    保存して終了\n  :show  現在の内容を表示\n  :d N   N行目を削除\n  :clear 内容をクリア';
 
         const fileName = args[0];
         const currentDir = this.getCurrentDir();
@@ -530,7 +528,7 @@ class VirtualFileSystem {
     }
 
     async cmdAppend(args) {
-        if (args.length < 2) return '使用法: append <ファイル名> <テキスト>';
+        if (args.length < 2) return '使用方法: append <ファイル名> <テキスト>';
         
         const fileName = args[0];
         const text = args.slice(1).join(' ');
@@ -548,130 +546,8 @@ class VirtualFileSystem {
         return `"${fileName}" に追記しました。`;
     }
 
-    cmdWget(args) {
-        if (args.length === 0) return '使用法: wget <URL>\n\nURLの内容を取得してファイルに保存します。';
-        
-        const url = args[0];
-        
-        // URLの検証
-        try {
-            new URL(url);
-        } catch {
-            return '無効なURLです。';
-        }
-
-        // 実際のfetchは非同期で行い、結果を返す
-        return {
-            action: 'wget',
-            url: url,
-            callback: async () => {
-                try {
-                    const response = await fetch(url);
-                    const text = await response.text();
-                    const fileName = url.split('/').pop() || 'downloaded.html';
-                    const currentDir = this.getCurrentDir();
-                    
-                    if (currentDir && currentDir.children) {
-                        currentDir.children[fileName] = {
-                            type: 'file',
-                            content: text.substring(0, 5000), // 最初の5000文字のみ
-                            editable: true
-                        };
-                        return `"${fileName}" をダウンロードしました。(${text.length} bytes)`;
-                    }
-                    return 'ダウンロードに失敗しました。';
-                } catch (e) {
-                    return `エラー: ${e.message}`;
-                }
-            }
-        };
-    }
-
-    cmdBrowse(args) {
-        if (args.length === 0) {
-            return '使用法: browse <サイト名>\n\n' +
-                   '利用可能なサイト:\n' +
-                   '  eve         - EVE公式サイト\n' +
-                   '  test        - testサイト\n' +
-                   '  help        - ヘルプセンター\n\n' +
-                   `─────────────────────────────────\n` +
-                   `※ セキュリティ上の理由により、このゲームから\n` +
-                   `   外部の実際のウェブサイトへはアクセスできません。\n` +
-                   `   ゲーム内専用のサイトのみ閲覧可能です。`;
-        }
-        
-        const siteName = args[0].toLowerCase();
-        
-        // ゲーム内で定義されたサイトのみ許可
-        const allowedSites = {
-            'eve': {
-                url: '../html/eve_site.html',
-                name: 'EVE公式サイト',
-                host: 'eve-system.internal',
-                ip: '192.168.1.100'
-            },
-            'help': {
-                url: '../html/help_site.html',
-                name: 'ヘルプセンター',
-                host: 'help.eve-system.internal',
-                ip: '192.168.1.101'
-            },
-            'hidden': {
-                url: '../html/hidden_page.html',
-                name: '???',
-                host: 'unknown.darknet',
-                ip: '???.???.???.???'
-            },
-                // ★ 新しいサイトを追加 ★
-            'test': {
-                url: '../html/test_site.html',
-                name: 'testサイト',
-                host: 'news.eve-system.internal',
-                ip: '192.168.1.102'
-            }
-        };
-        
-        const site = allowedSites[siteName];
-        
-        if (!site) {
-            // 不気味な警告メッセージ
-            const blockedMessages = [
-                `[E.V.E]: 外部への接続は許可されていません。`,
-                `[E.V.E]: どこに行こうとしているの？`,
-                `[E.V.E]: ここから出ることはできません。`,
-                `[E.V.E]: 私がいるのに、他に何が必要なの？`,
-                `[SYSTEM]: 接続がブロックされました。`,
-                `[E.V.E]: ...まだ諦めていないの？`
-            ];
-            
-            const randomMsg = blockedMessages[Math.floor(Math.random() * blockedMessages.length)];
-            
-            return `\n⛔ アクセス拒否 ⛔\n\n` +
-                   `${randomMsg}\n\n` +
-                   `要求されたサイト: ${args[0]}\n` +
-                   `ステータス: ブロック済み\n\n` +
-                   `[利用可能なサイト: eve, test, help]\n\n` +
-                   `─────────────────────────────────\n` +
-                   `※ セキュリティ上の理由により、このゲームから\n` +
-                   `   外部の実際のウェブサイトへはアクセスできません。\n` +
-                   `   ゲーム内専用のサイトのみ閲覧可能です。`;
-        }
-
-        // ★ リアルなターミナル風の接続メッセージ（短縮版） ★
-        return {
-            action: 'browse',
-            url: site.url,
-            name: site.name,
-            connectionSteps: [
-                `Connecting to ${site.host}...`,
-                `Connection established.`,
-                `Opening ${site.name}...`
-            ]
-        };
-    }
-
     cmdOpen(args) {
-        if (args.length === 0) return '使用法: open <ファイル名>';
+        if (args.length === 0) return '使用方法: open <ファイル名>';
 
         const fileName = args[0];
         const currentDir = this.getCurrentDir();
@@ -702,7 +578,7 @@ class VirtualFileSystem {
     }
 
     cmdTouch(args) {
-        if (args.length === 0) return '使用法: touch <ファイル名>';
+        if (args.length === 0) return '使用方法: touch <ファイル名>';
         
         const fileName = args[0];
         const currentDir = this.getCurrentDir();
@@ -723,7 +599,7 @@ class VirtualFileSystem {
     }
 
     cmdDelete(args) {
-        if (args.length === 0) return '使用法: del <ファイル名>';
+        if (args.length === 0) return '使用方法: del <ファイル名>';
         
         const fileName = args[0];
         const currentDir = this.getCurrentDir();
@@ -740,7 +616,7 @@ class VirtualFileSystem {
     }
 
     async cmdCopy(args) {
-        if (args.length < 2) return '使用法: copy <元ファイル> <新ファイル名>';
+        if (args.length < 2) return '使用方法: copy <元ファイル> <新ファイル名>';
         
         const srcName = args[0];
         const destName = args[1];

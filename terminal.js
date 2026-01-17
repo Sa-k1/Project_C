@@ -272,25 +272,105 @@
             var regex = wildcardToRegex(pattern);
             var candidates = [];
             
-            // 現在のバッファから入力行全体を取得
-            var inputLine = buffer || "";
+            // 入力バッファを分解してコマンドと引数の位置を判定
+            var bufChars = Array.from(buffer);
+            var beforeCursor = bufChars.slice(0, cursorPos).join('');
+            var parts = beforeCursor.trim().split(/\s+/);
+            var isFirstWord = parts.length <= 1;
             
-            // 全ての補完候補を取得（コマンド + ファイル/フォルダ）
-            if (window.commandHandler && window.commandHandler.getAllCompletionCandidates) {
-                var allCandidates = window.commandHandler.getAllCompletionCandidates(gameState, vfs, inputLine);
-                candidates = allCandidates.filter(function(candidate) {
-                    return regex.test(candidate);
-                });
-            } else if (window.commandHandler && window.commandHandler.getAvailableCommands) {
-                // フォールバック: 旧メソッドを使用（後方互換性）
+            // コマンド候補を取得（常に追加）
+            if (window.commandHandler && window.commandHandler.getAvailableCommands) {
                 var commands = window.commandHandler.getAvailableCommands(gameState);
-                candidates = commands.filter(function(cmd) {
+                candidates = candidates.concat(commands.filter(function(cmd) {
                     return regex.test(cmd);
-                });
+                }));
+            }
+            
+            // 第二単語以降（引数）の場合：ファイルとフォルダも候補に追加
+            if (!isFirstWord && window.vfs) {
+                var currentDir = window.vfs.getCurrentDir();
+                var firstCommand = parts[0] ? parts[0].toLowerCase() : '';
+                
+                // 現在のディレクトリ内のファイルとフォルダを取得
+                if (currentDir && currentDir.children) {
+                    var entries = Object.keys(currentDir.children);
+                    
+                    entries.forEach(function(name) {
+                        var entry = currentDir.children[name];
+                        
+                        // 隠しファイル/フォルダは、searchUnlockedでない限りスキップ
+                        if (entry.hidden && (!gameState || !gameState.searchUnlocked)) {
+                            return;
+                        }
+                        
+                        // パターンにマッチするものを追加
+                        if (regex.test(name)) {
+                            // フォルダの場合は末尾に / を追加して識別しやすくする
+                            if (entry.type === 'folder') {
+                                candidates.push(name + '/');
+                            } else {
+                                candidates.push(name);
+                            }
+                        }
+                    });
+                }
+                
+                // 親ディレクトリへの移動（..）も候補に追加
+                if (regex.test('..')) {
+                    candidates.push('..');
+                }
+                
+                // ゴミ箱コマンドの場合：ゴミ箱内のファイルを候補に追加（時間軸：最初から利用可能）
+                if ((firstCommand === 'trash') && window.puzzleSystem && window.puzzleSystem.TRASH_FILES) {
+                    var trashFiles = Object.keys(window.puzzleSystem.TRASH_FILES);
+                    trashFiles.forEach(function(fileName) {
+                        if (regex.test(fileName)) {
+                            candidates.push(fileName);
+                        }
+                    });
+                }
+                
+                // 暗号化ファイル（magic1）の候補追加（時間軸：最初から利用可能）
+                if ((firstCommand === 'open' || firstCommand === 'cat' || firstCommand === 'type') && 
+                    window.puzzleSystem && window.puzzleSystem.PUZZLE_CONFIG) {
+                    var encryptedFiles = Object.keys(window.puzzleSystem.PUZZLE_CONFIG);
+                    encryptedFiles.forEach(function(fileName) {
+                        if (regex.test(fileName)) {
+                            candidates.push(fileName);
+                        }
+                    });
+                }
             }
             
             // 重複を除去してソート
-            candidates = Array.from(new Set(candidates)).sort();
+            // ただし、コマンドを優先し、その後にファイル/フォルダをソート
+            candidates = Array.from(new Set(candidates));
+            
+            // 時間軸を考慮したソート：
+            // 1. コマンド（'/'がつかないもの）を先に
+            // 2. フォルダ（'/'がつくもの）
+            // 3. ファイル
+            candidates.sort(function(a, b) {
+                var aIsFolder = a.endsWith('/');
+                var bIsFolder = b.endsWith('/');
+                var aIsCommand = !aIsFolder && (a === '..' || a.startsWith('-') || 
+                    (window.commandHandler && window.commandHandler.getAvailableCommands && 
+                     window.commandHandler.getAvailableCommands(gameState).indexOf(a) !== -1));
+                var bIsCommand = !bIsFolder && (b === '..' || b.startsWith('-') || 
+                    (window.commandHandler && window.commandHandler.getAvailableCommands && 
+                     window.commandHandler.getAvailableCommands(gameState).indexOf(b) !== -1));
+                
+                // コマンドを最優先
+                if (aIsCommand && !bIsCommand) return -1;
+                if (!aIsCommand && bIsCommand) return 1;
+                
+                // 次にフォルダ
+                if (aIsFolder && !bIsFolder) return -1;
+                if (!aIsFolder && bIsFolder) return 1;
+                
+                // 同じタイプの場合はアルファベット順
+                return a.toLowerCase().localeCompare(b.toLowerCase());
+            });
             
             return candidates;
         } catch (e) {
