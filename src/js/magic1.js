@@ -2,6 +2,11 @@
 // search = frnepu (ROT13でsearch)
 
 (function() {
+    
+    // メッセージ送信フラグ
+    let cMe_1 = true;
+    let cMe_2 = true;
+
     // グローバルなpuzzleSystemオブジェクトを作成
     window.puzzleSystem = {};
 
@@ -79,7 +84,12 @@
         var args = command.split(/\s+/);
         var TRASH_FILES = window.puzzleSystem.TRASH_FILES;
         var trashState = window.puzzleSystem.trashState;
-        
+
+        if(cMe_1 === true && cMe_1 !== false){
+            window.parent.sendEveMessage('EVEに隠されたコマンドを探しましょう。', '目標');
+            cMe_1 = false;
+        }
+            
         // trash のみ、または trash list / trash ls → ゴミ箱一覧表示
         if (args.length === 1 || args[1] === 'list' || args[1] === 'ls') {
             await helpers.systemLine('[SYSTEM]: ゴミ箱を開いています...', 30);
@@ -361,6 +371,11 @@
             }
         } catch (e) {
             console.log('アイコン更新エラー:', e);
+        }
+        
+        if (cMe_2 === true && cMe_2 !== false){
+            window.parent.sendEveMessage('何か画面に変化があったようです', '確認');
+            cMe_2 = false;
         }
     };
 

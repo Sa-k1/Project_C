@@ -211,8 +211,6 @@ class VirtualFileSystem {
             case 'clear': return { action: 'clear' };
             case 'pwd': return this.getPathString();
             case 'whoami': return 'Student';
-            case 'date': return `現在の日付: ${new Date().toLocaleDateString('ja-JP')}`;
-            case 'time': return `現在の時刻: ${new Date().toLocaleTimeString('ja-JP')}`;
             case 'open':
             case 'run': return this.cmdOpen(args);
             case 'edit':
@@ -388,7 +386,8 @@ class VirtualFileSystem {
     }
 
     async cmdType(args) {
-        if (args.length === 0) return '使用方法: type <ファイル名>\ncat <ファイル名>';
+        if (args.length === 0) return '使用方法: type <ファイル名>\n　　　　  cat <ファイル名>';
+
 
         const fileName = args[0];
         const currentDir = this.getCurrentDir();
