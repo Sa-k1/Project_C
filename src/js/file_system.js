@@ -386,7 +386,7 @@ class VirtualFileSystem {
     }
 
     async cmdType(args) {
-        if (args.length === 0) return '使用方法: type <ファイル名>\n　　　　  cat <ファイル名>';
+        if (args.length === 0) return '使用方法: type <ファイル名>\n　　　　  cat  <ファイル名>';
 
 
         const fileName = args[0];
