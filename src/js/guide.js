@@ -143,7 +143,7 @@ setTimeout(() => {
         
         // 3秒後にチュートリアル開始のメッセージとアイコンを表示
         setTimeout(() => {
-            window.sendEveMessage('まずこの世界の操作に慣れましょう<br>デスクトップのREADME.txtを開こう', '操作説明');
+            window.sendEveMessage('まずこの世界の操作に慣れましょう<br>デスクトップのREADME.mdを開こう', '操作説明');
 
             setTimeout(() => {
                 // チュートリアルアイコンを表示
