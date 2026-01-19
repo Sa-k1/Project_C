@@ -672,7 +672,10 @@
                 cursorPos = 0;
                 
                 // 履歴に追加（空でなく、直前と重複しない場合）
-                if (userMessage && (commandHistory.length === 0 || 
+                // ただし、パスワード入力モードや確認モードの場合は履歴に追加しない
+                var isPasswordMode = gameState.inputMode && gameState.inputMode.includes('password');
+                var isConfirmationMode = gameState.inputMode && gameState.inputMode.includes('confirmation');
+                if (userMessage && !isPasswordMode && !isConfirmationMode && (commandHistory.length === 0 || 
                     commandHistory[commandHistory.length - 1] !== userMessage)) {
                     commandHistory.push(userMessage);
                 }

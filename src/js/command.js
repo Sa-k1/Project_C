@@ -501,6 +501,10 @@
                     }
                     await systemLine("[SYSTEM]: 破損データを復元しました。", 25);
                 }
+                
+                // 日記が解読されたフラグを設定（verstehenコマンドが使用可能になる）
+                gameState.diaryUnlocked = true;
+                
                 return;
             } else if (target === '') {
                 await errorLine("[ERROR]: ファイル名を指定してください。", 20);
@@ -873,7 +877,6 @@
             'open',
             'clear',
             'trash',
-            // 'remnant',
             // cd用のショートカット
             '..',
             // ファイルシステムコマンド引数
@@ -896,6 +899,16 @@
             if (Object.keys(gameState.commandFragments).length > 0) {
                 commands.push('merge');
             }
+        }
+        
+        // remnantコマンドが解放されている場合（magic3クリア報酬）
+        if (gameState && gameState.hasRemnantCommand) {
+            commands.push('remnant');
+        }
+        
+        // verstehenコマンド（日記が解読された後に使用可能）
+        if (gameState && gameState.diaryUnlocked) {
+            commands.push('verstehen');
         }
         
         return commands;

@@ -100,7 +100,7 @@ function createWindow() {
     height: 600,
     autoHideMenuBar: true,
     // フルスクリーン表示にする場合は下のコメントアウトを外してください
-    //fullscreen: true,
+    fullscreen: true,
     frame: false,
     show: true,
     webPreferences: {
@@ -128,7 +128,8 @@ function createWindow() {
           width: 800,
           height: 600,
           autoHideMenuBar: true,
-          // fullscreen: true,
+          // フルスクリーン表示にする場合は下のコメントアウトを外してください
+          fullscreen: true,
           show: false,
           webPreferences: {
             nodeIntegration: false,
@@ -163,10 +164,11 @@ function createWindow() {
 
 function createBgWindow() {
   BGScreen = new BrowserWindow({
-    width: 800,  //1920に設定
-    height: 600,  //1080に設定
+    width: 1920,  //1920に設定
+    height: 1080,  //1080に設定
     frame: false,       // フレームを消す（透明にするために必要）
     // fullscreenにするとほかのウィンドウが最前面に来れなくなる可能性があるためウィンドウサイズで対応
+    // fullscreen: true,
     alwaysOnTop: false,  // 常に最前面を無効化
     show: false,      // 最初は非表示
     webPreferences: {
@@ -195,7 +197,7 @@ function createtitleWindow() {
     show: true,
     alwaysOnTop: true,  // Titleを最前面に
     // フルスクリーン表示にする場合は下のコメントアウトを外してください
-    //fullscreen: true,
+    fullscreen: true,
     webPreferences: {
       nodeIntegration: true,  // 既存のコードとの互換性のため維持
       contextIsolation: false  // 既存のコードとの互換性のため維持
@@ -228,7 +230,7 @@ app.whenReady().then(() => {
     width: 800,
     height: 600,
     // フルスクリーン表示にする場合は下のコメントアウトを外してください
-    //fullscreen: true,
+    fullscreen: true,
     frame: false,
     alwaysOnTop: true,
     transparent: true,
