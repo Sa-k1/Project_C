@@ -42,22 +42,94 @@
         searchUnlocked: false,          // searchコマンドが解放されたか（magic1クリア報酬）
         discoveredHidden: [],           // searchで発見した隠しファイル/フォルダのパス
         hasAdminCommand: false,         // 管理者権限コマンドを入手したか
-        hasRemnantCommand: false        // remnantコマンドが解放されたか（magic3クリア報酬）
+        hasRemnantCommand: false,       // remnantコマンドが解放されたか（magic3クリア報酬）
+        isFirstLaunch: true,            // 初回起動かどうか
+        commandHistory: [],             // コマンド履歴
+        outputHistory: []               // 出力履歴
     };
+
+    // ゲーム状態をlocalStorageから復元
+    function loadGameState() {
+        try {
+            const saved = localStorage.getItem('eveGameState');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                // 保存されたデータを現在の状態にマージ
+                Object.keys(parsed).forEach(function(key) {
+                    gameState[key] = parsed[key];
+                });
+                gameState.isFirstLaunch = false;
+                
+                // コマンド履歴を復元（配列であることを確認）
+                if (Array.isArray(gameState.commandHistory)) {
+                    commandHistory = gameState.commandHistory;
+                }
+                return true;
+            }
+        } catch (e) {
+            console.error('ゲーム状態の読み込みに失敗:', e);
+        }
+        return false;
+    }
+
+    // ゲーム状態をlocalStorageに保存
+    function saveGameState() {
+        try {
+            // inputModeやwaitingForConfirmationなど、一時的な状態は保存しない
+            const stateToSave = Object.assign({}, gameState);
+            stateToSave.inputMode = 'normal';
+            stateToSave.waitingForConfirmation = null;
+            stateToSave.passwordTarget = null;
+            // コマンド履歴を保存（最新100件まで）
+            stateToSave.commandHistory = commandHistory.slice(-100);
+            // 出力履歴を保存（最新200行まで）
+            stateToSave.outputHistory = gameState.outputHistory.slice(-200);
+            localStorage.setItem('eveGameState', JSON.stringify(stateToSave));
+        } catch (e) {
+            console.error('ゲーム状態の保存に失敗:', e);
+        }
+    }
+
+    // より確実なリロード検出：sessionStorageとタイムスタンプを使用
+    const lastSessionTime = localStorage.getItem('lastSessionTime');
+    const currentTime = Date.now();
+    const sessionTimeout = 1000; // 1秒以内なら同じセッション
+    
+    // localStorageをクリアする条件：
+    // 1. lastSessionTimeが存在しない（初回）
+    // 2. 前回から1秒以上経過（リロードまたは新規起動）
+    if (!lastSessionTime || (currentTime - parseInt(lastSessionTime)) > sessionTimeout) {
+        localStorage.removeItem('eveGameState');
+        console.log('リロード/新規起動検出: ゲーム状態をリセットしました');
+    }
+    
+    localStorage.setItem('lastSessionTime', currentTime.toString());
+
+    // 保存されたゲーム状態を読み込む
+    const hasExistingState = loadGameState();
+
+    // 定期的に自動保存とタイムスタンプ更新
+    setInterval(function() {
+        saveGameState();
+        localStorage.setItem('lastSessionTime', Date.now().toString());
+    }, 5000);
+
+    // ページを閉じる前に保存（通常の閉じる操作では保存）
+    window.addEventListener('beforeunload', saveGameState);
 
     if (!window.vfs && window.VirtualFileSystem) {
         window.vfs = new VirtualFileSystem(gameState);
     }
 
-    // 警戒度を上げる関数
-    function increaseAlert(amount) {
-        gameState.alertLevel = Math.min(100, gameState.alertLevel + amount);
-    }
-
     //  文字
     function getPrompt() {
         if (window.vfs) {
-            return window.vfs.getPathString() + "> ";
+            if(window.vfs.getPathString() === "C:"){
+                return window.vfs.getPathString() + "\\> ";                
+            }else {
+                return window.vfs.getPathString() + "> ";
+            }
+
         }
         return "C:\\Users\\Student\\Downloads\\Project_C> ";
     }
@@ -65,6 +137,7 @@
     // -------------------------
     // ターミナル初期化
     // -------------------------
+
     const term = new Terminal({
         cursorBlink: true,
         fontFamily: "Courier New, monospace",
@@ -77,6 +150,8 @@
     if (fitAddon) term.loadAddon(fitAddon);
     term.open(document.getElementById("terminal"));
     if (fitAddon && typeof fitAddon.fit === "function") fitAddon.fit();
+    
+
 
     // -------------------------
     // ユーティリティ関数
@@ -89,6 +164,10 @@
         if (line == null) line = "";
         else if (typeof line !== "string") line = String(line);
         term.write(line + "\r\n");
+        // 出力履歴に記録（ANSIコードを含む）
+        if (gameState.outputHistory) {
+            gameState.outputHistory.push(line);
+        }
     }
 
     // -------------------------
@@ -113,7 +192,12 @@
     // lightweight synchronous system print for startup logs
     function systemPrint(line) {
         if (term && typeof term.write === "function") {
-            term.write(COLORS.gray + line + COLORS.reset + "\r\n");
+            var output = COLORS.gray + line + COLORS.reset;
+            term.write(output + "\r\n");
+            // 出力履歴に記録
+            if (gameState.outputHistory) {
+                gameState.outputHistory.push(output);
+            }
         } else {
             console.log(line);
         }
@@ -568,8 +652,27 @@
     }
 
 
-    // 起動メッセージ
-    systemPrint("\x1b[0mEVE-OS [Version 10.0.26]\n");
+    // 起動メッセージ（初回起動時のみ）
+    if (gameState.isFirstLaunch) {
+        systemPrint("\x1b[0mEVE-OS [Version 10.0.26]\n");
+
+    } else {
+        
+        // 出力履歴を復元（最新50行程度を表示）
+        if (Array.isArray(gameState.outputHistory) && gameState.outputHistory.length > 0) {
+            var historyToRestore = gameState.outputHistory.slice(-50);
+            for (var i = 0; i < historyToRestore.length; i++) {
+                term.write(historyToRestore[i] + "\r\n");
+            }
+        }
+        
+        // 最後のプロンプトを削除して新しいプロンプトを表示
+        var lastOutput = gameState.outputHistory[gameState.outputHistory.length - 1];
+        if (!lastOutput || !lastOutput.includes(">")) {
+            // プロンプトがない場合のみ空行を追加
+            term.write("\r\n");
+        }
+    }
     term.write(getPrompt());
 
     // 入力処理
@@ -685,6 +788,7 @@
                 if (userMessage) {
                     inputEnabled = false;
                     await handleInput(userMessage);
+                    saveGameState(); // コマンド実行後に状態を保存
                     inputEnabled = true;
                 }
                 

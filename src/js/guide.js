@@ -153,6 +153,6 @@ setTimeout(() => {
                     tutorialIcon.style.display = 'block';
                 }
             }, 100);
-        }, 5000);
+        }, 2000);
     }
 }, 1000);

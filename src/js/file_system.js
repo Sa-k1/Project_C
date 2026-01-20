@@ -369,11 +369,12 @@ class VirtualFileSystem {
                 const size = (node.content?.length || 0).toString().padStart(10);
                 const editFlag = node.editable ? '' : ' [読取専用]';
                 const hiddenMark = node.hidden ? ' [隠し]' : '';
-                output += `${date}           ${size} ${name}${editFlag}${hiddenMark}\n`;
+                output += `${date}            ${name}${editFlag}${hiddenMark}\n`;
+                // ↑ここで出力を変えれる
                 fileCount++;
             }
         }
-        
+
         output += `\n               ${fileCount} 個のファイル\n`;
         output += `               ${dirCount} 個のディレクトリ`;
 

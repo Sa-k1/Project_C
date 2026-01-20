@@ -132,6 +132,15 @@ document.querySelectorAll('.file-viewer-container .ctrl.close, .trash-viewer-con
         // viewerIdが'trash'や'terminal'や'tutorial'や特殊な値の場合、直接取得
         if (viewerId === 'terminal') {
             container = document.getElementById('terminalViewerContainer');
+            // ターミナルを閉じる前に状態を保存
+            const terminalIframe = document.getElementById('terminal-viewer-iframe');
+            if (terminalIframe && terminalIframe.contentWindow) {
+                try {
+                    terminalIframe.contentWindow.postMessage({ type: 'saveState' }, '*');
+                } catch (err) {
+                    console.log('Terminal state save message sent');
+                }
+            }
         } else if (viewerId === 'tutorial') {
             container = document.getElementById('tutorialViewerContainer');
         } else if (viewerId === '3' && e.target.closest('.trash-viewer-container')) {
@@ -143,7 +152,7 @@ document.querySelectorAll('.file-viewer-container .ctrl.close, .trash-viewer-con
         if (container) {
             container.style.display = 'none';
             const iframe = container.querySelector('iframe');
-            if (iframe) {
+            if (iframe && viewerId !== 'terminal') {
                 iframe.src = '';
                 iframe.dataset.loaded = '';  // 次回開くときに再読み込みできるようにリセット
             }

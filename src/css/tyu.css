@@ -21,6 +21,37 @@ body::-webkit-scrollbar-thumb {
     background-clip: padding-box; /* 背景を切り取る */
 }
 
+.scrollBtns {
+    position: fixed;
+    top: 75%;
+    left: 92.5%;
+}
+
+ .scrollBtns a {
+    display: block;         /* ブロック化(全体をクリック可能にするため) */
+    color: white;           /* 文字色：白色 */
+    border-radius: 12px;    /* 角を丸くする：半径12ピクセルで */
+    opacity: 0.4;           /* 半透明にする(＝不透明度60％／つまり背後が40％透けて見える) */
+    line-height: 1;         /* 行の高さを詰める */
+    text-decoration: none;  /* リンクの下線を付けない */
+    text-align: center;     /* 文字をセンタリングする */
+    transition: color  1s;
+}
+
+.anime_arrow {
+    transition: transform 1s;
+}
+
+/* ▼マウスが載ったときの装飾変更 */
+.scrollBtns :hover {
+    transform: rotate(360deg);
+    color: rgba(255, 255, 255, 0.623);
+}
+
+
+/* ▼矢印記号 */
+.arrow  { display:block; font-size:3em; }
+
 h2 {
     color: #ffffff;
     border-bottom: 2px solid #ffffff;

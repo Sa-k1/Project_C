@@ -129,7 +129,7 @@ function createWindow() {
           height: 600,
           autoHideMenuBar: true,
           // フルスクリーン表示にする場合は下のコメントアウトを外してください
-          fullscreen: true,
+          // fullscreen: true,
           show: false,
           webPreferences: {
             nodeIntegration: false,
@@ -168,7 +168,7 @@ function createBgWindow() {
     height: 1080,  //1080に設定
     frame: false,       // フレームを消す（透明にするために必要）
     // fullscreenにするとほかのウィンドウが最前面に来れなくなる可能性があるためウィンドウサイズで対応
-    // fullscreen: true,
+    fullscreen: true,
     alwaysOnTop: false,  // 常に最前面を無効化
     show: false,      // 最初は非表示
     webPreferences: {
@@ -189,15 +189,15 @@ function createBgWindow() {
 
 function createtitleWindow() {
   TitleScreen = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1920,
+    height: 1080,
     autoHideMenuBar: true,
     transparent: true,  // 透明にする
     frame: false,       // フレームを消す（透明にするために必要）
     show: true,
     alwaysOnTop: true,  // Titleを最前面に
     // フルスクリーン表示にする場合は下のコメントアウトを外してください
-    fullscreen: true,
+    // fullscreen: true,
     webPreferences: {
       nodeIntegration: true,  // 既存のコードとの互換性のため維持
       contextIsolation: false  // 既存のコードとの互換性のため維持
@@ -286,6 +286,12 @@ app.whenReady().then(() => {
 app.on('before-quit', () => {
   console.log('apri end...');
   stopIMEMonitor();
+  
+  // ゲーム状態をリセット（localStorageをクリア）
+  if (TitleScreen && !TitleScreen.isDestroyed()) {
+    TitleScreen.webContents.executeJavaScript('localStorage.removeItem("eveGameState");')
+      .catch(err => console.error('localStorage削除エラー:', err));
+  }
 });
 
 app.on('window-all-closed', () => {
