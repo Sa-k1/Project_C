@@ -1,0 +1,146 @@
+@charset "UTF-8";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #000;
+    color: #fff;
+    font-family: 'Yu Gothic', 'Meiryo', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.container {
+    text-align: center;
+    padding: 40px;
+    max-width: 700px;
+}
+
+.story-text {
+    font-size: 18px;
+    line-height: 2.2;
+    color: #ccc;
+}
+
+.story-text p {
+    margin: 20px 0;
+    opacity: 0;
+    transition: opacity 1s ease-out;
+}
+
+.story-text p.show {
+    opacity: 1;
+}
+
+.end-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.end-title {
+    font-size: 36px;
+    color: #ff4444;
+    letter-spacing: 8px;
+    margin-bottom: 20px;
+}
+
+.end-subtitle {
+    font-size: 18px;
+    color: #888;
+    letter-spacing: 3px;
+}
+
+.start-container {
+    margin-top: 40px;
+}
+
+.start-button {
+    background: transparent;
+    border: 2px solid #666;
+    color: #fff;
+    padding: 15px 40px;
+    font-size: 16px;
+    letter-spacing: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Yu Gothic', 'Meiryo', sans-serif;
+}
+
+.start-button:hover {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+    transform: scale(1.05);
+}
+
+/* フェードインアニメーション */
+.fade-in {
+    animation: fadeIn 2s ease-out forwards;
+}
+
+.fade-out {
+    animation: fadeOut 1.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px);
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from { 
+        opacity: 1;
+    }
+    to { 
+        opacity: 0;
+    }
+}
+
+.end-container.fade-in {
+    animation: fadeInCenter 2s ease-out forwards;
+}
+
+@keyframes fadeInCenter {
+    from { 
+        opacity: 0; 
+    }
+    to { 
+        opacity: 1; 
+    }
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+}
+
+.click-indicator {
+    display: inline;
+    color: #aaa;
+    margin-left: 10px;
+    animation: blink 1s ease-in-out infinite;
+}
+
+.highlight {
+    color: #ff4444;
+    font-weight: 600;
+}

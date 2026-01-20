@@ -129,7 +129,7 @@ function createWindow() {
           height: 600,
           autoHideMenuBar: true,
           // フルスクリーン表示にする場合は下のコメントアウトを外してください
-          // fullscreen: true,
+          fullscreen: true,
           show: false,
           webPreferences: {
             nodeIntegration: false,
@@ -168,8 +168,7 @@ function createBgWindow() {
     height: 1080,  //1080に設定
     frame: false,       // フレームを消す（透明にするために必要）
     // fullscreenにするとほかのウィンドウが最前面に来れなくなる可能性があるためウィンドウサイズで対応
-    fullscreen: true,
-    alwaysOnTop: false,  // 常に最前面を無効化
+    // fullscreen: true,
     show: false,      // 最初は非表示
     webPreferences: {
       nodeIntegration: true,  // 既存のコードとの互換性のため維持
@@ -194,7 +193,7 @@ function createtitleWindow() {
     autoHideMenuBar: true,
     transparent: true,  // 透明にする
     frame: false,       // フレームを消す（透明にするために必要）
-    show: true,
+    show: false,        // 最初は非表示にして準備してから表示
     alwaysOnTop: true,  // Titleを最前面に
     // フルスクリーン表示にする場合は下のコメントアウトを外してください
     // fullscreen: true,
@@ -206,12 +205,18 @@ function createtitleWindow() {
   });
   TitleScreen.loadFile(path.join(__dirname, 'src', 'html', 'title.html'));
   
-  // Titleを最前面に、BGを背面に確実に配置
-  TitleScreen.setAlwaysOnTop(true);
-  if (BGScreen) {
-    BGScreen.setAlwaysOnTop(false);
-    BGScreen.blur();
-  }
+  TitleScreen.once('ready-to-show', () => {
+    // Titleを最前面に、BGを背面に確実に配置
+    TitleScreen.setAlwaysOnTop(true, 'screen-saver');
+    TitleScreen.show();
+    TitleScreen.focus();
+    TitleScreen.moveTop();
+    
+    if (BGScreen && !BGScreen.isDestroyed()) {
+      BGScreen.setAlwaysOnTop(false);
+      BGScreen.blur();
+    }
+  });
 }
 
 app.whenReady().then(() => {
@@ -279,6 +284,70 @@ app.whenReady().then(() => {
     }, 1500);
     // アニメーションは既に1秒進んでいるので1500msに調整
     // 0を1500に
+  });
+
+  // ENDからタイトルに戻る処理
+  console.log('✅ back-to-titleハンドラーを登録しました');
+  ipcMain.on('back-to-title', () => {
+    console.log('🔙 back to title from END');
+    
+    // 全てのウィンドウを取得
+    const allWindows = BrowserWindow.getAllWindows();
+    
+    // 現在のウィンドウ（END画面）を閉じる
+    allWindows.forEach(win => {
+      if (!win.isDestroyed() && win !== BGScreen) {
+        win.close();
+      }
+    });
+    
+    // スプラッシュ画面を再作成
+    splashScreen = new BrowserWindow({
+      width: 800,
+      height: 600,
+      fullscreen: true,
+      frame: false,
+      alwaysOnTop: true,
+      transparent: true,
+      show: false,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false
+      }
+    });
+    splashScreen.loadFile(path.join(__dirname, 'src', 'html', 'splash.html'));
+    
+    // 少し待ってからタイトル画面を再作成
+    setTimeout(() => {
+      // BGScreenを一時的に最前面に（強制的に前面に出す）
+      if (BGScreen && !BGScreen.isDestroyed()) {
+        BGScreen.setAlwaysOnTop(true, 'screen-saver');
+        BGScreen.show();
+        BGScreen.focus();
+        BGScreen.moveTop();
+        // すぐにalwaysOnTopを解除（背面に戻す）
+        setTimeout(() => {
+          if (BGScreen && !BGScreen.isDestroyed()) {
+            BGScreen.setAlwaysOnTop(true);
+            BGScreen.blur();
+          }
+        }, 50);
+        console.log('✅ BG画面を前面に配置しました');
+      }
+      
+      createtitleWindow();
+      
+      // タイトル画面が作成されたら最前面に持ってくる
+      setTimeout(() => {
+        if (TitleScreen && !TitleScreen.isDestroyed()) {
+          TitleScreen.setAlwaysOnTop(true, 'screen-saver');
+          TitleScreen.show();
+          TitleScreen.focus();
+          TitleScreen.moveTop();
+          console.log('✅ タイトル画面を最前面に配置しました');
+        }
+      }, 1000);
+    }, 500);
   });
 });
 

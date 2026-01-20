@@ -4,149 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TRUE END</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #000;
-            color: #fff;
-            font-family: 'Yu Gothic', 'Meiryo', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .container {
-            text-align: center;
-            padding: 40px;
-            max-width: 700px;
-        }
-
-        .story-text {
-            font-size: 18px;
-            line-height: 2.2;
-            color: #ccc;
-        }
-
-        .story-text p {
-            margin: 20px 0;
-            opacity: 0;
-            transition: opacity 1s ease-out;
-        }
-
-        .story-text p.show {
-            opacity: 1;
-        }
-
-        .end-container {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .end-title {
-            font-size: 36px;
-            color: #fff;
-            letter-spacing: 8px;
-            margin-bottom: 20px;
-        }
-
-        .end-subtitle {
-            font-size: 18px;
-            color: #888;
-            letter-spacing: 3px;
-        }
-
-        /* フェードインアニメーション */
-        .fade-in {
-            animation: fadeIn 2s ease-out forwards;
-        }
-
-        .fade-out {
-            animation: fadeOut 1.5s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(20px);
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeOut {
-            from { 
-                opacity: 1;
-            }
-            to { 
-                opacity: 0;
-            }
-        }
-
-        .end-container.fade-in {
-            animation: fadeInCenter 2s ease-out forwards;
-        }
-
-        @keyframes fadeInCenter {
-            from { 
-                opacity: 0; 
-            }
-            to { 
-                opacity: 1; 
-            }
-        }
-
-        .click-guide {
-            position: fixed;
-            bottom: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 14px;
-            color: #ccc;
-            letter-spacing: 2px;
-            opacity: 0;
-            animation: blink 1.5s ease-in-out infinite;
-        }
-
-        .click-guide.show {
-            opacity: 1;
-        }
-
-        .click-guide.hide {
-            display: none;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 1; }
-        }
-
-        .click-indicator {
-            display: inline;
-            color: #aaa;
-            margin-left: 10px;
-            animation: blink 1s ease-in-out infinite;
-        }
-
-        .highlight {
-            color: #ff4444;
-            font-weight: 600;
-        }
-    </style>
+    <link rel="stylesheet" href="../css/true_end.css">
 </head>
 <body>
     <div class="container">
@@ -157,7 +15,9 @@
     <div class="end-container" id="endContainer">
         <div class="end-title">END 1</div>
         <div class="end-subtitle">─ User 0002 ─</div>
-        <!-- <button class="title_go_button" id="title_go_button">RESET</button> -->
+            <div class="start-container">
+                <button class="start-button" id="startBtn">Title に戻る</button>
+            </div>
     </div>
 
     <script src="../js/title_back_button.js"></script>

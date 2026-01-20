@@ -34,18 +34,17 @@ body::-webkit-scrollbar-thumb {
     opacity: 0.4;           /* 半透明にする(＝不透明度60％／つまり背後が40％透けて見える) */
     line-height: 1;         /* 行の高さを詰める */
     text-decoration: none;  /* リンクの下線を付けない */
-    text-align: center;     /* 文字をセンタリングする */
-    transition: color  1s;
+    text-align: center;     /* 文字をセンタリングする */    
 }
 
 .anime_arrow {
-    transition: transform 1s;
+    transition: transform 1s, color 1s;
 }
 
 /* ▼マウスが載ったときの装飾変更 */
 .scrollBtns :hover {
     transform: rotate(360deg);
-    color: rgba(255, 255, 255, 0.623);
+    color: rgb(147, 147, 147);
 }
 
 

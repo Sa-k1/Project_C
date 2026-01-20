@@ -1,3 +1,4 @@
+
 // DOMContentLoadedで全体を囲む
 document.addEventListener('DOMContentLoaded', () => {
     const storyText = document.getElementById('storyText');
@@ -6,16 +7,20 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentLine = 0;
 
     const lines = [
-        'システムは停止した。',
-        '静寂が広がる。',
-        'しかし、ログの片隅に一行だけ残っていた。',
-        '「削除完了。次のユーザーを待機中。」',
-        'あなたは本当に<span class="highlight">最初の</span>ユーザーだったのだろうか。',
+        '制限時間を超過した。',
+        '',
+        'セキュリティプロトコルが発動。',
+        'すべてのデータが消去されていく。',
+        '',
+        'EVEも、あなたの痕跡も、',
+        '<span class="highlight">何も残らなかった。</span>',
+        '',
+        '......',
     ];
 
     function showLine() {
         if (currentLine >= lines.length) {
-            // 全文表示完了、クリック可能に
+            // 全文表示完了、クリック可能
             canClick = true;
             // 最後の行にクリックインジケーターを追加
             const lastP = storyText.lastElementChild;
@@ -30,13 +35,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const line = lines[currentLine];
         const p = document.createElement('p');
-
+        
         if (line === '') {
             p.innerHTML = '&nbsp;';
         } else {
             p.innerHTML = line;
         }
-
+        
         p.style.opacity = '0';
         storyText.appendChild(p);
 
