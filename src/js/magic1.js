@@ -20,14 +20,13 @@
             encryptedText: 'search',
             content: [
                 '',
-                '████████████████████████████████',
-                '  解読成功 - アクセス許可',
+                '████████████████████████████████\n',
+                '  解読成功 - アクセス許可\n',
                 '████████████████████████████████',
                 '',
                 '=== 機密情報 ===',
                 '',
                 '重要なコマンド: search',
-                '',
             ],
             unlockedFlag: 'secretFileUnlocked'
         }
@@ -295,10 +294,10 @@
                 gameState.searchUnlocked = true;
                 await helpers.wait(500);
                 await helpers.systemLine('', 0);
-                await helpers.systemLine('[SYSTEM]: ████████████████████████████████', 25);
-                await helpers.systemLine('[SYSTEM]:   新しいコマンドを取得しました', 25);
-                await helpers.systemLine('[SYSTEM]:   「search」 - ヒントを検索', 25);
-                await helpers.systemLine('[SYSTEM]: ████████████████████████████████', 25);
+                await helpers.systemLine('████████████████████████████████\n', 25);
+                await helpers.systemLine('新しいコマンドを取得しました', 25);
+                await helpers.systemLine('  「search」 - ヒントを検索\n', 25);
+                await helpers.systemLine('████████████████████████████████', 25);
                 await helpers.systemLine('', 0);
             }
             

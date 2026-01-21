@@ -247,6 +247,23 @@
                 // --- 脱出エンド分岐 ---
                 if (cmd === 'cd') {
                     var cdArg = command.split(/\s+/)[1]?.toLowerCase();
+                    
+                    // cd - で前のディレクトリに戻る
+                    if (cdArg === '-') {
+                        // 履歴スタックの初期化
+                        if (!gameState.pathHistory) {
+                            gameState.pathHistory = [];
+                        }
+                        
+                        if (gameState.pathHistory.length > 0) {
+                            // スタックから前のパスを取り出して移動
+                            vfs.currentPath = gameState.pathHistory.pop();
+                            return;
+                        } else {
+                            return;
+                        }
+                    }
+                    
                     // C:にいる状態でcd escapeまたはcd exit
                     if ((cdArg === 'escape' || cdArg === 'exit') && vfs.currentPath.length === 1 && vfs.currentPath[0] === 'C:') {
                         // 脱出エンド用のフラグや演出（仮）
@@ -258,6 +275,14 @@
                         term.writeln("\r しかしEVEの脅威はまだ終わっていない。");
                         // ここでreturnして通常のcd処理をスキップ
                         return;
+                    }
+                    
+                    // 通常のcd処理の前に現在のパスを履歴スタックに保存
+                    if (cdArg && cdArg !== '-' && cdArg !== 'escape' && cdArg !== 'exit') {
+                        if (!gameState.pathHistory) {
+                            gameState.pathHistory = [];
+                        }
+                        gameState.pathHistory.push(vfs.currentPath.slice());
                     }
                 }
                 var result = await vfs.execute(command);
@@ -879,6 +904,7 @@
             'trash',
             // cd用のショートカット
             '..',
+            // '-'
             // ファイルシステムコマンド引数
             '-l',
             '-a'
