@@ -368,7 +368,7 @@
                     term.writeln("\r  === 特殊コマンド ===");
                     specialHeaderShown = true;
                 }
-                term.writeln("\r  remnant <ファイル名> - ファイルの履歴を復元");
+                term.writeln("\r  remnant <ファイル名> - 特定ののファイルの履歴を復元");
             }
             
             // readコマンドが解放されている場合のみ表示

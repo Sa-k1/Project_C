@@ -243,7 +243,7 @@ if (terminalIcon) {
         if (!terminalFirstOpened && typeof window.sendEveMessage === 'function') {
             terminalFirstOpened = true;
             setTimeout(() => {
-                window.sendEveMessage('こちらの場所ではコマンドを使って色々な場所に行くことができます。', 'ターミナルを開けましたね');
+                window.sendEveMessage('こちらの場所ではコマンドを使って色々な場所に行くことができます。', 'ターミナルを開けました');
             //         setTimeout(() => {
             //         window.sendEveMessage('試しにhelpコマンドを打ってみましょう。<br>helpコマンドが打てたら何か手がかりになるものを探すために色々なコマンドを打ってください。<br>何かわかったら連絡します。', 'helpコマンドについて');
             //         }, 10000)

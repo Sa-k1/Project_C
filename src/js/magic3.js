@@ -6,6 +6,8 @@
     // グローバルなgimmick3Systemオブジェクトを作成
     window.gimmick3System = {};
 
+    let cMe_11 = true;
+
     // -------------------------
     // パスワード設定（キーボード位置パズル）
     // -------------------------
@@ -176,6 +178,13 @@
 
             // 報酬としてremnantコマンド解放を通知
             await systemLine("[SYSTEM]: 新しいコマンドを取得しました『remnant』", 25);
+
+            if(cMe_11 === true){
+                window.parent.sendEveMessage('remnantはデスクトップだったりの文字化けしているファイルなどに<br>有効です', 'コマンド説明');  
+            }
+
+            
+            cMe_11 = false;
 
             return true;
         }

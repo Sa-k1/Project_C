@@ -109,7 +109,7 @@ function addEveMessage(message, title = '') {
                 <h3 class="main-chat-item-up">${title}</h3>
                 <h3 class="main-chat-item">${message}</h3>
             <div>
-        <div class="chat-timestamp">${time}</div>
+        <div class="chat-timestamp"></div>
     `;
 
     notificationContent.appendChild(messageDiv);
@@ -143,11 +143,13 @@ setTimeout(() => {
         
         // 3秒後にチュートリアル開始のメッセージとアイコンを表示
         setTimeout(() => {
-            window.sendEveMessage('まずこの世界の操作に慣れましょう<br>デスクトップのREADME.mdを開こう', '操作説明');
+            window.sendEveMessage('まずこの世界の操作に慣れましょう<br>デスクトップのREADME.mdを開きましょう', '操作説明');
 
             setTimeout(() => {
                 // チュートリアルアイコンを表示
                 const tutorialIcon = document.getElementById('tutorialIcon');
+
+                window.sendEveMessage('EVEによってタスクバーからアプリを開けないようにされています!! ', '※  緊急報告  ※');
 
                 if (tutorialIcon) {
                     tutorialIcon.style.display = 'block';

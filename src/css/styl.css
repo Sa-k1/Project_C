@@ -726,14 +726,6 @@ body {
     margin-top: 10px;
     font-weight: 100;
 }
-/* タイムスタンプ */
-.chat-timestamp {
-    font-size: 10px;
-    color: #ffffff00;
-    margin-top: -5px;
-    text-align: right;
-    font-weight: 1000;
-}
 
 /* 最大化, 最小化を誤魔化す */
 .no_play {
