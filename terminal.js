@@ -654,7 +654,7 @@
 
     // 起動メッセージ（初回起動時のみ）
     if (gameState.isFirstLaunch) {
-        systemPrint("\x1b[0mEVE-OS [Version 10.0.26]\n");
+        systemPrint("\x1b[0mEVE-OS [Version 24.43.87]\n");
 
     } else {
         

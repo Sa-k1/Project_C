@@ -103,12 +103,13 @@ function createWindow() {
     fullscreen: true,
     frame: false,
     show: true,
+    icon: path.join(__dirname, "src/pic/app_icon.ico"),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js')
     },
-    title: 'EVE System'
+    title: 'EVE'
   });
   
   eveIntroScreen.loadFile(path.join(__dirname, 'src', 'html', 'eve_intro.html'));
@@ -131,12 +132,13 @@ function createWindow() {
           // フルスクリーン表示にする場合は下のコメントアウトを外してください
           fullscreen: true,
           show: false,
+          icon: path.join(__dirname, "src/pic/app_icon.ico"),
           webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
             preload: path.join(__dirname, 'preload.js')
           },
-          title: ''
+          title: 'EVE'
         });
         
         mainWin.loadFile(path.join(__dirname, 'src', 'html', 'index.html'));
@@ -170,11 +172,13 @@ function createBgWindow() {
     // fullscreenにするとほかのウィンドウが最前面に来れなくなる可能性があるためウィンドウサイズで対応
     // fullscreen: true,
     show: false,      // 最初は非表示
+    skipTaskbar: true,  // タスクバーに表示しない
+    icon: path.join(__dirname, "src/pic/app_icon.ico"),
     webPreferences: {
       nodeIntegration: true,  // 既存のコードとの互換性のため維持
       contextIsolation: false  // 既存のコードとの互換性のため維持
     },
-    title: ' '
+    title: 'EVE'
   });
   
   BGScreen.once('ready-to-show', () => {
@@ -197,11 +201,12 @@ function createtitleWindow() {
     alwaysOnTop: true,  // Titleを最前面に
     // フルスクリーン表示にする場合は下のコメントアウトを外してください
     // fullscreen: true,
+    icon: path.join(__dirname, "src/pic/app_icon.ico"),
     webPreferences: {
       nodeIntegration: true,  // 既存のコードとの互換性のため維持
       contextIsolation: false  // 既存のコードとの互換性のため維持
     },
-    title: 's'
+    title: 'EVE'
   });
   TitleScreen.loadFile(path.join(__dirname, 'src', 'html', 'title.html'));
   
@@ -240,6 +245,7 @@ app.whenReady().then(() => {
     alwaysOnTop: true,
     transparent: true,
     show: false,  // 最初は非表示
+    icon: path.join(__dirname, "src/pic/app_icon.ico"),
     webPreferences: {
       nodeIntegration: true,  // 既存のコードとの互換性のため維持
       contextIsolation: false  // 既存のコードとの互換性のため維持
@@ -310,6 +316,7 @@ app.whenReady().then(() => {
       alwaysOnTop: true,
       transparent: true,
       show: false,
+      icon: path.join(__dirname, "src/pic/app_icon.ico"),
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false

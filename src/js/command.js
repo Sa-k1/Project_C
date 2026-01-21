@@ -5,6 +5,8 @@
     // グローバルなcommandHandlerオブジェクトを作成
     window.commandHandler = {};
 
+    let cMe_10 = true;
+
     // waitヘルパー関数
     window.commandHandler.wait = function(ms) {
         return new Promise(res => setTimeout(res, ms));
@@ -294,8 +296,7 @@
                             term.clear();
                             return;
                         case "openFile":
-                            await systemLine("ファイルを開いています: " + result.file, 20);
-                            window.open("../html/" + result.file, "_blank");
+                            await errorLine("そのファイルには使えません", 20);
                             return;
                         case "gimmick3_keytrace":
                             // ギミック3のキートレース表示
@@ -378,6 +379,16 @@
                     specialHeaderShown = true;
                 }
                 term.writeln("\r  read <ファイル名> - 特殊フォーマットのファイルを解読");
+            }
+            
+            // verstehenコマンドが解放されている場合のみ表示
+            if (gameState.diaryUnlocked) {
+                if (!specialHeaderShown) {
+                    term.writeln("\r");
+                    term.writeln("\r  === 特殊コマンド ===");
+                    specialHeaderShown = true;
+                }
+                term.writeln("\r  verstehen <ファイル名> - 特定のファイルの深層データを解析");
             }
             
             // 管理者コマンドが解放されている場合のみ表示
@@ -529,6 +540,12 @@
                 
                 // 日記が解読されたフラグを設定（verstehenコマンドが使用可能になる）
                 gameState.diaryUnlocked = true;
+
+                if (cMe_10 === true){
+                    window.parent.sendEveMessage('MyDayが解読されました<br>試しに開いて見ましょう何かありそうです。', '解読成功');
+                }
+
+                cMe = false;
                 
                 return;
             } else if (target === '') {
@@ -761,9 +778,9 @@
         }
         
         term.writeln("\r");
-        term.writeln("\r  ╔════════════════════════════════════╗");
-        term.writeln("\r  ║          調査結果                  ║");
-        term.writeln("\r  ╚════════════════════════════════════╝");
+        term.writeln("\r  ╔═══════════════════════════╗");
+        term.writeln("\r  ║          調査結果         ║");
+        term.writeln("\r  ╚═══════════════════════════╝");
         term.writeln("\r");
         
         // 通常ファイル一覧を表示
@@ -792,8 +809,6 @@
             term.writeln("\r  この場所にはファイルがありません...");
         }
         
-        term.writeln("\r");
-        term.writeln("\r  [TIP]: open <ファイル名> で中身を確認できます");
         
         // 警戒度を少し上げる
         gameState.alertLevel = Math.min(100, (gameState.alertLevel || 0) + 1);
