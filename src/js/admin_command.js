@@ -41,6 +41,9 @@
     const resultDisplay = document.getElementById('result-display');
     const loading = document.getElementById('loading');
 
+    // ファーストクリック判定用フラグ
+    let isExecuted = false;
+
     // =============================================
     // ユーティリティ関数
     // =============================================
@@ -56,6 +59,16 @@
     function hideLoading() {
         loading.classList.remove('show');
         executeBtn.disabled = false;
+    }
+
+    // すべての操作を無効化する関数
+    function disableAllControls() {
+        executeBtn.disabled = true;
+        cancelBtn.disabled = true;
+        commandInput.disabled = true;
+        commandInput.style.opacity = '0.5';
+        cancelBtn.style.opacity = '0.5';
+        executeBtn.style.opacity = '0.5';
     }
 
     function showResult(message, type) {
@@ -162,6 +175,9 @@
     // コマンド実行処理
     // =============================================
     async function executeCommand() {
+        // ファーストクリックのみ判定
+        if (isExecuted) return;
+        
         const command = commandInput.value;
         clearResult();
         
@@ -172,6 +188,11 @@
             return;
         }
 
+        // 実行済みフラグを立てる
+        isExecuted = true;
+        
+        // コマンド実行開始時にすべての操作を無効化
+        disableAllControls();
         showLoading();
         
         // 処理中の演出

@@ -11,14 +11,11 @@
     // =========================================
     const PUZZLE_CONFIG = {
         // ダイヤルの正解（0-100の3つの数字）
-        // dialAnswers: [24, 43, 87],
-        dialAnswers: [0, 0, 1],
+        dialAnswers: [24, 43, 87],
         // クリック目標回数
-        // clickTarget: 20,
-        clickTarget: 0,
+        clickTarget: 20,
         // 長押し目標秒数
-        // holdTarget: 5.0,
-        holdTarget: 0,
+        holdTarget: 5.0,
         // 時間制限（秒）
         timeLimit: 2,
         // 成功後の遷移先
