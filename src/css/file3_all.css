@@ -172,9 +172,9 @@ body.glitch-active::after {
     animation: jumpscareFlash 0.5s steps(2) infinite;
 }
 .jumpscare-image {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     animation: jumpscareShake 0.1s infinite;
     filter: contrast(1.2) brightness(1.1);
 }
