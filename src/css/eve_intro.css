@@ -53,8 +53,7 @@ body {
     font-weight: bold;
     color: #00ffff;
     text-shadow: 0 0 10px #00ffff,
-                 0 0 20px #00ffff,
-                 0 0 30px #00ffff;
+                0 0 20px #00ffff;
     letter-spacing: 4px;
     opacity: 0;
     transition: opacity 0.5s ease;
@@ -62,7 +61,7 @@ body {
     background: rgba(0, 10, 20, 0.7);
     border: 3px solid #00ffff;
     box-shadow: 0 0 40px rgba(0, 255, 255, 0.6),
-                inset 0 0 40px rgba(0, 255, 255, 0.1);
+            inset 0 0 40px rgba(0, 255, 255, 0.1);
     animation: messageGlow 2s infinite;
 }
 
