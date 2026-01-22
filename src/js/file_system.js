@@ -43,7 +43,7 @@ class VirtualFileSystem {
                                                 children:{
                                                     'temp.txt': {
                                                         type: 'file',
-                                                        content: `いいですね\nこれであなたは基礎的な動きができます。\nそして困った時にはhelpコマンドを使って色々なコマンドを確認し使ってみるのも良いでしょう`,
+                                                        content: `いいですね\nこれであなたは基礎的な動きができます。\nそして困った時にはhelpコマンドを使って色々なコマンドを確認して使ってみるのも良いでしょう\nそしてあなたはまず、ゴミ箱の中を探すのがよいでしょう`,
                                                         editable: true
                                                     }
                                                 }
@@ -58,7 +58,7 @@ class VirtualFileSystem {
                                                             'memo.txt': {   //ここ使うから触んな
                                                                 type: 'file',
                                                                 htmlFile: 'file1.html',
-                                                                content: `admin_2_tempを探してみてください\nそしてそのフォルダ内のファイルの中を確認してください\nまず、cd .. を使用して最初にいた階層に戻りましょう`, 
+                                                                content: `admin_2_tempというファルダを探してみてください\nそしてそのフォルダ内のファイルを確認してください\nまず、cd ../.. を試しに使用してdirと入力してください\nそして、cd admin_2_tempと入力してその中にあるファイルをcat ファイル名で開いてみてください`, 
                                                                 editable: true
                                                             },
                                                             'log.txt': {
