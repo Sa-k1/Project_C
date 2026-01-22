@@ -15,12 +15,19 @@
     <div class="start-container">
         <button class="start-button" id="startBtn">start</button>
     </div>
+    <script src="../js/save_system.js"></script>
     <script>
         const { ipcRenderer } = require('electron');
         const startButton = document.getElementById('startBtn');
 
         startButton.addEventListener('click', function() {
             startButton.classList.add('clicked');
+            
+            // 「最初から」を選択したのでセーブデータを削除
+            if (window.saveSystem) {
+                window.saveSystem.clear();
+                console.log('タイトルからスタート: セーブデータを削除しました');
+            }
             
             // フェードアウト開始と同時にスプラッシュのアニメーションを開始
             ipcRenderer.send('prepare-splash');

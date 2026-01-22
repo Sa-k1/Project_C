@@ -11,6 +11,7 @@ let TitleScreen;
 let splashScreen;
 let BGScreen;
 let eveIntroScreen;
+let mainWin; // メインゲーム画面
 let imeMonitorInterval = null;
 let lastIMEStatus = false;
 
@@ -125,7 +126,7 @@ function createWindow() {
       
       // フェード完了後にメインウィンドウ作成
       setTimeout(() => {
-        const mainWin = new BrowserWindow({
+        mainWin = new BrowserWindow({
           width: 800,
           height: 600,
           autoHideMenuBar: true,
@@ -142,6 +143,30 @@ function createWindow() {
         });
         
         mainWin.loadFile(path.join(__dirname, 'src', 'html', 'index.html'));
+        
+        // リロード検出用の変数
+        let lastLoadedURL = '';
+        
+        // リロード（Ctrl+R）を検出してセーブデータを削除
+        mainWin.webContents.on('did-start-loading', () => {
+          const currentURL = mainWin.webContents.getURL();
+          console.log('ページ読み込み開始:', currentURL);
+          
+          // 同じURLが再度読み込まれた場合はリロードと判断
+          if (lastLoadedURL && currentURL === lastLoadedURL) {
+            console.log('🔄 リロード検出: セーブデータを削除します');
+            mainWin.webContents.executeJavaScript(`
+              if (window.saveSystem) {
+                window.saveSystem.clear();
+                console.log('リロードによりセーブデータを削除しました');
+              }
+              localStorage.removeItem("eveGameState");
+              localStorage.removeItem("lastSessionTime");
+            `).catch(err => console.error('セーブデータ削除エラー:', err));
+          }
+          
+          lastLoadedURL = currentURL;
+        });
         
         // メインウィンドウの準備完了後にフェードイン
         mainWin.once('ready-to-show', () => {
@@ -292,6 +317,145 @@ app.whenReady().then(() => {
     // 0を1500に
   });
 
+  // 続きから再開ボタンが押されたとき
+  console.log('✅ continue-gameハンドラーを登録します');
+  ipcMain.on('continue-game', (event) => {
+    console.log('🔄 続きから再開: ゲーム画面に戻ります');
+    console.log('イベント受信:', event);
+    
+    // 送信元のウィンドウを取得
+    const senderWindow = BrowserWindow.getFocusedWindow();
+    console.log('送信元ウィンドウ:', senderWindow ? senderWindow.getTitle() : 'なし');
+    
+    // 全てのウィンドウをログ出力
+    const allWindows = BrowserWindow.getAllWindows();
+    console.log('現在のウィンドウ数:', allWindows.length);
+    allWindows.forEach((win, index) => {
+      if (!win.isDestroyed()) {
+        const url = win.webContents.getURL();
+        console.log(`ウィンドウ${index}:`, win.getTitle(), 'URL:', url);
+      }
+    });
+    
+    // mainWinが存在するか確認
+    console.log('mainWin存在:', mainWin ? 'あり' : 'なし');
+    console.log('mainWin破棄:', mainWin && mainWin.isDestroyed() ? 'はい' : 'いいえ');
+    
+    // mainWinが存在しない、または破棄されている場合は新規作成
+    if (!mainWin || mainWin.isDestroyed()) {
+      console.log('✅ mainWinを新規作成します');
+      
+      // EVE導入画面はスキップして直接メインウィンドウを作成
+      mainWin = new BrowserWindow({
+        width: 800,
+        height: 600,
+        autoHideMenuBar: true,
+        fullscreen: true,
+        show: false,
+        icon: path.join(__dirname, "src/pic/app_icon.ico"),
+        webPreferences: {
+          nodeIntegration: false,
+          contextIsolation: true,
+          preload: path.join(__dirname, 'preload.js')
+        },
+        title: 'EVE - Main Game'
+      });
+      
+      mainWin.loadFile(path.join(__dirname, 'src', 'html', 'index.html'));
+      
+      // リロード検出用の変数
+      let lastLoadedURL = '';
+      
+      // リロード（Ctrl+R）を検出してセーブデータを削除
+      mainWin.webContents.on('did-start-loading', () => {
+        const currentURL = mainWin.webContents.getURL();
+        console.log('ページ読み込み開始:', currentURL);
+        
+        // 同じURLが再度読み込まれた場合はリロードと判断
+        if (lastLoadedURL && currentURL === lastLoadedURL) {
+          console.log('🔄 リロード検出: セーブデータを削除します');
+          mainWin.webContents.executeJavaScript(`
+            if (window.saveSystem) {
+              window.saveSystem.clear();
+              console.log('リロードによりセーブデータを削除しました');
+            }
+            localStorage.removeItem("eveGameState");
+            localStorage.removeItem("lastSessionTime");
+          `).catch(err => console.error('セーブデータ削除エラー:', err));
+        }
+        
+        lastLoadedURL = currentURL;
+      });
+      
+      mainWin.once('ready-to-show', () => {
+        console.log('✅ mainWinの準備が完了しました');
+        
+        // 全てのEND画面を閉じる（mainWin作成後）
+        allWindows.forEach(win => {
+          if (!win.isDestroyed() && win !== BGScreen && win !== mainWin) {
+            const url = win.webContents.getURL();
+            if (url.includes('end.html') || url.includes('true_end.html') || 
+                url.includes('dominated_end.html') || url.includes('timeout_end.html')) {
+              console.log('END画面を閉じます:', url);
+              win.close();
+            }
+          }
+        });
+        
+        mainWin.webContents.executeJavaScript(`
+          document.body.style.opacity = '0';
+          document.body.style.transition = 'opacity 1s ease-in';
+          setTimeout(() => { document.body.style.opacity = '1'; }, 50);
+        `);
+        mainWin.show();
+        mainWin.focus();
+        console.log('✅ mainWinを表示しました');
+      });
+    } else {
+      // 既存のmainWinを表示
+      console.log('✅ 既存のmainWinが存在します');
+      const currentURL = mainWin.webContents.getURL();
+      console.log('現在のmainWin URL:', currentURL);
+      
+      // mainWinがEND画面を表示している場合、index.htmlに戻す
+      if (currentURL.includes('end.html') || currentURL.includes('true_end.html') || 
+          currentURL.includes('dominated_end.html') || currentURL.includes('timeout_end.html')) {
+        console.log('✅ mainWinをindex.htmlに戻します');
+        
+        // フェードアウト
+        mainWin.webContents.executeJavaScript(`
+          document.body.style.transition = 'opacity 0.5s ease-out';
+          document.body.style.opacity = '0';
+        `);
+        
+        setTimeout(() => {
+          mainWin.loadFile(path.join(__dirname, 'src', 'html', 'index.html'));
+          mainWin.once('ready-to-show', () => {
+            console.log('✅ index.htmlの読み込みが完了しました');
+            mainWin.webContents.executeJavaScript(`
+              document.body.style.opacity = '0';
+              document.body.style.transition = 'opacity 1s ease-in';
+              setTimeout(() => { document.body.style.opacity = '1'; }, 50);
+            `);
+            mainWin.show();
+            mainWin.focus();
+          });
+        }, 500);
+      } else {
+        // 既にindex.htmlを表示している場合はそのまま表示
+        console.log('✅ mainWinをそのまま表示します');
+        mainWin.webContents.executeJavaScript(`
+          document.body.style.opacity = '0';
+          document.body.style.transition = 'opacity 1s ease-in';
+          setTimeout(() => { document.body.style.opacity = '1'; }, 50);
+        `);
+        mainWin.show();
+        mainWin.focus();
+      }
+      console.log('✅ 既存のmainWin処理完了');
+    }
+  });
+
   // ENDからタイトルに戻る処理
   console.log('✅ back-to-titleハンドラーを登録しました');
   ipcMain.on('back-to-title', () => {
@@ -360,14 +524,23 @@ app.whenReady().then(() => {
 
 // アプリ終了時のクリーンアップ
 app.on('before-quit', () => {
-  console.log('apri end...');
+  console.log('アプリ終了: セーブデータを削除します');
   stopIMEMonitor();
   
-  // ゲーム状態をリセット（localStorageをクリア）
-  if (TitleScreen && !TitleScreen.isDestroyed()) {
-    TitleScreen.webContents.executeJavaScript('localStorage.removeItem("eveGameState");')
-      .catch(err => console.error('localStorage削除エラー:', err));
-  }
+  // ゲームを閉じる場合はセーブデータを削除
+  const windows = BrowserWindow.getAllWindows();
+  windows.forEach(win => {
+    if (!win.isDestroyed()) {
+      win.webContents.executeJavaScript(`
+        if (window.saveSystem) {
+          window.saveSystem.clear();
+          console.log('アプリ終了: セーブデータを削除しました');
+        }
+        localStorage.removeItem("eveGameState");
+        localStorage.removeItem("lastSessionTime");
+      `).catch(err => console.error('セーブデータ削除エラー:', err));
+    }
+  });
 });
 
 app.on('window-all-closed', () => {

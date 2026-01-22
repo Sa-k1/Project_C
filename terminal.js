@@ -45,77 +45,43 @@
         hasRemnantCommand: false,       // remnantコマンドが解放されたか（magic3クリア報酬）
         isFirstLaunch: true,            // 初回起動かどうか
         commandHistory: [],             // コマンド履歴
-        outputHistory: []               // 出力履歴
+        outputHistory: [],              // 出力履歴
+        // 謎解き解決状態
+        puzzleCleared: false,           // ギミック1クリア
+        gimmick2Cleared: false,         // ギミック2クリア
+        gimmick3Cleared: false,         // ギミック3クリア
+        adminKeyState: null             // 管理者キー状態
     };
 
-    // ゲーム状態をlocalStorageから復元
-    function loadGameState() {
-        try {
-            const saved = localStorage.getItem('eveGameState');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                // 保存されたデータを現在の状態にマージ
-                Object.keys(parsed).forEach(function(key) {
-                    gameState[key] = parsed[key];
-                });
-                gameState.isFirstLaunch = false;
-                
-                // コマンド履歴を復元（配列であることを確認）
-                if (Array.isArray(gameState.commandHistory)) {
-                    commandHistory = gameState.commandHistory;
-                }
-                return true;
+    // セーブシステムからデータを読み込み
+    if (window.saveSystem && window.saveSystem.hasSaveData()) {
+        window.saveSystem.applyToGameState(gameState);
+        console.log('セーブデータから復元しました');
+    }
+    
+    // コマンド実行時に自動保存（重要な状態変化を記録）
+    const originalHandleInput = window.commandHandler ? window.commandHandler.handleInput : null;
+    if (originalHandleInput) {
+        const autoSaveWrapper = async function(term, gameState, puzzleHelpers, vfs, command) {
+            await originalHandleInput.call(window.commandHandler, term, gameState, puzzleHelpers, vfs, command);
+            // コマンド実行後にセーブ
+            if (window.saveSystem) {
+                window.saveSystem.save(gameState);
             }
-        } catch (e) {
-            console.error('ゲーム状態の読み込みに失敗:', e);
-        }
-        return false;
+        };
+        // handleInputをラップ（初期化後に設定）
+        setTimeout(function() {
+            if (window.commandHandler && window.commandHandler.handleInput) {
+                const original = window.commandHandler.handleInput;
+                window.commandHandler.handleInput = async function(term, gameState, puzzleHelpers, vfs, command) {
+                    await original.call(window.commandHandler, term, gameState, puzzleHelpers, vfs, command);
+                    if (window.saveSystem) {
+                        window.saveSystem.save(gameState);
+                    }
+                };
+            }
+        }, 100);
     }
-
-    // ゲーム状態をlocalStorageに保存
-    function saveGameState() {
-        try {
-            // inputModeやwaitingForConfirmationなど、一時的な状態は保存しない
-            const stateToSave = Object.assign({}, gameState);
-            stateToSave.inputMode = 'normal';
-            stateToSave.waitingForConfirmation = null;
-            stateToSave.passwordTarget = null;
-            // コマンド履歴を保存（最新100件まで）
-            stateToSave.commandHistory = commandHistory.slice(-100);
-            // 出力履歴を保存（最新200行まで）
-            stateToSave.outputHistory = gameState.outputHistory.slice(-200);
-            localStorage.setItem('eveGameState', JSON.stringify(stateToSave));
-        } catch (e) {
-            console.error('ゲーム状態の保存に失敗:', e);
-        }
-    }
-
-    // より確実なリロード検出：sessionStorageとタイムスタンプを使用
-    const lastSessionTime = localStorage.getItem('lastSessionTime');
-    const currentTime = Date.now();
-    const sessionTimeout = 1000; // 1秒以内なら同じセッション
-    
-    // localStorageをクリアする条件：
-    // 1. lastSessionTimeが存在しない（初回）
-    // 2. 前回から1秒以上経過（リロードまたは新規起動）
-    if (!lastSessionTime || (currentTime - parseInt(lastSessionTime)) > sessionTimeout) {
-        localStorage.removeItem('eveGameState');
-        console.log('リロード/新規起動検出: ゲーム状態をリセットしました');
-    }
-    
-    localStorage.setItem('lastSessionTime', currentTime.toString());
-
-    // 保存されたゲーム状態を読み込む
-    const hasExistingState = loadGameState();
-
-    // 定期的に自動保存とタイムスタンプ更新
-    setInterval(function() {
-        saveGameState();
-        localStorage.setItem('lastSessionTime', Date.now().toString());
-    }, 5000);
-
-    // ページを閉じる前に保存（通常の閉じる操作では保存）
-    window.addEventListener('beforeunload', saveGameState);
 
     if (!window.vfs && window.VirtualFileSystem) {
         window.vfs = new VirtualFileSystem(gameState);
@@ -788,7 +754,10 @@
                 if (userMessage) {
                     inputEnabled = false;
                     await handleInput(userMessage);
-                    saveGameState(); // コマンド実行後に状態を保存
+                    // セーブシステムで状態を保存
+                    if (window.saveSystem) {
+                        window.saveSystem.save(gameState);
+                    }
                     inputEnabled = true;
                 }
                 

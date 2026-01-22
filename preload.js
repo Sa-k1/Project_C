@@ -7,7 +7,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // 既存のIPCメソッド（既に使用されている場合は維持）
   send: (channel, data) => {
-    const validChannels = ['game-start', 'prepare-splash', 'back-to-title'];
+    const validChannels = ['game-start', 'prepare-splash', 'back-to-title', 'continue-game'];
     if (validChannels.includes(channel)) {
       console.log(`[preload.js] Sending IPC message: ${channel}`, data);
       ipcRenderer.send(channel, data);
@@ -25,7 +25,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 汎用的なipcRenderer呼び出し（後方互換性のため）
   ipcRenderer: {
     send: (channel, ...args) => {
-      const validChannels = ['game-start', 'prepare-splash', 'back-to-title'];
+      const validChannels = ['game-start', 'prepare-splash', 'back-to-title', 'continue-game'];
       if (validChannels.includes(channel)) {
         ipcRenderer.send(channel, ...args);
       }
