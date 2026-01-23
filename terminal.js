@@ -117,7 +117,8 @@
     term.open(document.getElementById("terminal"));
     if (fitAddon && typeof fitAddon.fit === "function") fitAddon.fit();
     
-
+    // termをグローバルに公開（外部からアクセス可能にする）
+    window.term = term;
 
     // -------------------------
     // ユーティリティ関数

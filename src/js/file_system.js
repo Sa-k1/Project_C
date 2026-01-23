@@ -35,6 +35,64 @@ class VirtualFileSystem {
                             'Student': {
                                 type: 'folder',
                                 children: {
+                                    'Documents': {
+                                        type: 'folder',
+                                        hidden: true,
+                                        children: {
+                                            'personal': {
+                                                type: 'folder',
+                                                children: {
+                                                    '重要なデータ.txt': {
+                                                        type: 'file',
+                                                        htmlFile: 'file1.html',
+                                                        content: `重要なファイルです。\n何か手がかりがあるかもしれません。`,
+                                                        editable: false
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    'Pictures': {
+                                        type: 'folder',
+                                        hidden: true,
+                                        children: {
+                                            'old_photos': {
+                                                type: 'folder',
+                                                children: {
+                                                    '不要な写真.png': {
+                                                        type: 'file',
+                                                        htmlFile: 'file3.html',
+                                                        contentSelector: '.image-info',
+                                                        content: null,
+                                                        fileType: 'image',
+                                                        editable: false
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    'AppData': {
+                                        type: 'folder',
+                                        hidden: true,
+                                        children: {
+                                            'Local': {
+                                                type: 'folder',
+                                                children: {
+                                                    'MyDay': {
+                                                        type: 'folder',
+                                                        children: {
+                                                            'MyDay.app': {
+                                                                type: 'file',
+                                                                htmlFile: 'file2.html',
+                                                                content: `MyDayアプリケーション`,
+                                                                editable: false
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
                                     'Downloads': {
                                         type: 'folder',
                                         children: {
@@ -52,6 +110,14 @@ class VirtualFileSystem {
                                             'Desktop': {
                                                 type: 'folder',
                                                 children: {
+                                                    // frnepu.enc - デスクトップ直下（searchコマンド不要）
+                                                    'frnepu.enc': {
+                                                        type: 'file',
+                                                        encrypted: true,
+                                                        htmlFile: 'file_encrypted.html',
+                                                        content: `[暗号化されたファイル]\n\nこのファイルはパスワードで保護されています。\nopenコマンドで開いてパスワードを入力してください。`,
+                                                        editable: false
+                                                    },
                                                     'data': {
                                                         type: 'folder',
                                                         children: {
@@ -65,19 +131,6 @@ class VirtualFileSystem {
                                                                 type: 'file',
                                                                 content: `[2025-11-27 10:23:45] システム起動\n[2025-11-27 10:30:15] 不明なプロセス検出...`,
                                                                 editable: true
-                                                            },
-                                                            // 'memoO.txt': {
-                                                            //     type: 'file',
-                                                            //     content: `メモ:\n- パスワードを変更する\n- バックアップを取る`,
-                                                            //     editable: true
-                                                            // },
-                                                            '不要な写真.png': {
-                                                                type: 'file',
-                                                                htmlFile: 'file3.html',
-                                                                contentSelector: '.image-info',
-                                                                content: null,
-                                                                fileType: 'image',
-                                                                editable: false
                                                             }
                                                         }
                                                     },

@@ -296,7 +296,18 @@
                             term.clear();
                             return;
                         case "openFile":
-                            await errorLine("そのファイルには使えません", 20);
+                            // 親ウィンドウでファイルビューアを開く
+                            try {
+                                var targetWindow = (window.parent && window.parent !== window) ? window.parent : window;
+                                if (targetWindow.openFileFromTerminal) {
+                                    targetWindow.openFileFromTerminal(result.file);
+                                    await systemLine("[SYSTEM]: ファイルを開きました", 20);
+                                } else {
+                                    await errorLine("ファイルビューアが見つかりません", 20);
+                                }
+                            } catch (e) {
+                                await errorLine("ファイルを開けませんでした: " + e.message, 20);
+                            }
                             return;
                         case "gimmick3_keytrace":
                             // ギミック3のキートレース表示

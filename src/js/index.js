@@ -183,14 +183,53 @@ const trashCan = document.getElementById('trash-can');
 // ファイルごとのページ設定(ファイルIDとウィンドウ番号のマッピング)
 const filePages = {
     'file1': { page: 'file1.html', viewerId: 1 },  // 重要なデータ.txt
-    'file2': { page: 'file2.html', viewerId: 2 },  // 古いメモ.doc
-    'file3': { page: 'file3.html', viewerId: 3 },  // 不要な写真.jpg
+    'file2': { page: 'file2.html', viewerId: 2 },  // MyDay
+    'file3': { page: 'file3.html', viewerId: 3 },  // 不要な写真.png
     'file_encrypted': { page: 'file_encrypted.html', viewerId: 4 },  // 暗号化ファイル
     'key_trace': { page: 'key_trace_viewer.html', viewerId: 4 }
 };
 
+// HTMLファイル名からビューア設定へのマッピング
+const htmlToViewerMap = {
+    'file1.html': { viewerId: 1, title: '重要なデータ.txt' },
+    'file2.html': { viewerId: 2, title: 'MyDay' },
+    'file3.html': { viewerId: 3, title: '不要な写真.png' },
+    'file_encrypted.html': { viewerId: 4, title: 'frnepu.enc' }
+};
+
 // グローバルに公開（ターミナルからアクセス可能に）
 window.filePages = filePages;
+
+// ターミナルからファイルを開く関数
+window.openFileFromTerminal = function(htmlFile) {
+    const config = htmlToViewerMap[htmlFile];
+    if (!config) {
+        console.error('未知のファイル:', htmlFile);
+        return false;
+    }
+    
+    const container = fileViewerContainers[config.viewerId];
+    const iframe = document.getElementById(`file-viewer-iframe${config.viewerId}`);
+    const title = document.getElementById(`fileViewerTitle${config.viewerId}`);
+    
+    // タイトル設定
+    if (title) {
+        title.textContent = config.title;
+    }
+    
+    // iframeにファイルを読み込み
+    if (iframe) {
+        iframe.src = htmlFile;
+    }
+    
+    // ウィンドウを表示して前面に
+    if (container) {
+        container.style.display = 'block';
+        bringToFront(container);
+    }
+    
+    return true;
+};
 
 // ゴミ箱のダブルクリック処理
 if (trashCan) {
