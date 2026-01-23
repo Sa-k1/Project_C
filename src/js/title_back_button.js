@@ -87,12 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const continueBtn = document.getElementById('continueBtn');
     if (continueBtn) {
         continueBtn.addEventListener('click', (e) => {
-            console.log('🔵 続きから再開ボタンがクリックされました');
             e.stopPropagation();
-            
-            // デバッグ情報
-            console.log('window.electronAPI:', window.electronAPI);
-            console.log('window.require:', typeof require);
             
             // セーブデータを保持したままゲーム画面に戻る
             document.body.style.transition = 'opacity 1s ease-out';
@@ -100,28 +95,19 @@ document.addEventListener('DOMContentLoaded', () => {
             
             setTimeout(() => {
                 if (window.electronAPI && window.electronAPI.send) {
-                    console.log('✅ electronAPI.send経由でcontinue-gameメッセージを送信');
                     window.electronAPI.send('continue-game');
                 } else if (typeof require !== 'undefined') {
-                    // contextIsolation: falseの場合
-                    console.log('✅ require経由でcontinue-gameメッセージを送信');
                     const { ipcRenderer } = require('electron');
                     ipcRenderer.send('continue-game');
-                } else {
-                    console.error('❌ electronAPIもrequireも利用できません');
-                    console.log('利用可能なグローバル変数:', Object.keys(window));
                 }
             }, 1000);
         });
-    } else {
-        console.error('❌ continueBtnが見つかりません');
     }
 
     // Titleに戻るボタンの処理
     const startBtn = document.getElementById('startBtn');
     if (startBtn) {
         startBtn.addEventListener('click', (e) => {
-            console.log('Titleに戻るボタンがクリックされました');
             e.stopPropagation();
             
             // フェードアウト開始
@@ -130,14 +116,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             setTimeout(() => {
                 if (window.electronAPI && window.electronAPI.send) {
-                    console.log('back-to-titleメッセージを送信');
                     window.electronAPI.send('back-to-title');
-                } else {
-                    console.error('electronAPIが利用できません');
                 }
             }, 1000);
         });
-    } else {
-        console.error('startBtnが見つかりません');
     }
 });

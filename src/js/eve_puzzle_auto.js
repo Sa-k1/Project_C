@@ -20,7 +20,7 @@
         // holdTarget: 5.0,
         holdTarget: 5.0,
         // 時間制限（秒）
-        timeLimit: 60.0,
+        timeLimit: 2.0,
         // 成功後の遷移先
         successDestination: 'true_end.html',
         // 失敗後の遷移先（時間切れ）

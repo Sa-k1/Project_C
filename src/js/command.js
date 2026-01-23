@@ -469,6 +469,12 @@
             if (targetFile === 'admin_key.dat' || targetFile === 'admin_key') {
                 if (!gameState.hasAdminCommand) {
                     gameState.hasAdminCommand = true;
+                    
+                    // セーブ
+                    if (window.saveSystem) {
+                        window.saveSystem.save(gameState);
+                    }
+                    
                     await systemLine("[SYSTEM]: admin_key.dat を解読中...", 25);
                     await window.commandHandler.wait(500);
                     term.writeln("\r");
@@ -603,6 +609,12 @@
                 
                 // 管理者コマンド入力画面を開けるようにする
                 gameState.hasAdminCommand = true;
+                
+                // セーブ
+                if (window.saveSystem) {
+                    window.saveSystem.save(gameState);
+                }
+                
                 await systemLine("[TIP]: 'open admin_command' で管理者コマンド入力画面を開けます。", 25);
                 return;
             } else if (target === '') {

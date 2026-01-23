@@ -88,6 +88,19 @@
     }
 
     // -------------------------
+    // ランダム文字列生成関数
+    // -------------------------
+    function generateRandomString() {
+        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/~`";
+        const length = Math.floor(Math.random() * 50) + 20; // 20〜70文字のランダムな長さ
+        let result = "";
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return result;
+    }
+
+    // -------------------------
     // AI呼び出し関数
     // -------------------------
     async function callAI(userMessage) {
@@ -150,7 +163,10 @@
         } catch (error) {
             removeTypingIndicator();
             console.error("[ERROR]: AI呼び出しエラー:", error.message || error);
-            addMessage("AIとの通信に失敗しました: " + (error.message || error), "error");
+            
+            // エラー時はランダムな文字列を出力
+            const randomText = generateRandomString();
+            addMessage(randomText, "ai");
         }
 
         isProcessing = false;
