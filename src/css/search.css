@@ -1,0 +1,100 @@
+@charset "UTF-8";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(135deg, #0a1a0a 0%, #152d15 100%);
+    color: #00ff00;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.container {
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: 10px;
+    padding: 0 30px 30px 30px;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+}
+
+.unlock-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+    animation: glow 2s infinite;
+}
+
+h1 {
+    color: #00ff00;
+    font-size: 1.3em;
+    margin-bottom: 15px;
+}
+
+.content-box {
+    background: #111;
+    border: 1px solid #333;
+    padding: 20px;
+    margin: 15px 0;
+    text-align: left;
+    font-size: 1em;
+    font-weight: bold;
+    line-height: 1.6;
+}
+
+.section-title {
+    color: #00ff00;
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #00ff00;
+    padding-bottom: 5px;
+    text-align: center;
+}
+
+.command_center {
+    text-align: center;
+}
+
+.important {
+    color: #ffff00;
+    font-weight: bold;
+}
+
+.hint {
+    color: #88ff88;
+    margin-top: 15px;
+    padding: 10px;
+    border-left: 3px solid #00ff00;
+    background: rgba(0, 255, 0, 0.1);
+}
+
+.status {
+    margin-top: 20px;
+    padding: 10px;
+    background: #002200;
+    border-left: 3px solid #00ff00;
+}
+
+.status-label {
+    color: #00ff00;
+    font-weight: bold;
+}
+
+.status-value {
+    color: #88ff88;
+}
+
+.footer {
+    margin-top: 20px;
+    color: #666;
+    font-size: 0.8em;
+}

@@ -812,7 +812,7 @@
             term.writeln("\r  [通常ファイル]");
             for (var i = 0; i < normalFiles.length; i++) {
                 var file = normalFiles[i];
-                var icon = file.type === 'folder' ? '📁' : '📄';
+                var icon = file.type === 'folder' ? '📁 ' : '📄 ';
                 term.writeln("\r    " + icon + " " + file.name);
             }
             term.writeln("\r");
@@ -823,7 +823,7 @@
             term.writeln("\r  \x1b[33m[隠しファイル発見！]\x1b[0m");
             for (var j = 0; j < hiddenFiles.length; j++) {
                 var hfile = hiddenFiles[j];
-                var hicon = hfile.type === 'folder' ? '📁' : '📄';
+                var hicon = hfile.type === 'folder' ? '📁 ' : '📄 ';
                 term.writeln("\r    " + hicon + " " + hfile.name + " \x1b[33m[隠し]\x1b[0m");
             }
             term.writeln("\r");

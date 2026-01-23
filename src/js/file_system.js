@@ -55,41 +55,26 @@ class VirtualFileSystem {
                                     'Pictures': {
                                         type: 'folder',
                                         hidden: true,
-                                        children: {
-                                            'old_photos': {
-                                                type: 'folder',
-                                                children: {
-                                                    '不要な写真.png': {
-                                                        type: 'file',
-                                                        htmlFile: 'file3.html',
-                                                        contentSelector: '.image-info',
-                                                        content: null,
-                                                        fileType: 'image',
-                                                        editable: false
-                                                    }
+                                            children: {
+                                                'none.png': {
+                                                    type: 'file',
+                                                    htmlFile: 'file3.html',
+                                                    contentSelector: '.image-info',
+                                                    content: null,
+                                                    fileType: 'image',
+                                                    editable: false
                                                 }
                                             }
-                                        }
                                     },
                                     'AppData': {
                                         type: 'folder',
                                         hidden: true,
                                         children: {
-                                            'Local': {
-                                                type: 'folder',
-                                                children: {
-                                                    'MyDay': {
-                                                        type: 'folder',
-                                                        children: {
-                                                            'MyDay.app': {
-                                                                type: 'file',
-                                                                htmlFile: 'file2.html',
-                                                                content: `MyDayアプリケーション`,
-                                                                editable: false
-                                                            }
-                                                        }
-                                                    }
-                                                }
+                                            'MyDay.app': {
+                                                type: 'file',
+                                                htmlFile: 'file2.html',
+                                                content: `MyDayアプリケーション`,
+                                                editable: false
                                             }
                                         }
                                     },
@@ -387,11 +372,11 @@ class VirtualFileSystem {
     cmdDir(args) {
         // 隠しファイル表示オプション（複数パターン対応）
         const showHidden = args.includes('/a') || 
-                          args.includes('-a') || 
-                          args.includes('hidden') || 
-                          args.includes('all') ||
-                          args.includes('すべて') ||
-                          args.includes('全部');
+                        args.includes('-a') || 
+                        args.includes('hidden') || 
+                        args.includes('all') ||
+                        args.includes('すべて') ||
+                        args.includes('全部');
         
         const currentDir = this.getCurrentDir();
         
@@ -526,10 +511,10 @@ class VirtualFileSystem {
         this.editBuffer = content ? content.split('\n') : [];
 
         return `--- ${fileName} を編集中 ---\n` +
-               `現在の内容:\n${content || '(空)'}\n\n` +
-               `--- 編集モード ---\n` +
-               `テキストを入力してください。\n` +
-               `:w=保存 :q=キャンセル :wq=保存して終了 :show=内容表示`;
+            `現在の内容:\n${content || '(空)'}\n\n` +
+            `--- 編集モード ---\n` +
+            `テキストを入力してください。\n` +
+            `:w=保存 :q=キャンセル :wq=保存して終了 :show=内容表示`;
     }
 
     cmdEcho(args) {
@@ -697,34 +682,34 @@ class VirtualFileSystem {
 === 利用可能なコマンド ===
 
 【ナビゲーション】
-  cd <パス>      ディレクトリ移動
-  dir, ls        ファイル一覧表示 (-a で隠しファイルも表示)
-  pwd            現在のパス表示
+cd <パス>      ディレクトリ移動
+dir, ls        ファイル一覧表示 (-a で隠しファイルも表示)
+pwd            現在のパス表示
 
 【ファイル操作】
-  type <ファイル>    ファイル内容表示
-  open <ファイル>    ファイルを開く
-  edit <ファイル>    ファイルを編集
-  touch <ファイル>   空のファイル作成
-  del <ファイル>     ファイル削除
-  copy <元> <先>     ファイルコピー
+type <ファイル>    ファイル内容表示
+open <ファイル>    ファイルを開く
+edit <ファイル>    ファイルを編集
+touch <ファイル>   空のファイル作成
+del <ファイル>     ファイル削除
+copy <元> <先>     ファイルコピー
 
 【テキスト操作】
-  echo <テキスト>           テキスト表示
-  echo <テキスト> > file    ファイルに書き込み
-  echo <テキスト> >> file   ファイルに追記
-  append <ファイル> <テキスト>  追記
+echo <テキスト>           テキスト表示
+echo <テキスト> > file    ファイルに書き込み
+echo <テキスト> >> file   ファイルに追記
+append <ファイル> <テキスト>  追記
 
 【ネットワーク】
-  browse <URL>   ブラウザでURLを開く
-  wget <URL>     URLの内容をダウンロード
+browse <URL>   ブラウザでURLを開く
+wget <URL>     URLの内容をダウンロード
 
 【その他】
-  cls, clear     画面クリア
-  whoami         ユーザー名表示
-  date           日付表示
-  time           時刻表示
-  help           このヘルプを表示
+cls, clear     画面クリア
+whoami         ユーザー名表示
+date           日付表示
+time           時刻表示
+help           このヘルプを表示
 `;
     }
 

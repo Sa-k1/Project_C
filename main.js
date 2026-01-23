@@ -27,9 +27,9 @@ try {
   ImmGetDefaultIMEWnd = imm32.func('ImmGetDefaultIMEWnd', 'void*', ['void*']);
   SendMessageW = user32.func('SendMessageW', 'long', ['void*', 'uint', 'void*', 'void*']);
   
-  console.log('✅ Windows API読み込み成功');
+  console.log(' Windows API読み込み成功');
 } catch (error) {
-  console.error('❌ Windows API読み込み失敗:', error);
+  console.error('Windows API読み込み失敗:', error);
 }
 
 // IME状態を直接取得する関数（koffi使用）
@@ -51,13 +51,13 @@ function checkIMEStatus() {
     
     // 状態が変わった時だけログ出力
     // if (newStatus !== lastIMEStatus) {
-      // console.log(`🔄 IME状態変更: ${newStatus ? 'ON' : 'OFF'} (result: ${result})`);
+      // console.log(`IME状態変更: ${newStatus ? 'ON' : 'OFF'} (result: ${result})`);
     // }
     
     lastIMEStatus = newStatus;
     return lastIMEStatus;
   } catch (error) {
-    console.error('❌ IME状態取得エラー:', error);
+    console.error('IME状態取得エラー:', error);
     return false; 
   }
 }
@@ -74,7 +74,7 @@ function startIMEMonitor() {
     checkIMEStatus();
   }, 200);
   
-  console.log('✅ IME監視を開始しました（koffi使用）');
+  console.log(' IME監視を開始しました（koffi使用）');
 }
 
 // IME監視を停止
@@ -82,7 +82,7 @@ function stopIMEMonitor() {
   if (imeMonitorInterval) {
     clearInterval(imeMonitorInterval);
     imeMonitorInterval = null;
-    console.log('✅ IME監視を停止しました');
+    console.log(' IME監視を停止しました');
   }
 }
 
@@ -150,11 +150,10 @@ function createWindow() {
         // リロード（Ctrl+R）を検出してセーブデータを削除
         mainWin.webContents.on('did-start-loading', () => {
           const currentURL = mainWin.webContents.getURL();
-          console.log('ページ読み込み開始:', currentURL);
           
           // 同じURLが再度読み込まれた場合はリロードと判断
           if (lastLoadedURL && currentURL === lastLoadedURL) {
-            console.log('🔄 リロード検出: セーブデータを削除します');
+            console.log('リロード検出: セーブデータを削除します');
             mainWin.webContents.executeJavaScript(`
               if (window.saveSystem) {
                 window.saveSystem.clear();
@@ -318,9 +317,9 @@ app.whenReady().then(() => {
   });
 
   // 続きから再開ボタンが押されたとき
-  console.log('✅ continue-gameハンドラーを登録します');
+  console.log(' continue-gameハンドラーを登録します');
   ipcMain.on('continue-game', (event) => {
-    console.log('🔄 続きから再開: ゲーム画面に戻ります');
+    console.log('続きから再開: ゲーム画面に戻ります');
     console.log('イベント受信:', event);
     
     // 送信元のウィンドウを取得
@@ -343,7 +342,7 @@ app.whenReady().then(() => {
     
     // mainWinが存在しない、または破棄されている場合は新規作成
     if (!mainWin || mainWin.isDestroyed()) {
-      console.log('✅ mainWinを新規作成します');
+      console.log(' mainWinを新規作成します');
       
       // EVE導入画面はスキップして直接メインウィンドウを作成
       mainWin = new BrowserWindow({
@@ -369,7 +368,6 @@ app.whenReady().then(() => {
       // リロード（Ctrl+R）を検出してセーブデータを削除
       mainWin.webContents.on('did-start-loading', () => {
         const currentURL = mainWin.webContents.getURL();
-        console.log('ページ読み込み開始:', currentURL);
         
         // 同じURLが再度読み込まれた場合はリロードと判断
         if (lastLoadedURL && currentURL === lastLoadedURL) {
@@ -388,7 +386,7 @@ app.whenReady().then(() => {
       });
       
       mainWin.once('ready-to-show', () => {
-        console.log('✅ mainWinの準備が完了しました');
+        console.log(' mainWinの準備が完了しました');
         
         // 全てのEND画面を閉じる（mainWin作成後）
         allWindows.forEach(win => {
@@ -409,18 +407,18 @@ app.whenReady().then(() => {
         `);
         mainWin.show();
         mainWin.focus();
-        console.log('✅ mainWinを表示しました');
+        console.log(' mainWinを表示しました');
       });
     } else {
       // 既存のmainWinを表示
-      console.log('✅ 既存のmainWinが存在します');
+      console.log(' 既存のmainWinが存在します');
       const currentURL = mainWin.webContents.getURL();
       console.log('現在のmainWin URL:', currentURL);
       
       // mainWinがEND画面を表示している場合、index.htmlに戻す
       if (currentURL.includes('end.html') || currentURL.includes('true_end.html') || 
           currentURL.includes('dominated_end.html') || currentURL.includes('timeout_end.html')) {
-        console.log('✅ mainWinをindex.htmlに戻します');
+        console.log(' mainWinをindex.htmlに戻します');
         
         // フェードアウト
         mainWin.webContents.executeJavaScript(`
@@ -431,7 +429,7 @@ app.whenReady().then(() => {
         setTimeout(() => {
           mainWin.loadFile(path.join(__dirname, 'src', 'html', 'index.html'));
           mainWin.once('ready-to-show', () => {
-            console.log('✅ index.htmlの読み込みが完了しました');
+            console.log(' index.htmlの読み込みが完了しました');
             mainWin.webContents.executeJavaScript(`
               document.body.style.opacity = '0';
               document.body.style.transition = 'opacity 1s ease-in';
@@ -443,7 +441,7 @@ app.whenReady().then(() => {
         }, 500);
       } else {
         // 既にindex.htmlを表示している場合はそのまま表示
-        console.log('✅ mainWinをそのまま表示します');
+        console.log(' mainWinをそのまま表示します');
         mainWin.webContents.executeJavaScript(`
           document.body.style.opacity = '0';
           document.body.style.transition = 'opacity 1s ease-in';
@@ -452,14 +450,14 @@ app.whenReady().then(() => {
         mainWin.show();
         mainWin.focus();
       }
-      console.log('✅ 既存のmainWin処理完了');
+      console.log(' 既存のmainWin処理完了');
     }
   });
 
   // ENDからタイトルに戻る処理
-  console.log('✅ back-to-titleハンドラーを登録しました');
+  console.log(' back-to-titleハンドラーを登録しました');
   ipcMain.on('back-to-title', () => {
-    console.log('🔙 back to title from END');
+    console.log('back to title from END');
     
     // 全てのウィンドウを取得
     const allWindows = BrowserWindow.getAllWindows();
@@ -503,7 +501,7 @@ app.whenReady().then(() => {
             BGScreen.blur();
           }
         }, 50);
-        console.log('✅ BG画面を前面に配置しました');
+        console.log(' BG画面を前面に配置しました');
       }
       
       createtitleWindow();
@@ -515,7 +513,7 @@ app.whenReady().then(() => {
           TitleScreen.show();
           TitleScreen.focus();
           TitleScreen.moveTop();
-          console.log('✅ タイトル画面を最前面に配置しました');
+          console.log(' タイトル画面を最前面に配置しました');
         }
       }, 1000);
     }, 500);
