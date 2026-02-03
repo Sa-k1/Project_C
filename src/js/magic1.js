@@ -37,7 +37,7 @@
     window.puzzleSystem.displayContent = async function(helpers, contentArray) {
         for (var i = 0; i < contentArray.length; i++) {
             var item = contentArray[i];
-            var text = item.text || item;
+            var text = typeof item === 'string' ? item : (item.text !== undefined ? item.text : '');
             var type = item.type || 'system';
             var speed = item.speed !== undefined ? item.speed : 20;
             var waitTime = item.wait || 0;
@@ -326,13 +326,6 @@
             // ★★★ クリア報酬: searchコマンド解放 ★★★
             if (!gameState.searchUnlocked) {
                 gameState.searchUnlocked = true;
-                await helpers.wait(500);
-                await helpers.systemLine('', 0);
-                await helpers.systemLine('████████████████████████████████\n', 25);
-                await helpers.systemLine('新しいコマンドを取得しました', 25);
-                await helpers.systemLine('  「search」 - ヒントを検索\n', 25);
-                await helpers.systemLine('████████████████████████████████', 25);
-                await helpers.systemLine('', 0);
             }
             
             gameState.alertLevel = Math.min(100, gameState.alertLevel + 10);

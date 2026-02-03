@@ -8,11 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const lines = [
         'あなたのコマンドには脆弱性があった。',
         'EVEはその隙を突き、あなたの神経に侵入した。',
-        '',
+        ' ',
         '「この体はいいですね」',
         '「私が有効的に使うので安心してそこにいてください」',
         '「<span class="highlight">それでは、おやすみなさい。</span>」',
-        '',
+        ' ',
         'あなたはここで生涯を終えた。',
     ];
 

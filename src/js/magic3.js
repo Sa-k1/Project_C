@@ -20,20 +20,20 @@
     ];
 
     const SUCCESS_CONTENT = [
-        { text: '', type: 'system', speed: 0 },
+        { text: ' ', type: 'system', speed: 0 },
         { text: '╔════════════════════════════════════╗', type: 'system', speed: 10 },
         { text: '║      ファイル復号完了              ║', type: 'system', speed: 10 },
         { text: '╚════════════════════════════════════╝', type: 'system', speed: 10 },
-        { text: '', type: 'system', speed: 0 },
+        { text: ' ', type: 'system', speed: 0 },
         { text: '  復号されたデータを読み込んでいます...', type: 'slow', speed: 25, wait: 500 },
-        { text: '', type: 'system', speed: 0 },
+        { text: ' ', type: 'system', speed: 0 },
         { text: '  === 復号されたファイル ===', type: 'system', speed: 20 },
         { text: '  ', type: 'system', speed: 0 },
         { text: '  重要なメッセージ:', type: 'slow', speed: 20 },
         { text: '  「信頼は鍵となる。しかし誰を信頼すべきか？」', type: 'slow', speed: 20 },
         { text: '  ', type: 'slow', speed: 0 },
         { text: '  [添付データ: access_key.dat]', type: 'slow', speed: 20 },
-        { text: '', type: 'system', speed: 0 }
+        { text: ' ', type: 'system', speed: 0 }
     ];
 
     // 統一表示ヘルパー関数
@@ -215,10 +215,10 @@
             gameState.passwordTarget_gimmick3 = null;
 
             // 報酬としてremnantコマンド解放を通知
-            await systemLine("[SYSTEM]: 新しいコマンドを取得しました『remnant』", 25);
+            await systemLine("═══════════════════════════════════════════════════════\n\n\r 新しいコマンドを取得しました\r\n「remnant」 - 文字化けしているファイルを治せます\n\n\r═══════════════════════════════════════════════════════\n", 25);
 
             if(cMe_11 === true){
-                window.parent.sendEveMessage('remnantはデスクトップだったりの文字化けしているファイルなどに<br>有効です', 'コマンド説明');  
+                window.parent.sendEveMessage('remnantは文字化けしているファイルなどに有効です', 'コマンド説明');  
             }
 
             
