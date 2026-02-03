@@ -42,7 +42,7 @@ class VirtualFileSystem {
                                             'personal': {
                                                 type: 'folder',
                                                 children: {
-                                                    '重要なデータ.txt': {
+                                                    'secret.txt': {
                                                         type: 'file',
                                                         htmlFile: 'file1.html',
                                                         content: `重要なファイルです。\n何か手がかりがあるかもしれません。`,
@@ -70,7 +70,7 @@ class VirtualFileSystem {
                                         type: 'folder',
                                         hidden: true,
                                         children: {
-                                            'MyDay.app': {
+                                            'MyDay': {
                                                 type: 'file',
                                                 htmlFile: 'file2.html',
                                                 content: `MyDayアプリケーション`,
