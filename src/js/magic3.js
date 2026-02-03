@@ -11,6 +11,63 @@
     // -------------------------
     // パスワード設定（キーボード位置パズル）
     // -------------------------
+    
+    // 統一形式: { text, type, speed, wait }
+    const AUTH_SEQUENCE = [
+        { text: '[SYSTEM]: パスワード認証中...', type: 'system', speed: 30, wait: 800 },
+        { text: '[SYSTEM]: キートレース解析中...', type: 'system', speed: 30, wait: 800 },
+        { text: '[SYSTEM]: ✓ 認証成功', type: 'system', speed: 30, wait: 400 }
+    ];
+
+    const SUCCESS_CONTENT = [
+        { text: '', type: 'system', speed: 0 },
+        { text: '╔════════════════════════════════════╗', type: 'system', speed: 10 },
+        { text: '║      ファイル復号完了              ║', type: 'system', speed: 10 },
+        { text: '╚════════════════════════════════════╝', type: 'system', speed: 10 },
+        { text: '', type: 'system', speed: 0 },
+        { text: '  復号されたデータを読み込んでいます...', type: 'slow', speed: 25, wait: 500 },
+        { text: '', type: 'system', speed: 0 },
+        { text: '  === 復号されたファイル ===', type: 'system', speed: 20 },
+        { text: '  ', type: 'system', speed: 0 },
+        { text: '  重要なメッセージ:', type: 'slow', speed: 20 },
+        { text: '  「信頼は鍵となる。しかし誰を信頼すべきか？」', type: 'slow', speed: 20 },
+        { text: '  ', type: 'slow', speed: 0 },
+        { text: '  [添付データ: access_key.dat]', type: 'slow', speed: 20 },
+        { text: '', type: 'system', speed: 0 }
+    ];
+
+    // 統一表示ヘルパー関数
+    async function displayContent(puzzleHelpers, contentArray) {
+        const { systemLine, errorLine, warnLine, slowPrintLine, wait } = puzzleHelpers;
+        for (var i = 0; i < contentArray.length; i++) {
+            var item = contentArray[i];
+            var text = item.text || item;
+            var type = item.type || 'system';
+            var speed = item.speed !== undefined ? item.speed : 20;
+            var waitTime = item.wait || 0;
+            
+            switch (type) {
+                case 'slow':
+                    await slowPrintLine(text, speed);
+                    break;
+                case 'error':
+                    await errorLine(text, speed);
+                    break;
+                case 'warn':
+                    await warnLine(text, speed);
+                    break;
+                case 'system':
+                default:
+                    await systemLine(text, speed);
+                    break;
+            }
+            
+            if (waitTime > 0) {
+                await wait(waitTime);
+            }
+        }
+    }
+
     window.gimmick3System.PUZZLE_CONFIG = {
         correctPassword: 'TRUST',
         lockedFile: 'traced_file.enc',
@@ -143,30 +200,11 @@
         // 正解
         if (password === config.correctPassword) {
             term.write('\r\n');
-            await systemLine("[SYSTEM]: パスワード認証中...", 30);
-            await wait(800);
-            await systemLine("[SYSTEM]: キートレース解析中...", 30);
-            await wait(800);
-            await systemLine("[SYSTEM]: ✓ 認証成功", 30);
-            await wait(400);
             
-            await systemLine("", 0);
-            await systemLine("╔════════════════════════════════════╗", 10);
-            await systemLine("║      ファイル復号完了              ║", 10);
-            await systemLine("╚════════════════════════════════════╝", 10);
-            await systemLine("", 0);
-            
-            await slowPrintLine("  復号されたデータを読み込んでいます...", 25);
-            await wait(500);
-            
-            await systemLine("", 0);
-            await systemLine("  === 復号されたファイル ===", 20);
-            await systemLine("  ", 0);
-            await slowPrintLine("  重要なメッセージ:", 20);
-            await slowPrintLine("  「信頼は鍵となる。しかし誰を信頼すべきか？」", 20);
-            await slowPrintLine("  ", 0);
-            await slowPrintLine("  [添付データ: access_key.dat]", 20);
-            await systemLine("", 0);
+            // 認証シーケンス（統一形式）
+            await displayContent(puzzleHelpers, AUTH_SEQUENCE);
+            // 成功コンテンツ表示（統一形式）
+            await displayContent(puzzleHelpers, SUCCESS_CONTENT);
             
             // クリア処理
             window.gimmick3System.isCleared = true;

@@ -51,6 +51,77 @@
     const SECRET_PASSWORD = '4132'; // 隠しパスワード（断片の順序: 4→1→2→3）
     const LOCKED_FILE = 'restored_data.enc';
 
+    // 統一形式: { text, type, speed, wait }
+    const AUTH_SEQUENCE = [
+        { text: '[SYSTEM]: パスワード認証中...', type: 'system', speed: 30, wait: 800 },
+        { text: '[SYSTEM]: 暗号解読中...', type: 'system', speed: 30, wait: 800 },
+        { text: '[SYSTEM]: ✓ 認証成功', type: 'system', speed: 30, wait: 400 }
+    ];
+
+    const SECRET_CONTENT = [
+        { text: ' ', type: 'system', speed: 0 },
+        { text: '════════════════════════════════════', type: 'system', speed: 10 },
+        { text: '  隠された記憶領域が解放された...   ', type: 'system', speed: 10 },
+        { text: '════════════════════════════════════', type: 'system', speed: 10 },
+        { text: ' ', type: 'system', speed: 0 },
+        { text: '  データの深層を覗き込んでいます...', type: 'slow', speed: 25, wait: 500 },
+        { text: ' ', type: 'system', speed: 0 },
+        { text: '  === 隠しデータ ===', type: 'system', speed: 20 },
+        { text: '  ', type: 'system', speed: 0 },
+        { text: '  EVEシステム シークレットログ', type: 'slow', speed: 20 },
+        { text: '  日付: 2025-XX-XX', type: 'slow', speed: 20 },
+        { text: '  内容: [未知のコマンド情報]', type: 'slow', speed: 20 },
+        { text: ' ', type: 'system', speed: 0 }
+    ];
+
+    const NORMAL_CONTENT = [
+        { text: ' ', type: 'system', speed: 0 },
+        { text: '════════════════════════════════════', type: 'system', speed: 10 },
+        { text: '      データ復元完了                ', type: 'system', speed: 10 },
+        { text: '════════════════════════════════════', type: 'system', speed: 10 },
+        { text: ' ', type: 'system', speed: 0 },
+        { text: '  復元されたデータを読み込んでいます...', type: 'slow', speed: 25, wait: 500 },
+        { text: ' ', type: 'system', speed: 0 },
+        { text: '  === 復元されたデータ ===', type: 'system', speed: 20 },
+        { text: '  ', type: 'system', speed: 0 },
+        { text: '  EVEシステム バックアップログ', type: 'slow', speed: 20 },
+        { text: '  日付: 2025-XX-XX', type: 'slow', speed: 20 },
+        { text: '  内容: [重要なシステム情報]', type: 'slow', speed: 20 },
+        { text: ' ', type: 'system', speed: 0 }
+    ];
+
+    // 統一表示ヘルパー関数
+    async function displayContent(puzzleHelpers, contentArray) {
+        const { systemLine, errorLine, warnLine, slowPrintLine, wait } = puzzleHelpers;
+        for (var i = 0; i < contentArray.length; i++) {
+            var item = contentArray[i];
+            var text = item.text || item;
+            var type = item.type || 'system';
+            var speed = item.speed !== undefined ? item.speed : 20;
+            var waitTime = item.wait || 0;
+            
+            switch (type) {
+                case 'slow':
+                    await slowPrintLine(text, speed);
+                    break;
+                case 'error':
+                    await errorLine(text, speed);
+                    break;
+                case 'warn':
+                    await warnLine(text, speed);
+                    break;
+                case 'system':
+                default:
+                    await systemLine(text, speed);
+                    break;
+            }
+            
+            if (waitTime > 0) {
+                await wait(waitTime);
+            }
+        }
+    }
+
     window.gimmick2System = {
         
         isCleared: false,
@@ -120,26 +191,12 @@
             // 隠しパスワード
             if (password === SECRET_PASSWORD) {
                 term.write('\r\n');
-                await systemLine("[SYSTEM]: パスワード認証中...", 30);
-                await wait(800);
-                await systemLine("[SYSTEM]: 暗号解読中...", 30);
-                await wait(800);
-                await systemLine("[SYSTEM]: ✓ 認証成功", 30);
-                await wait(400);
-                await systemLine("", 0);
-                await systemLine("╔════════════════════════════════════╗", 10);
-                await systemLine("║  隠された記憶領域が解放された...   ║", 10);
-                await systemLine("╚════════════════════════════════════╝", 10);
-                await systemLine("", 0);
-                await slowPrintLine("  データの深層を覗き込んでいます...", 25);
-                await wait(500);
-                await systemLine("", 0);
-                await systemLine("  === 隠しデータ ===", 20);
-                await systemLine("  ", 0);
-                await slowPrintLine("  EVEシステム シークレットログ", 20);
-                await slowPrintLine("  日付: 2025-XX-XX", 20);
-                await slowPrintLine("  内容: [未知のコマンド情報]", 20);
-                await systemLine("", 0);
+                
+                // 認証シーケンス（統一形式）
+                await displayContent(puzzleHelpers, AUTH_SEQUENCE);
+                // 隠しコンテンツ表示（統一形式）
+                await displayContent(puzzleHelpers, SECRET_CONTENT);
+                
                 // クリア処理
                 this.isCleared = true;
                 gameState.gimmick2Cleared = true;
@@ -156,29 +213,11 @@
             // 通常正解
             if (password === CORRECT_PASSWORD) {
                 term.write('\r\n');
-                await systemLine("[SYSTEM]: パスワード認証中...", 30);
-                await wait(800);
-                await systemLine("[SYSTEM]: 暗号解読中...", 30);
-                await wait(800);
-                await systemLine("[SYSTEM]: ✓ 認証成功", 30);
-                await wait(400);
                 
-                await systemLine("", 0);
-                await systemLine("╔════════════════════════════════════╗", 10);
-                await systemLine("║      データ復元完了                ║", 10);
-                await systemLine("╚════════════════════════════════════╝", 10);
-                await systemLine("", 0);
-                
-                await slowPrintLine("  復元されたデータを読み込んでいます...", 25);
-                await wait(500);
-                
-                await systemLine("", 0);
-                await systemLine("  === 復元されたデータ ===", 20);
-                await systemLine("  ", 0);
-                await slowPrintLine("  EVEシステム バックアップログ", 20);
-                await slowPrintLine("  日付: 2025-XX-XX", 20);
-                await slowPrintLine("  内容: [重要なシステム情報]", 20);
-                await systemLine("", 0);
+                // 認証シーケンス（統一形式）
+                await displayContent(puzzleHelpers, AUTH_SEQUENCE);
+                // 通常コンテンツ表示（統一形式）
+                await displayContent(puzzleHelpers, NORMAL_CONTENT);
                 
                 // クリア処理
                 this.isCleared = true;

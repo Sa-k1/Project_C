@@ -18,17 +18,52 @@
             displayName: '暗号化されたデータ',
             password: 'search', // frnepuをROT13で変換
             encryptedText: 'search',
+            // 統一形式: { text, type, speed, wait }
+            // type: 'system' | 'slow' | 'error' | 'warn' | 'eve'
             content: [
-                '',
-                '████████████████████████████████\n',
-                '  解読成功 - アクセス許可\n',
-                '████████████████████████████████',
-                '',
-                '=== 機密情報 ===',
-                '',
-                '重要なコマンド: search',
+                { text: ' '},
+                { text: '═══════════════════════════════════════════════════════\n', type: 'system', speed: 10 },
+                { text: '  新しいコマンドを取得しました', type: 'slow', speed: 20 },
+                { text: '  「search」 - ディレクトリに隠されているファイルを探す\n', type: 'slow', speed: 20 },
+                { text: '═══════════════════════════════════════════════════════', type: 'system', speed: 10 }
             ],
             unlockedFlag: 'secretFileUnlocked'
+        }
+    };
+
+    // -------------------------
+    // 統一表示ヘルパー関数
+    // -------------------------
+    window.puzzleSystem.displayContent = async function(helpers, contentArray) {
+        for (var i = 0; i < contentArray.length; i++) {
+            var item = contentArray[i];
+            var text = item.text || item;
+            var type = item.type || 'system';
+            var speed = item.speed !== undefined ? item.speed : 20;
+            var waitTime = item.wait || 0;
+            
+            switch (type) {
+                case 'slow':
+                    await helpers.slowPrintLine(text, speed);
+                    break;
+                case 'error':
+                    await helpers.errorLine(text, speed);
+                    break;
+                case 'warn':
+                    await helpers.warnLine(text, speed);
+                    break;
+                case 'eve':
+                    await helpers.eveLine(text, speed);
+                    break;
+                case 'system':
+                default:
+                    await helpers.systemLine(text, speed);
+                    break;
+            }
+            
+            if (waitTime > 0) {
+                await helpers.wait(waitTime);
+            }
         }
     };
 
@@ -268,18 +303,17 @@
         
         if (password.trim().toUpperCase() === fileData.password.toUpperCase()) {
             term.write('\r\n');
-            await helpers.systemLine('[SYSTEM]: パスワード認証中...', 30);
-            await helpers.wait(500);
-            await helpers.systemLine('[SYSTEM]: 暗号解読中...', 30);
-            await helpers.wait(800);
-            await helpers.systemLine('[SYSTEM]: ✓ 認証成功', 30);
-            await helpers.wait(400);
-            await helpers.systemLine('', 0);
             
-            for (var i = 0; i < fileData.content.length; i++) {
-                await helpers.slowPrintLine(fileData.content[i], 20);
-                await helpers.wait(100);
-            }
+            // 認証成功演出（統一形式）
+            var authSequence = [
+                { text: '[SYSTEM]: パスワード認証中...', type: 'system', speed: 30, wait: 500 },
+                { text: '[SYSTEM]: 暗号解読中...', type: 'system', speed: 30, wait: 800 },
+                { text: '[SYSTEM]: ✓ 認証成功', type: 'system', speed: 30, wait: 400 },
+            ];
+            await window.puzzleSystem.displayContent(helpers, authSequence);
+            
+            // ファイル内容表示（統一形式）
+            await window.puzzleSystem.displayContent(helpers, fileData.content);
             
             await helpers.systemLine('', 0);
             
