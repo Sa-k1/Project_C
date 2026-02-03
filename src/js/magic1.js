@@ -36,8 +36,8 @@
     // ゴミ箱内ファイル設定
     // -------------------------
     window.puzzleSystem.TRASH_FILES = {
-        'cipher_hint.txt': {
-            displayName: '古いメモ.txt',
+        'cipher.txt': {
+            displayName: 'cipher.txt',
             content: [
                 '=== 暗号解読メモ ===',
                 '',
@@ -54,8 +54,8 @@
                 '',
             ]
         },
-        'deleted_diary.txt': {
-            displayName: '削除された日記.txt',
+        'diary': {
+            displayName: 'diary',
             content: [
                 '=== 日記 ===',
                 '',
@@ -101,7 +101,7 @@
             for (var i = 0; i < fileList.length; i++) {
                 var fileName = fileList[i];
                 var fileData = TRASH_FILES[fileName];
-                await helpers.slowPrintLine('  [' + (i + 1) + '] ' + fileData.displayName + ' (' + fileName + ')', 20);
+                await helpers.slowPrintLine('  [' + (i + 1) + '] ' + fileData.displayName, 20);
                 await helpers.wait(100);
             }
             
@@ -137,7 +137,7 @@
                 trashState.filesViewed.push(fileName);
             }
             
-            if (fileName === 'cipher_hint.txt') {
+            if (fileName === 'cipher.txt') {
                 await helpers.wait(500);
                 await helpers.eveLine('[EVE]: ...ゴミ箱を漁っているのですか？', 30);
                 await helpers.wait(400);
