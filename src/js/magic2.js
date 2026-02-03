@@ -60,33 +60,22 @@
 
     const SECRET_CONTENT = [
         { text: ' ', type: 'system', speed: 0 },
-        { text: '════════════════════════════════════', type: 'system', speed: 10 },
-        { text: '  隠された記憶領域が解放された...   ', type: 'system', speed: 10 },
-        { text: '════════════════════════════════════', type: 'system', speed: 10 },
-        { text: ' ', type: 'system', speed: 0 },
-        { text: '  データの深層を覗き込んでいます...', type: 'slow', speed: 25, wait: 500 },
-        { text: ' ', type: 'system', speed: 0 },
-        { text: '  === 隠しデータ ===', type: 'system', speed: 20 },
-        { text: '  ', type: 'system', speed: 0 },
-        { text: '  EVEシステム シークレットログ', type: 'slow', speed: 20 },
-        { text: '  日付: 2025-XX-XX', type: 'slow', speed: 20 },
-        { text: '  内容: [未知のコマンド情報]', type: 'slow', speed: 20 },
+        { text: '═══════════════════════════════════════════════════════\n', type: 'system', speed: 10 },
+        { text: '  新しいコマンドを取得しました', type: 'slow', speed: 20 },
+        { text: '  「read」 - 復元されたデータを読み込む\n', type: 'slow', speed: 20 },
+        { text: ' ', type: 'slow', speed: 20 },
+        { text: '  新しいコマンドを取得しました', type: 'slow', speed: 20 },
+        { text: '  「stealth」 - 一時的にEVEから見つからなくなる\n', type: 'slow', speed: 20 },
+        { text: '═══════════════════════════════════════════════════════', type: 'system', speed: 10 },
         { text: ' ', type: 'system', speed: 0 }
     ];
 
     const NORMAL_CONTENT = [
         { text: ' ', type: 'system', speed: 0 },
-        { text: '════════════════════════════════════', type: 'system', speed: 10 },
-        { text: '      データ復元完了                ', type: 'system', speed: 10 },
-        { text: '════════════════════════════════════', type: 'system', speed: 10 },
-        { text: ' ', type: 'system', speed: 0 },
-        { text: '  復元されたデータを読み込んでいます...', type: 'slow', speed: 25, wait: 500 },
-        { text: ' ', type: 'system', speed: 0 },
-        { text: '  === 復元されたデータ ===', type: 'system', speed: 20 },
-        { text: '  ', type: 'system', speed: 0 },
-        { text: '  EVEシステム バックアップログ', type: 'slow', speed: 20 },
-        { text: '  日付: 2025-XX-XX', type: 'slow', speed: 20 },
-        { text: '  内容: [重要なシステム情報]', type: 'slow', speed: 20 },
+        { text: '═══════════════════════════════════════════════════════\n', type: 'system', speed: 10 },
+        { text: '  新しいコマンドを取得しました', type: 'slow', speed: 20 },
+        { text: '  「read」 - 復元されたデータを読み込む\n', type: 'slow', speed: 20 },
+        { text: '═══════════════════════════════════════════════════════', type: 'system', speed: 10 },        
         { text: ' ', type: 'system', speed: 0 }
     ];
 
@@ -205,9 +194,6 @@
                 gameState.hasStealthCommand = true;
                 gameState.inputMode = 'normal';
                 gameState.passwordTarget_gimmick2 = null;
-                await systemLine("", 0);
-                await systemLine("[SYSTEM]: 新しいコマンドを取得しました『read』", 25);
-                await systemLine("[SYSTEM]: 隠しコマンドを取得しました『stealth』", 25);
                 return true;
             }
             // 通常正解
@@ -226,11 +212,6 @@
                 gameState.hasReadCommand = true;
                 gameState.inputMode = 'normal';
                 gameState.passwordTarget_gimmick2 = null;
-
-                await systemLine("", 0);
-
-                // 報酬としてreadコマンド解放を通知
-                await systemLine("[SYSTEM]: 新しいコマンドを取得しました『read』", 25);
 
                 return true;
             }
