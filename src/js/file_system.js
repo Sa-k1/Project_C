@@ -109,7 +109,7 @@ class VirtualFileSystem {
                                                             'memo.txt': {   //ここ使うから触んな
                                                                 type: 'file',
                                                                 htmlFile: 'file1.html',
-                                                                content: `admin_2_tempというファルダを探してみてください\nそしてそのフォルダ内のファイルを確認してください\nまず、cd ../.. を試しに使用してdirと入力してください\nそして、cd admin_2_tempと入力してその中にあるファイルをcat ファイル名で開いてみてください`, 
+                                                                content: `admin_2_tempというフォルダを探してみてください\nそしてそのフォルダ内のファイルを確認してください\nまず、cd ../.. を試しに使用してdirと入力してください\nそして、cd admin_2_tempと入力してその中にあるファイルをcat ファイル名で開いてみてください`, 
                                                                 editable: true
                                                             },
                                                             'log.txt': {
