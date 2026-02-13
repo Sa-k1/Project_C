@@ -225,11 +225,11 @@
     // キャンセル処理
     // =============================================
     function cancelCommand() {
-        if (window.parent && window.parent !== window) {
-            window.parent.postMessage({ type: 'close_admin_command' }, '*');
-        } else {
-            window.history.back();
-        }
+        // if (window.parent && window.parent !== window) {
+        //     window.parent.postMessage({ type: 'close_admin_command' }, '*');
+        // } else {
+        //     window.history.back();
+        // }
     }
 
     // =============================================

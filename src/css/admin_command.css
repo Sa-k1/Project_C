@@ -191,8 +191,10 @@ body::before {
 }
 
 .btn-cancel:hover {
-    background: #9f1313;
-    color: #000;
+    cursor: default;
+    background: #00000000;
+    border-color: #00000000;
+    color: #00000000;
 }
 
 #result-display {
