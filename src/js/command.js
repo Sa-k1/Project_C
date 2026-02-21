@@ -1128,7 +1128,7 @@
         
         // 通常ファイル一覧を表示
         if (normalFiles.length > 0) {
-            term.writeln("\r  [通常ファイル]");
+            term.writeln("\r  [通常ファイル、フォルダ]");
             for (var i = 0; i < normalFiles.length; i++) {
                 var file = normalFiles[i];
                 var icon = file.type === 'folder' ? '<DIR>  ' : '';
@@ -1139,7 +1139,7 @@
         
         // 隠しファイル一覧を表示
         if (hiddenFiles.length > 0) {
-            term.writeln("\r  \x1b[33m[隠しファイル発見！]\x1b[0m");
+            term.writeln("\r  \x1b[33m[隠しファイル、フォルダ発見！]\x1b[0m");
             for (var j = 0; j < hiddenFiles.length; j++) {
                 var hfile = hiddenFiles[j];
                 var hicon = hfile.type === 'folder' ? '<DIR>  ' : '';
