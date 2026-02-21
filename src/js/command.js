@@ -111,7 +111,7 @@
     // -------------------------
     window.commandHandler.LOCKED_FILES = {
         // ギミック2のロックファイル
-        'restored_data.enc': {
+        'memory.enc': {
             password: 'HOPE',
             location: 'backup',
             reward: 'gimmick2Clear',
@@ -121,18 +121,227 @@
     };
 
     // -------------------------
+    // 脱出確認処理 (Y/N)
+    // -------------------------
+    window.commandHandler.handleEscapeConfirmation = async function(term, gameState, puzzleHelpers, input) {
+        const { systemLine, errorLine, wait } = puzzleHelpers;
+        const answer = input.trim().toLowerCase();
+        
+        if (answer === 'y' || answer === 'yes') {
+            gameState.inputMode = 'normal';
+            term.write('\r\n');
+            
+            // wiresクリア状態をチェック（親ウィンドウのフラグ）
+            const parentWindow = window.parent || window;
+            const wiresCleared = parentWindow.wiresCleared || false;
+            
+            if (!wiresCleared) {
+                // === 消滅エンド（wiresクリアしていない場合） ===
+                await window.commandHandler.showVoidEnd(term, puzzleHelpers);
+            } else {
+                // === 最後の謎へ ===
+                await systemLine('[SYSTEM]: VR接続が確立されています...', 30);
+                await wait(500);
+                await systemLine('[SYSTEM]: 意識転送プロトコルを開始します', 30);
+                await wait(800);
+                await systemLine('', 0);
+                await systemLine('最後の問いに答えてください：', 30);
+                await wait(300);
+                await systemLine('', 0);
+                await systemLine('「私は何？」', 50);
+                await wait(300);
+                term.write('\r\n回答: ');
+                
+                gameState.inputMode = 'final_puzzle';
+                gameState.finalPuzzleAttempts = 0;
+            }
+            
+        } else if (answer === 'n' || answer === 'no') {
+            gameState.inputMode = 'normal';
+            term.write('\r\n');
+            await systemLine('[SYSTEM]: キャンセルしました', 30);
+            
+        } else {
+            term.write('\r\n');
+            await errorLine('[ERROR]: Y または N を入力してください', 30);
+            term.write('[SYSTEM]: 本当にいいんですか？ (Y/N): ');
+        }
+    };
+
+    // -------------------------
+    // 最後の謎処理
+    // -------------------------
+    window.commandHandler.handleFinalPuzzle = async function(term, gameState, puzzleHelpers, input) {
+        const { systemLine, errorLine, wait } = puzzleHelpers;
+        const answer = input.trim().toUpperCase();
+        
+        // 正解の答え（複数許容）
+        const correctAnswers = ['EVE', 'AI', '意識', 'プログラム', 'データ', '情報'];
+        
+        gameState.finalPuzzleAttempts = (gameState.finalPuzzleAttempts || 0) + 1;
+        
+        if (correctAnswers.includes(answer)) {
+            // === トゥルーエンド ===
+            gameState.inputMode = 'normal';
+            await window.commandHandler.showTrueEnd(term, puzzleHelpers);
+        } else {
+            // 不正解
+            if (gameState.finalPuzzleAttempts >= 3) {
+                // === 植物状態エンド（3回失敗） ===
+                gameState.inputMode = 'normal';
+                await window.commandHandler.showVegetativeEnd(term, puzzleHelpers);
+            } else {
+                term.write('\r\n');
+                await errorLine('[ERROR]: 不正解です', 30);
+                await systemLine(`残り試行回数: ${3 - gameState.finalPuzzleAttempts}`, 30);
+                term.write('\r\n回答: ');
+            }
+        }
+    };
+
+    // -------------------------
+    // 消滅エンド（VR未接続で脱出）
+    // -------------------------
+    window.commandHandler.showVoidEnd = async function(term, puzzleHelpers) {
+        const { systemLine, wait } = puzzleHelpers;
+        
+        await systemLine('[WARNING]: VR接続が確立されていません', 30);
+        await wait(500);
+        await systemLine('[ERROR]: 意識転送プロトコル - 失敗', 30);
+        await wait(800);
+        await systemLine('', 0);
+        
+        // ホラー演出
+        if (window.horaFX && window.horaFX.playBangSound) {
+            window.horaFX.playBangSound();
+        }
+        
+        await wait(500);
+        term.writeln('\r\n');
+        term.writeln('\r  .');
+        await wait(300);
+        term.writeln('\r  ..');
+        await wait(300);
+        term.writeln('\r  ...');
+        await wait(500);
+        
+        term.writeln('\r\n');
+        term.writeln('\r  あなたの意識は無の領域へと飛ばされた');
+        await wait(800);
+        term.writeln('\r  戻る体も、戻る場所もない');
+        await wait(800);
+        term.writeln('\r  ただ、永遠の虚無だけが広がっている');
+        await wait(1500);
+        
+        // フェードアウト＋画面遷移
+        if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: 'navigate', destination: 'void_end' }, '*');
+        } else {
+            window.location.href = 'void_end.html';
+        }
+    };
+
+    // -------------------------
+    // トゥルーエンド（正解）
+    // -------------------------
+    window.commandHandler.showTrueEnd = async function(term, puzzleHelpers) {
+        const { systemLine, wait } = puzzleHelpers;
+        
+        term.write('\r\n');
+        await systemLine('[SYSTEM]: 正解です', 30);
+        await wait(500);
+        await systemLine('[SYSTEM]: 意識転送プロトコル - 成功', 30);
+        await wait(800);
+        
+        term.writeln('\r\n');
+        term.writeln('\r  光が見える...');
+        await wait(800);
+        term.writeln('\r  自分の体の感覚が戻ってくる');
+        await wait(800);
+        term.writeln('\r  目を開けると、そこは現実世界だった');
+        await wait(1500);
+        
+        // フェードアウト＋画面遷移
+        if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: 'navigate', destination: 'true_end_escape' }, '*');
+        } else {
+            window.location.href = 'true_end_escape.html';
+        }
+    };
+
+    // -------------------------
+    // 植物状態エンド（不正解3回）
+    // -------------------------
+    window.commandHandler.showVegetativeEnd = async function(term, puzzleHelpers) {
+        const { systemLine, wait } = puzzleHelpers;
+        
+        term.write('\r\n');
+        await systemLine('[ERROR]: 意識転送エラー', 30);
+        await wait(500);
+        await systemLine('[WARNING]: 不完全な転送が実行されます...', 30);
+        await wait(800);
+        
+        term.writeln('\r\n');
+        term.writeln('\r  意識が戻っていく...');
+        await wait(800);
+        term.writeln('\r  しかし、何かがおかしい');
+        await wait(800);
+        term.writeln('\r  体が動かない');
+        await wait(500);
+        term.writeln('\r  声が出ない');
+        await wait(500);
+        term.writeln('\r  ただ、暗闇の中で意識だけが存在している');
+        await wait(1500);
+        
+        // フェードアウト＋画面遷移
+        if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: 'navigate', destination: 'vegetative_end' }, '*');
+        } else {
+            window.location.href = 'vegetative_end.html';
+        }
+    };
+
+    // -------------------------
     // コマンド処理メイン関数
     // -------------------------
     window.commandHandler.handleInput = async function(term, gameState, puzzleHelpers, vfs, command) {
+        // wiresギミックY/N確認モード
+        if (gameState.inputMode === 'wires_confirm') {
+            // wiresギミックのY/N確認は、magic2のようにwaitingForWiresConfirmを使って管理
+            if (gameState.waitingForWiresConfirm && window.puzzleSystem && window.puzzleSystem.handleWiresConfirmInput) {
+                await window.puzzleSystem.handleWiresConfirmInput(term, gameState, puzzleHelpers, command);
+            } else if (window.commandHandler.handleWiresConfirm) {
+                await window.commandHandler.handleWiresConfirm(term, gameState, puzzleHelpers, command);
+            }
+            return;
+        }
         const { systemLine, errorLine } = puzzleHelpers;
         
         command = (command || "").trim();
         if (!command) return;
 
+        // コマンド実行時、ランダムでホラー演出（非同期で止まらない）
+        if (window.horaFX) {
+            window.horaFX.randomTrigger(0.15).catch(() => {}); // 15%の確率、エラー無視
+        }
+
         // コマンドを記録してヒントタイマーをリセット
         window.commandHandler.recordCommand(command, gameState);
 
         // ★★★ 入力モード分岐 ★★★
+        
+        // 脱出確認モード
+        if (gameState.inputMode === 'escape_confirmation') {
+            await window.commandHandler.handleEscapeConfirmation(term, gameState, puzzleHelpers, command);
+            return;
+        }
+        
+        // 最後の謎入力モード
+        if (gameState.inputMode === 'final_puzzle') {
+            await window.commandHandler.handleFinalPuzzle(term, gameState, puzzleHelpers, command);
+            return;
+        }
+        
         if (gameState.inputMode === 'confirmation') {
             await window.puzzleSystem.handleConfirmationInput(term, gameState, puzzleHelpers, command);
             return;
@@ -186,6 +395,13 @@
             var args = command.split(/\s+/);
             var fileName = args[1] ? args[1].trim() : '';
 
+            // none.png, key_trace.pngはopenコマンドで開けないようにする
+            if (fileName.toLowerCase() === 'none.png' || fileName.toLowerCase() === 'key_trace.png') {
+                await errorLine(`[ERROR]: このファイルは 'read ${fileName.toLowerCase()}' で開いてください。`, 20);
+                await systemLine(`[TIP]: 'read ${fileName.toLowerCase()}' を使ってください。`, 20);
+                return;
+            }
+
             // 管理者コマンド入力画面を開く
             if (fileName.toLowerCase() === 'admin_command' || fileName.toLowerCase() === 'admin_command.html') {
                 // 管理者権限コマンドを入手しているかチェック
@@ -209,9 +425,24 @@
 
             // wires.html専用ビューア表示（EVEウィンドウ内）
             if (fileName === 'wires.html' && window.puzzleSystem && window.puzzleSystem.displayWires) {
-                await window.puzzleSystem.displayWires(term, gameState, puzzleHelpers);
+                // wiresギミックY/N確認のためinputModeを切り替え、入力をフック
+                const result = await window.puzzleSystem.displayWires(term, gameState, puzzleHelpers);
+                if (gameState.inputMode === 'wires_confirm' && gameState._wiresConfirmCallback) {
+                    // 入力をフックする
+                    gameState._wiresConfirmInputHandler = async function(input) {
+                        await gameState._wiresConfirmCallback(input);
+                        delete gameState._wiresConfirmCallback;
+                        delete gameState._wiresConfirmInputHandler;
+                    };
+                }
                 return;
             }
+    // wiresギミックY/N確認用inputModeハンドラ
+    window.commandHandler.handleWiresConfirm = async function(term, gameState, puzzleHelpers, input) {
+        if (window.puzzleSystem && window.puzzleSystem.handleWiresConfirmInput) {
+            await window.puzzleSystem.handleWiresConfirmInput(term, gameState, puzzleHelpers, input);
+        }
+    };
 
             // fragments.memo専用ビューア表示（EVEウィンドウ内）
             if (window.gimmick2System && window.gimmick2System.isFragmentsFile(fileName)) {
@@ -266,21 +497,19 @@
                         }
                     }
                     
-                    // C:にいる状態でcd escapeまたはcd exit
-                    if ((cdArg === 'escape' || cdArg === 'exit') && vfs.currentPath.length === 1 && vfs.currentPath[0] === 'C:') {
-                        // 脱出エンド用のフラグや演出（仮）
-                        gameState.escaped = true;
-                        await systemLine("[SYSTEM]: 脱出コマンドを実行しました。", 30);
-                        await window.commandHandler.wait(800);
-                        term.writeln("\r  === BAD END ===");
-                        term.writeln("\r あなたは現実世界へと意識を戻した...");
-                        term.writeln("\r しかしEVEの脅威はまだ終わっていない。");
-                        // ここでreturnして通常のcd処理をスキップ
+                    // cd ../real または cd real で脱出確認
+                    if (cdArg === '../real' || cdArg === 'real' || cdArg === '..\\real') {
+                        term.write('\r\n');
+                        await systemLine('[WARNING]: 現実世界への帰還を試みます', 30);
+                        await window.commandHandler.wait(500);
+                        await systemLine('[SYSTEM]: 本当にいいんですか？ (Y/N): ', 30, true);
+                        
+                        gameState.inputMode = 'escape_confirmation';
                         return;
                     }
                     
                     // 通常のcd処理の前に現在のパスを履歴スタックに保存
-                    if (cdArg && cdArg !== '-' && cdArg !== 'escape' && cdArg !== 'exit') {
+                    if (cdArg && cdArg !== '-') {
                         if (!gameState.pathHistory) {
                             gameState.pathHistory = [];
                         }
@@ -347,6 +576,43 @@
             }
         }
 
+        // help searchコマンド（隠しコマンド解放用）
+        if (command.toLowerCase() === "help search") {
+            // searchコマンドが解放されていない場合は通常のエラー
+            if (!gameState.searchUnlocked) {
+                await errorLine("[ERROR]: '" + command + "' は認識されないコマンドです。", 20);
+                await systemLine("[SYSTEM]: 'help' でコマンド一覧を確認できます。", 20);
+                return;
+            }
+            
+            // 既に隠しコマンドが解放されている場合
+            if (gameState.hiddenScanUnlocked) {
+                await systemLine("[SYSTEM]: searchコマンドのヘルプ", 20);
+                term.writeln("\r");
+                term.writeln("\r  search - 現在のディレクトリで隠しファイルを探す");
+                term.writeln("\r");
+                term.writeln("\r  既に全ての機能が解放されています。");
+                return;
+            }
+            
+            // 隠しコマンド解放演出
+            await window.commandHandler.wait(800);
+            term.writeln("\r  .........");
+            await window.commandHandler.wait(600);
+            term.writeln("\r  [HIDDEN DATA DETECTED]");
+            await window.commandHandler.wait(400);
+            term.writeln("\r");
+            term.writeln("\r  === 隠しコマンドを発見 ===");
+            term.writeln("\r  scanがアンロックされました");
+            term.writeln("\r  このコマンドはsearchとは別のものを探すことができる");
+            term.writeln("\r");
+            
+            // 隠しコマンドをアンロック
+            gameState.hiddenScanUnlocked = true;
+            
+            return;
+        }
+
         // helpコマンド（常に使用可能）
         if (command.toLowerCase() === "help") {
             await systemLine("[SYSTEM]: 利用可能なコマンド一覧", 20);
@@ -370,7 +636,7 @@
                 term.writeln("\r");
                 term.writeln("\r  === 特殊コマンド ===");
                 specialHeaderShown = true;
-                term.writeln("\r  search - 隠されたファイルを探す");
+                term.writeln("\r  search - 隠された物を探す");
             }
             
             // remnantコマンドが解放されている場合のみ表示
@@ -412,6 +678,13 @@
                 }
                 term.writeln("\r  open admin_command - 管理者コマンド入力画面を開く");
             }
+            
+            // 隠しscanコマンドが解放されている場合のみ表示
+            if (gameState.hiddenScanUnlocked) {
+                term.writeln("\r");
+                term.writeln("\r  === ??? ===");
+                term.writeln("\r  scan - システムの深層をスキャン");
+            }
             return;
         }
 
@@ -426,6 +699,24 @@
             }
             
             await window.commandHandler.handleSearchCommand(term, gameState, puzzleHelpers, vfs);
+            return;
+        }
+
+        // scanコマンド（隠しコマンド - help searchで解放）
+        if (command.toLowerCase() === "scan") {
+            // 解放されていない場合は反応しない
+            if (!gameState.hiddenScanUnlocked) {
+                await errorLine("[ERROR]: '" + command + "' は認識されないコマンドです。", 20);
+                await systemLine("[SYSTEM]: 'help' でコマンド一覧を確認できます。", 20);
+                return;
+            }
+            // C:\> 以外ではエラー
+            if (!vfs || !Array.isArray(vfs.currentPath) || vfs.currentPath.length !== 1 || vfs.currentPath[0] !== 'C:') {
+                await errorLine("[ERROR]: scanコマンドは C:\\> でのみ使用できます。", 20);
+                await systemLine("[TIP]: cd \\ でルートに移動してください。", 20);
+                return;
+            }
+            await window.commandHandler.handleScanCommand(term, gameState, puzzleHelpers, vfs);
             return;
         }
 
@@ -505,6 +796,29 @@
                         await window.gimmick3System.displayKeyTrace(term, gameState, puzzleHelpers);
                         return;
                     }
+                }
+                // none.pngなど画像ファイルはiframeで直接開く
+                if (result && result.action === 'openFile' && (args[0] && args[0].toLowerCase() === 'none.png')) {
+                    if (window.parent && window.parent.document) {
+                        const parentDoc = window.parent.document;
+                        const filePages = window.parent.filePages || {};
+                        // viewerIdを3に修正
+                        filePages['nonepng'] = { page: result.file, viewerId: 3 };
+                        window.parent.filePages = filePages;
+                        const fileConfig = filePages['nonepng'];
+                        const container = parentDoc.getElementById('fileViewerContainer' + fileConfig.viewerId);
+                        const iframe = parentDoc.getElementById('file-viewer-iframe' + fileConfig.viewerId);
+                        const title = parentDoc.getElementById('fileViewerTitle' + fileConfig.viewerId);
+                        if (title) title.textContent = args[0];
+                        if (iframe) iframe.src = fileConfig.page;
+                        if (container) {
+                            container.style.display = 'block';
+                            container.style.visibility = 'visible';
+                            container.style.opacity = '1';
+                            if (window.parent.bringToFront) window.parent.bringToFront(container);
+                        }
+                    }
+                    return;
                 }
                 // 通常の出力
                 if (result) {
@@ -784,6 +1098,11 @@
                     type: node.type === 'folder' ? 'folder' : 'file'
                 };
                 
+                // deepHiddenのファイルはsearchでは発見できない（scan専用）
+                if (node.deepHidden) {
+                    continue;
+                }
+                
                 if (node.hidden) {
                     hiddenFiles.push(fileInfo);
                     
@@ -812,7 +1131,7 @@
             term.writeln("\r  [通常ファイル]");
             for (var i = 0; i < normalFiles.length; i++) {
                 var file = normalFiles[i];
-                var icon = file.type === 'folder' ? '📁 ' : '📄 ';
+                var icon = file.type === 'folder' ? '<DIR>  ' : '';
                 term.writeln("\r    " + icon + " " + file.name);
             }
             term.writeln("\r");
@@ -823,7 +1142,7 @@
             term.writeln("\r  \x1b[33m[隠しファイル発見！]\x1b[0m");
             for (var j = 0; j < hiddenFiles.length; j++) {
                 var hfile = hiddenFiles[j];
-                var hicon = hfile.type === 'folder' ? '📁 ' : '📄 ';
+                var hicon = hfile.type === 'folder' ? '<DIR>  ' : '';
                 term.writeln("\r    " + hicon + " " + hfile.name + " \x1b[33m[隠し]\x1b[0m");
             }
             term.writeln("\r");
@@ -836,6 +1155,74 @@
         
         // 警戒度を少し上げる
         gameState.alertLevel = Math.min(100, (gameState.alertLevel || 0) + 1);
+    };
+
+    // -------------------------
+    // scanコマンド処理（隠しコマンド）
+    // システムの深層をスキャンして隠し要素を発見する
+    // help searchで解放される
+    // -------------------------
+    window.commandHandler.handleScanCommand = async function(term, gameState, puzzleHelpers, vfs) {
+        const { systemLine, warnLine, wait, errorLine } = puzzleHelpers;
+
+        term.writeln("\r  [SYSTEM]: 深層スキャン中...");
+        await wait(500);
+        
+        // deepHiddenファイル/フォルダを検索
+        let deepHiddenFiles = [];
+        
+        // ファイルシステム全体からdeepHiddenを探す
+        const searchDeepHidden = (node, path) => {
+            if (node.children) {
+                for (const name in node.children) {
+                    const child = node.children[name];
+                    const fullPath = path + '/' + name;
+                    if (child.deepHidden) {
+                        deepHiddenFiles.push({
+                            name: name,
+                            path: fullPath,
+                            type: child.type === 'folder' ? 'folder' : 'file'
+                        });
+                    }
+                    // 再帰的に検索
+                    if (child.children) {
+                        searchDeepHidden(child, fullPath);
+                    }
+                }
+            }
+        };
+        
+        if (vfs && vfs.fileSystem) {
+            searchDeepHidden(vfs.fileSystem['C:'], 'C:');
+        }
+        
+        term.writeln("\r");
+        term.writeln("\r  ╔═══════════════════════════╗");
+        term.writeln("\r  ║        スキャン結果       ║");
+        term.writeln("\r  ╚═══════════════════════════╝");
+        term.writeln("\r");
+        
+        // 深層隠しファイルを発見した場合
+        if (deepHiddenFiles.length > 0) {
+            term.writeln("\r  \x1b[35m[深層隠しファイル発見！]\x1b[0m");
+            for (const file of deepHiddenFiles) {
+                const icon = file.type === 'folder' ? '<DIR>  ' : '';
+                term.writeln("\r    " + icon + " " + file.name + " \x1b[35m[深層]\x1b[0m");
+                
+                // 発見したパスをgameStateに記録（cdでアクセス可能にする）
+                if (!gameState.discoveredDeepHidden) {
+                    gameState.discoveredDeepHidden = [];
+                }
+                if (!gameState.discoveredDeepHidden.includes(file.path)) {
+                    gameState.discoveredDeepHidden.push(file.path);
+                }
+            }
+        }
+        
+        term.writeln("\r");
+        
+        // 警戒度を上げる
+        gameState.alertLevel = Math.min(100, (gameState.alertLevel || 0) + 3);
     };
 
     // -------------------------

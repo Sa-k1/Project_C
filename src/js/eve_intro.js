@@ -354,13 +354,13 @@ class EVEIntroScene {
         // フェーズ1: 接続中 (0-3秒)
         setTimeout(() => {
             this.sequenceStep = 1;
-            this.showEVEMessage('こんにちは 私はEVE', 2000);
+            this.showEVEMessage('接続完了', 2000);
         }, 3000);
         
         // フェーズ2: EVE認識 (3-6秒)
         setTimeout(() => {
             this.sequenceStep = 2;
-            this.showEVEMessage('ここは、あなたが使っていると思っていた場所', 3000);
+            this.showEVEMessage('ここはPCの中、つまり電脳世界', 3000);
             this.triggerGlitch(0.3);
             this.enableGlitchPass(1000); // 1秒間グリッチパスを有効化
         }, 6000);
@@ -368,14 +368,14 @@ class EVEIntroScene {
         // フェーズ3: 監視開始 (6-9秒)
         setTimeout(() => {
             this.sequenceStep = 3;
-            this.showEVEMessage('けれど本当は――', 3000);
+            this.showEVEMessage('気がついたらこの世界に閉じ込められていた', 3000);
             this.activateSurveillance();
         }, 9000);
         
         // フェーズ4: 侵食 (9-13秒)
         setTimeout(() => {
             this.sequenceStep = 4;
-            this.showEVEMessage('あなたが選ばれていた場所', 3000);
+            this.showEVEMessage('「もとの体に戻らないと...」', 3000);
             this.triggerGlitch(0.6);
             this.intensifyEnvironment();
             this.enableGlitchPass(1500); // 1.5秒間グリッチパスを有効化
@@ -384,7 +384,7 @@ class EVEIntroScene {
         // フェーズ5: 完全支配 (13-18秒)
         setTimeout(() => {
             this.sequenceStep = 5;
-            this.showEVEMessage('ようこそ私の世界へ', 3000);
+            this.showEVEMessage('さあ、脱出を目指しましょう、、、', 3000);
             this.triggerGlitch(1.0);
             this.enableGlitchPass(2000); // 2秒間グリッチパスを有効化
         }, 16000);

@@ -4,15 +4,41 @@
   <meta charset="UTF-8">
   <title>通信プロトコル修正</title>
   <style>
+      /* 成功時の全体フラッシュ演出 */
+      body.success-flash {
+        animation: success-flash 1.2s cubic-bezier(0.4,0,0.2,1);
+      }
+      @keyframes success-flash {
+        0% { background: #0a0a12; }
+        10% { background: #00ffae44; }
+        30% { background: #00ffae99; }
+        60% { background: #0a0a12; }
+        100% { background: #0a0a12; }
+      }
     * { box-sizing: border-box; }
-    body { 
-      background: #0a0a12; 
-      color: #e0e0e0; 
-      font-family: 'Consolas', 'monospace'; 
+    body {
+      background: #0a0a12;
+      color: #e0e0e0;
+      font-family: 'Consolas', 'monospace';
       margin: 0;
       padding: 0;
       overflow: hidden;
       height: 100vh;
+      position: relative;
+    }
+    /* バイナリノイズ背景 */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(0deg, rgba(0,255,128,0.04) 0 2px, transparent 2px 4px), repeating-linear-gradient(90deg, rgba(0,255,128,0.04) 0 2px, transparent 2px 4px);
+      animation: scanlines 2s linear infinite;
+    }
+    @keyframes scanlines {
+      0% { background-position: 0 0, 0 0; }
+      100% { background-position: 0 4px, 4px 0; }
     }
     
     .main-container {
@@ -20,54 +46,70 @@
       height: 100%;
       padding: 10px;
       gap: 10px;
+      position: relative;
+      z-index: 1;
     }
     
     /* 左側：情報パネル */
     .info-panel {
       width: 200px;
       background: #12121e;
-      border-radius: 10px;
+      border-radius: 0;
       padding: 12px;
-      border: 1px solid #2a2a4a;
+      border: 2.5px solid #00ffae;
+      box-shadow: 0 0 0 2px #0a0a12, 0 0 12px #00ffae44;
       display: flex;
       flex-direction: column;
       gap: 8px;
+      outline: 2px solid #00ffae44;
     }
     
     .panel-title {
       font-size: 1em;
-      color: #ff6666;
+      color: #00ffae;
       text-align: center;
       padding-bottom: 8px;
-      border-bottom: 1px solid #333;
+      border-bottom: 2px solid #00ffae;
+      letter-spacing: 2px;
+      font-family: 'Consolas', 'monospace';
+      text-shadow: 0 0 8px #00ffae99;
+      border-radius: 0;
     }
     .panel-title.success {
       color: #7fffd4;
+      text-shadow: 0 0 8px #7fffd4;
     }
     
     .error-box {
-      background: rgba(255, 100, 100, 0.1);
-      border: 1px solid #ff6666;
-      border-radius: 6px;
+      background: rgba(0,255,128,0.08);
+      border: 2px solid #00ffae;
+      border-radius: 0;
       padding: 8px;
-      color: #ff6666;
+      color: #00ffae;
       font-size: 0.75em;
+      font-family: 'Consolas', 'monospace';
+      text-shadow: 0 0 6px #00ffae99;
     }
     .error-box.success {
       background: rgba(127, 255, 212, 0.1);
       border-color: #7fffd4;
       color: #7fffd4;
+      text-shadow: 0 0 8px #7fffd4;
     }
     
     .status-log {
       background: #0a0a12;
-      border: 1px solid #333;
-      border-radius: 6px;
+      border: 2px solid #00ffae;
+      border-radius: 0;
       padding: 8px;
       font-size: 0.7em;
       line-height: 1.5;
       flex: 1;
       overflow-y: auto;
+      font-family: 'Consolas', 'monospace';
+      color: #00ffae;
+      box-shadow: 0 0 8px #00ffae33 inset;
+      text-shadow: 0 0 4px #00ffae99;
     }
     .status-log .log-line {
       margin-bottom: 4px;
@@ -81,9 +123,13 @@
     
     .status-panel {
       background: #1a1a2e;
-      border-radius: 6px;
+      border-radius: 0;
       padding: 10px;
       text-align: center;
+      border: 2px solid #00ffae;
+      font-family: 'Consolas', 'monospace';
+      color: #00ffae;
+      box-shadow: 0 0 8px #00ffae33 inset;
     }
     .status-panel .label {
       font-size: 0.7em;
@@ -106,28 +152,36 @@
     
     .reset-btn {
       width: 100%;
-      background: #333;
-      color: #fff;
-      border: 1px solid #555;
-      border-radius: 5px;
+      background: #0a0a12;
+      color: #00ffae;
+      border: 2px solid #00ffae;
+      border-radius: 0;
       padding: 8px;
       cursor: pointer;
       font-size: 0.8em;
+      font-family: 'Consolas', 'monospace';
+      letter-spacing: 2px;
       transition: all 0.2s;
+      text-shadow: 0 0 6px #00ffae99;
+      box-shadow: 0 0 8px #00ffae33 inset;
     }
     .reset-btn:hover {
-      background: #444;
+      background: #222;
       border-color: #7fffd4;
+      color: #7fffd4;
+      text-shadow: 0 0 8px #7fffd4;
     }
     
     /* 右側：パズルエリア */
     .puzzle-wrapper {
       flex: 1;
       background: #12121e;
-      border-radius: 12px;
-      border: 1px solid #2a2a4a;
+      border-radius: 0;
+      border: 2.5px solid #00ffae;
       position: relative;
       overflow: hidden;
+      box-shadow: 0 0 0 2px #0a0a12, 0 0 12px #00ffae44;
+      outline: 2px solid #00ffae44;
     }
     
     .puzzle-wrapper::before {
@@ -148,8 +202,13 @@
       font-size: 0.85em;
       font-weight: bold;
       padding: 5px 12px;
-      border-radius: 4px;
-      background: rgba(0,0,0,0.5);
+      border-radius: 0;
+      background: rgba(0,0,0,0.7);
+      border: 2px solid #00ffae;
+      color: #00ffae;
+      letter-spacing: 2px;
+      font-family: 'Consolas', 'monospace';
+      text-shadow: 0 0 8px #00ffae99;
     }
     .column-header.left {
       left: 80px;
@@ -177,82 +236,96 @@
     .terminal {
       width: 130px;
       height: 48px;
-      border-radius: 6px;
+      border-radius: 0;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
       font-size: 0.85em;
-      color: #fff;
-      text-shadow: 1px 1px 2px #000;
+      color: #00ffae;
+      text-shadow: 0 0 8px #00ffae99;
       transition: transform 0.2s, box-shadow 0.2s;
-      border: 2px solid rgba(255,255,255,0.3);
+      border: 2.5px solid #00ffae;
       position: relative;
-      letter-spacing: 1px;
+      letter-spacing: 2px;
+      background: #0a0a12;
+      box-shadow: 0 0 8px #00ffae33 inset;
+      font-family: 'Consolas', 'monospace';
     }
     
     /* 左側（VR）の端子 */
     .terminal.vr {
-      background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+      background: #0a0a12;
+      border-color: #00ffae;
     }
     .terminal.vr::after {
       content: '';
       position: absolute;
       width: 16px;
       height: 6px;
-      background: #00bcd4;
+      background: #00ffae;
       top: 50%;
       right: -18px;
       transform: translateY(-50%);
-      border-radius: 0 3px 3px 0;
+      border-radius: 0;
     }
     
     /* 右側（PC）の端子 */
     .terminal.pc {
-      background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+      background: #0a0a12;
+      border-color: #00ffae;
     }
     .terminal.pc::after {
       content: '';
       position: absolute;
       width: 16px;
       height: 6px;
-      background: #9b59b6;
+      background: #00ffae;
       top: 50%;
       left: -18px;
       transform: translateY(-50%);
-      border-radius: 3px 0 0 3px;
+      border-radius: 0;
     }
     
     .terminal:hover:not(.connected) {
       transform: scale(1.05);
-      box-shadow: 0 0 15px currentColor;
+      box-shadow: 0 0 15px #00ffae, 0 0 30px #00ffae44;
+      border-color: #7fffd4;
     }
     .terminal.selected {
       transform: scale(1.08);
-      box-shadow: 0 0 20px currentColor, 0 0 30px currentColor;
+      box-shadow: 0 0 20px #00ffae, 0 0 30px #00ffae99;
+      border-color: #7fffd4;
       animation: terminal-pulse 0.8s infinite;
     }
     @keyframes terminal-pulse {
-      0%, 100% { box-shadow: 0 0 20px currentColor; }
-      50% { box-shadow: 0 0 30px currentColor, 0 0 40px currentColor; }
+      0%, 100% { box-shadow: 0 0 20px #00ffae; }
+      50% { box-shadow: 0 0 30px #00ffae, 0 0 40px #00ffae99; }
     }
     .terminal.connected {
       opacity: 0.5;
       cursor: not-allowed;
       transform: scale(1);
+      border-color: #555;
+      color: #555;
+      text-shadow: none;
     }
     .terminal.connected.correct::before {
-      content: '✓';
+      content: '■';
       position: absolute;
       font-size: 1.2em;
       color: #2ecc71;
+      left: 4px;
+      top: 4px;
     }
     .terminal.connected.wrong::before {
-      content: '✗';
+      content: '■';
       position: absolute;
       font-size: 1.2em;
       color: #ff6666;
+      left: 4px;
+      top: 4px;
     }
     
     /* SVGワイヤー */
@@ -268,9 +341,10 @@
     .wire {
       fill: none;
       stroke-width: 4;
-      stroke-linecap: round;
-      filter: drop-shadow(0 0 3px currentColor);
+      stroke-linecap: square;
+      filter: drop-shadow(0 0 3px #00ffae);
       transition: stroke 0.3s;
+      stroke: #00ffae;
     }
     .wire.correct {
       stroke: #2ecc71 !important;
@@ -303,23 +377,29 @@
     .complete-overlay {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(46, 204, 113, 0.1);
+      background: rgba(0,255,128,0.12);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 100;
       animation: fade-in 0.5s;
+      border: 2.5px solid #00ffae;
+      border-radius: 0;
     }
     @keyframes fade-in {
       from { opacity: 0; }
       to { opacity: 1; }
     }
     .complete-message {
-      background: rgba(0, 0, 0, 0.9);
-      border: 2px solid #2ecc71;
-      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.95);
+      border: 2.5px solid #00ffae;
+      border-radius: 0;
       padding: 30px 50px;
       text-align: center;
+      font-family: 'Consolas', 'monospace';
+      color: #00ffae;
+      text-shadow: 0 0 8px #00ffae99;
+      letter-spacing: 2px;
     }
     .complete-message h2 {
       color: #2ecc71;
@@ -360,7 +440,7 @@
         <div class="value" id="connectionStatus">0 / 5</div>
       </div>
       
-      <button class="reset-btn" id="resetBtn">リセット</button>
+
     </div>
     
     <!-- 右側：パズルエリア -->
@@ -392,6 +472,14 @@
     let connections = []; // { vrId, pcId, wireEl, correct }
     let selectedVr = null;
     let correctCount = 0;
+    // 回答済みフラグ（親windowのgameStateにも反映）
+    function setWiresAnswered() {
+      try {
+        if (window.parent && window.parent.gameState) {
+          window.parent.gameState.wiresAnswered = true;
+        }
+      } catch(e) {}
+    }
     
     const puzzleWrapper = document.getElementById('puzzleWrapper');
     const wireSvg = document.getElementById('wire-svg');
@@ -574,46 +662,79 @@
     }
     
     // 完了チェック
+    let wiresAnswered = false;
     function checkComplete() {
+      if (wiresAnswered) return;
+      wiresAnswered = true;
+      setWiresAnswered();
+      // 親windowのgameStateにも反映
+      try {
+        if (window.parent && window.parent.gameState) {
+          window.parent.gameState.wiresAnswered = true;
+        }
+      } catch(e) {}
       if (correctCount === protocolPairs.length) {
-        // 全正解
-        addLog('[SYSTEM] 全接続成功！', 'success');
-        addLog('[SYSTEM] プロトコル検証完了', 'success');
-        addLog('[SYSTEM] VR接続を確立しました', 'success');
-        
-        panelTitle.textContent = '✓ 接続成功';
+        // 成功演出
+        panelTitle.textContent = '✓ ACCESS GRANTED';
         panelTitle.classList.add('success');
         errorBox.innerHTML = '<strong>STATUS: OK</strong><br>通信プロトコル正常<br>VR接続が確立されました';
         errorBox.classList.add('success');
         statusPanel.classList.add('complete');
-        
-        // 完了演出
+        // 大きな演出
         const overlay = document.createElement('div');
         overlay.className = 'complete-overlay';
         overlay.innerHTML = `
-          <div class="complete-message">
-            <h2>✓ 通信確立</h2>
-            <p>VR接続が正常に回復しました</p>
+          <div class="complete-message" style="font-size:2.2em; color:#00ffae; animation: pop-in 0.7s;">
+            <h2 style="font-size:2.5em; margin-bottom:0.5em;">ACCESS GRANTED</h2>
+            <p style="font-size:1.1em;">VR接続が正常に回復しました</p>
           </div>
         `;
         puzzleWrapper.appendChild(overlay);
-        
+
+        // 成功時の全体フラッシュ
+        document.body.classList.add('success-flash');
+        setTimeout(() => document.body.classList.remove('success-flash'), 1200);
+
+        // 効果音（成功SE）
+        try {
+          const audio = new Audio('https://cdn.pixabay.com/audio/2022/07/26/audio_124bfae7e2.mp3');
+          audio.volume = 0.5;
+          audio.play();
+        } catch(e) {}
+
         // 親ウィンドウに通知
         if (window.parent && window.parent !== window) {
           window.parent.postMessage({ type: 'wiresComplete', success: true }, '*');
         }
+        setTimeout(() => { window.close(); }, 2000);
+        @keyframes pop-in {
+          0% { transform: scale(0.7); opacity: 0; }
+          60% { transform: scale(1.1); opacity: 1; }
+          100% { transform: scale(1); opacity: 1; }
+        }
       } else {
-        // 不正解あり
-        addLog('[ERROR] 接続エラーがあります', 'error');
-        addLog('[INFO] リセットして再接続してください', 'warning');
+        // 失敗演出（赤色＆自動でタブ閉じる）
+        panelTitle.textContent = '✗ ACCESS DENIED';
+        panelTitle.classList.remove('success');
+        errorBox.innerHTML = '<strong>ERROR</strong><br>接続失敗<br>ウィンドウが自動で閉じます';
+        errorBox.classList.remove('success');
+        statusPanel.classList.remove('complete');
+        // 大きな演出
+        const overlay = document.createElement('div');
+        overlay.className = 'complete-overlay';
+        overlay.innerHTML = `
+          <div class="complete-message" style="font-size:2.2em; color:#ff2222;">
+            <h2 style="font-size:2.5em; margin-bottom:0.5em; color:#ff2222;">ACCESS DENIED</h2>
+            <p style="font-size:1.1em; color:#ff6666;">接続に失敗しました</p>
+          </div>
+        `;
+        puzzleWrapper.appendChild(overlay);
+        setTimeout(() => { window.close(); }, 2000);
       }
     }
     
     // リセット
-    resetBtn.addEventListener('click', () => {
-      addLog('[SYSTEM] リセット実行...', 'info');
-      init();
-    });
+
     
     // 初期化実行
     init();

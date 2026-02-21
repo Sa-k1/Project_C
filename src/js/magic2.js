@@ -19,7 +19,6 @@
 //     ---
 //     
 //     <div class="hint">『闇より現れし影は、虚無を越え、歪みを抜け、最後に残響となる。その順に記憶を繋げ。』</div>
-//     （＝4→3→2→1）
 //     ----------------------
 //   ※断片は通常は見えないが、範囲選択で文字が現れる（CSS例：.invisible-frag { color: #111; background: #111; } .invisible-frag::selection { color: #fff; background: #333; }）
 //   ※catコマンドの出力がHTML対応の場合に有効
@@ -27,6 +26,7 @@
 // - restored_data.enc がパスワードロックされている
 // - パスワード: HOPE
 //
+
 // 【解き方】
 // 1. cd system → search で「backup/」フォルダ発見
 // 2. cd backup
@@ -49,7 +49,7 @@
 
     const CORRECT_PASSWORD = 'HOPE';
     const SECRET_PASSWORD = '4132'; // 隠しパスワード（断片の順序: 4→1→2→3）
-    const LOCKED_FILE = 'restored_data.enc';
+    const LOCKED_FILE = 'memory.enc';
 
     // 統一形式: { text, type, speed, wait }
     const AUTH_SEQUENCE = [
@@ -63,10 +63,8 @@
         { text: '═══════════════════════════════════════════════════════\n', type: 'system', speed: 10 },
         { text: '  新しいコマンドを取得しました', type: 'slow', speed: 20 },
         { text: '  「read」 - 復元されたデータを読み込む\n', type: 'slow', speed: 20 },
-        { text: ' ', type: 'slow', speed: 20 },
-        { text: '  新しいコマンドを取得しました', type: 'slow', speed: 20 },
-        { text: '  「stealth」 - 一時的にEVEから見つからなくなる\n', type: 'slow', speed: 20 },
         { text: '═══════════════════════════════════════════════════════', type: 'system', speed: 10 },
+        { text: ' [cd real]これが現実につながるコマンド', type: 'slow', speed: 20 },
         { text: ' ', type: 'system', speed: 0 }
     ];
 
@@ -88,23 +86,46 @@
             var type = item.type || 'system';
             var speed = item.speed !== undefined ? item.speed : 20;
             var waitTime = item.wait || 0;
-            
-            switch (type) {
-                case 'slow':
-                    await slowPrintLine(text, speed);
-                    break;
-                case 'error':
-                    await errorLine(text, speed);
-                    break;
-                case 'warn':
-                    await warnLine(text, speed);
-                    break;
-                case 'system':
-                default:
-                    await systemLine(text, speed);
-                    break;
+            var color = item.color;
+
+            // 色指定があれば一時的に色を変えて表示
+            if (color) {
+                const prev = document.body.style.color;
+                document.body.style.color = color;
+                switch (type) {
+                    case 'slow':
+                        await slowPrintLine(text, speed);
+                        break;
+                    case 'error':
+                        await errorLine(text, speed);
+                        break;
+                    case 'warn':
+                        await warnLine(text, speed);
+                        break;
+                    case 'system':
+                    default:
+                        await systemLine(text, speed);
+                        break;
+                }
+                document.body.style.color = prev;
+            } else {
+                switch (type) {
+                    case 'slow':
+                        await slowPrintLine(text, speed);
+                        break;
+                    case 'error':
+                        await errorLine(text, speed);
+                        break;
+                    case 'warn':
+                        await warnLine(text, speed);
+                        break;
+                    case 'system':
+                    default:
+                        await systemLine(text, speed);
+                        break;
+                }
             }
-            
+
             if (waitTime > 0) {
                 await wait(waitTime);
             }
@@ -212,6 +233,11 @@
                 gameState.hasReadCommand = true;
                 gameState.inputMode = 'normal';
                 gameState.passwordTarget_gimmick2 = null;
+
+                // ★★★ ホラー演出: 「ください」 ★★★
+                if (window.horaFX && window.horaFX.kudasaiEffect) {
+                    await window.horaFX.kudasaiEffect(term, puzzleHelpers);
+                }
 
                 return true;
             }

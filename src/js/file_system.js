@@ -13,10 +13,11 @@ class VirtualFileSystem {
                     'VR': {
                         type: 'folder',
                         hidden: true,
+                        deepHidden: true,  // scanコマンドでのみ発見可能
                         children: {
                             'escape_portal.txt': {
                                 type: 'file',
-                                content: '意識の出口ポータル。EVEの妨害に注意。',
+                                content: '100000000 - 2になるようにすると接続される',
                                 editable: false
                             },
                             // 結線ギミック用ファイル
@@ -86,7 +87,7 @@ class VirtualFileSystem {
                                                 children:{
                                                     'temp.txt': {
                                                         type: 'file',
-                                                        content: `いいですね\nこれであなたは基礎的な動きができます。\nそして困った時にはhelpコマンドを使って色々なコマンドを確認して使ってみるのも良いでしょう\nそしてあなたはまず、ゴミ箱の中を探すのがよいでしょう`,
+                                                        content: `いいですね\nこれであなたは基礎的な動きができます。\nそして困った時にはhelpコマンドを使って色々なコマンドを確認して使ってみるのも良いでしょう\nそしてあなたはまずゴミ箱の中や画面上にあるアプリアイコンなども探したりさわるのがよいでしょう`,
                                                         editable: true
                                                     }
                                                 }
@@ -108,7 +109,6 @@ class VirtualFileSystem {
                                                         children: {
                                                             'memo.txt': {   //ここ使うから触んな
                                                                 type: 'file',
-                                                                htmlFile: 'file1.html',
                                                                 content: `admin_2_tempというフォルダを探してみてください\nそしてそのフォルダ内のファイルを確認してください\nまず、cd ../.. を試しに使用してdirと入力してください\nそして、cd admin_2_tempと入力してその中にあるファイルをcat ファイル名で開いてみてください`, 
                                                                 editable: true
                                                             },
@@ -127,7 +127,7 @@ class VirtualFileSystem {
                                                                                                             content: `[破損データ]\n\nこのファイルは破損しています。\nopenコマンドで開いて内容を確認してください。`,
                                                                                                             editable: false
                                                                                                         },
-                                                                                                        'restored_data.enc': {
+                                                                                                        'memory.enc': {
                                                                                                             type: 'file',
                                                                                                             hidden: true,
                                                                                                             encrypted: true,
@@ -352,8 +352,15 @@ class VirtualFileSystem {
         if (this.pathExists(newPath)) {
             const node = this.getNodeAtPath(newPath);
             if (node && (node.type === 'folder' || node.type === 'drive')) {
+                // deepHiddenフォルダへのアクセスチェック（scanで発見後のみ）
+                if (node.deepHidden) {
+                    const pathString = newPath.join('/');
+                    if (!gameState || !gameState.discoveredDeepHidden || !gameState.discoveredDeepHidden.some(p => pathString.includes(p.replace('C:/', 'C:/')))) {
+                        return `指定されたパスが見つかりません。`;
+                    }
+                }
                 // 隠しフォルダへのアクセスチェック
-                if (node.hidden) {
+                if (node.hidden && !node.deepHidden) {
                     const pathString = newPath.join('/');
                     if (gameState && gameState.discoveredHidden && !gameState.discoveredHidden.includes(pathString)) {
                         return `指定されたパスが見つかりません。`;
@@ -472,6 +479,11 @@ class VirtualFileSystem {
                 return '[ERROR]: このファイルは特殊なフォーマットで暗号化されています。\n[TIP]: 復号ツールが必要です。';
             }
             return { action: 'gimmick3_keytrace', file: fileName };
+        }
+
+        // none.pngはreadコマンドで画像を開けるようにする
+        if (fileName.toLowerCase() === 'none.png' && file.htmlFile) {
+            return { action: 'openFile', file: file.htmlFile };
         }
 
         // 通常のファイルはreadできない
@@ -595,7 +607,7 @@ class VirtualFileSystem {
         const file = currentDir.children[fileName];
         
         if (!file) return `指定されたファイルが見つかりません。`;
-        if (file.type === 'folder') return this.cmdCd([fileName]);
+        if (file.type === 'folder') return `'${fileName}' はディレクトリです。openはファイルのみ開けます。`;
 
         // ギミック3のkey_trace.png特別処理
         if (file.special === 'gimmick3_keytrace') {

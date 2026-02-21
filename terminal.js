@@ -248,6 +248,10 @@
     async function handleInput(command) {
         if (window.commandHandler) {
             await window.commandHandler.handleInput(term, gameState, puzzleHelpers, window.vfs, command);
+            // wires_confirmなどY/Nプロンプト後に必ず入力を再有効化
+            if (gameState.inputMode === 'wires_confirm' || gameState.inputMode === 'gimmick2_confirmation' || gameState.inputMode === 'gimmick3_confirmation' || gameState.inputMode === 'confirmation' || gameState.inputMode === 'escape_confirmation' || gameState.inputMode === 'final_puzzle') {
+                inputEnabled = true;
+            }
         } else {
             await errorLine("[ERROR]: コマンドハンドラが初期化されていません", 20);
         }

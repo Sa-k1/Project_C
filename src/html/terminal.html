@@ -6,9 +6,38 @@
   <!-- xterm CSS via CDN -->
   <link rel="stylesheet" href="https://unpkg.com/xterm/css/xterm.css">
   <link rel="stylesheet" href="../css/style_con.css">
+  <!-- ホラー演出 -->
+  <link rel="stylesheet" href="../hora/hora.css">
 </head>
 <body>
   <div id="terminal"></div>
+
+  <!-- ファイルビューア用コンテナ -->
+  <div id="fileViewerContainer3" style="display:none; position:fixed; top:10%; left:10%; width:80vw; height:80vh; z-index:9999; background:#111; border-radius:12px; box-shadow:0 0 40px #000;">
+    <div id="fileViewerTitle3" style="color:#fff; font-size:1.2em; padding:8px 16px;">ファイルビューア</div>
+    <iframe id="file-viewer-iframe3" src="" style="width:100%; height:calc(100% - 32px); border:none; border-radius:0 0 12px 12px;"></iframe>
+    <button onclick="closeFileViewer()" style="position:absolute; top:8px; right:16px; z-index:10000; background:#333; color:#fff; border:none; border-radius:6px; padding:6px 12px; cursor:pointer;">閉じる</button>
+  </div>
+
+  <script>
+    // ファイルビューアを開く
+    window.openFileViewer = function(fileHtml) {
+      var container = document.getElementById('fileViewerContainer3');
+      var iframe = document.getElementById('file-viewer-iframe3');
+      var title = document.getElementById('fileViewerTitle3');
+      if (!container || !iframe) return;
+      container.style.display = 'block';
+      iframe.src = '../html/' + fileHtml;
+      title.textContent = fileHtml;
+    };
+    // ファイルビューアを閉じる
+    window.closeFileViewer = function() {
+      var container = document.getElementById('fileViewerContainer3');
+      var iframe = document.getElementById('file-viewer-iframe3');
+      if (container) container.style.display = 'none';
+      if (iframe) iframe.src = '';
+    };
+  </script>
 
   <!-- xterm + fit addon via CDN (UMD builds) -->
   <script src="https://unpkg.com/xterm/lib/xterm.js"></script>
@@ -23,6 +52,8 @@
   <script src="../js/magic3.js"></script>
   <script src="../js/admin_key.js"></script>
    <script src="../js/wires.js"></script>
+  <!-- ホラー演出 -->
+  <script src="../hora/hora.js"></script>
   <!-- ターミナルJS -->
   <script src="../js/command.js"></script>
   <script src="../../terminal.js"></script>

@@ -1,0 +1,616 @@
+/**
+ * ホラー演出用CSS - 怖いバージョン
+ */
+
+/* ================================
+   激しい画面振動
+================================ */
+.hora-violent-shake {
+    animation: hora-violent-shake 0.05s infinite;
+}
+
+@keyframes hora-violent-shake {
+    0%, 100% { transform: translate(0, 0) rotate(0); }
+    10% { transform: translate(-8px, -5px) rotate(-1deg); }
+    20% { transform: translate(8px, 5px) rotate(1deg); }
+    30% { transform: translate(-5px, 8px) rotate(-0.5deg); }
+    40% { transform: translate(5px, -8px) rotate(0.5deg); }
+    50% { transform: translate(-8px, 5px) rotate(-1deg); }
+    60% { transform: translate(8px, -5px) rotate(1deg); }
+    70% { transform: translate(-5px, -8px) rotate(-0.5deg); }
+    80% { transform: translate(5px, 8px) rotate(0.5deg); }
+    90% { transform: translate(-8px, -5px) rotate(-1deg); }
+}
+
+.hora-shake {
+    animation: hora-shake 0.1s infinite;
+}
+
+@keyframes hora-shake {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-3px, 2px); }
+    50% { transform: translate(3px, -2px); }
+    75% { transform: translate(-2px, -3px); }
+}
+
+/* ================================
+   不気味なメッセージ
+================================ */
+.hora-creepy-message {
+    position: fixed;
+    font-size: 5vw;
+    font-family: 'MS Gothic', 'Meiryo', monospace;
+    color: #ff0000;
+    z-index: 999998;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+    text-shadow: 
+        0 0 10px #ff0000,
+        0 0 20px #ff0000,
+        2px 2px 0 #000,
+        -2px -2px 0 #000;
+    letter-spacing: 0.2em;
+}
+
+.hora-creepy-message.active {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    animation: hora-message-glitch 0.1s infinite;
+}
+
+@keyframes hora-message-glitch {
+    0%, 100% { 
+        transform: translate(-50%, -50%) scale(1); 
+        filter: none;
+    }
+    25% { 
+        transform: translate(calc(-50% - 3px), calc(-50% + 1px)) scale(1.02); 
+        filter: hue-rotate(90deg);
+    }
+    50% { 
+        transform: translate(calc(-50% + 2px), calc(-50% - 2px)) scale(0.98); 
+        filter: hue-rotate(180deg);
+    }
+    75% { 
+        transform: translate(calc(-50% - 1px), calc(-50% + 3px)) scale(1.01); 
+        filter: hue-rotate(270deg);
+    }
+}
+
+/* ================================
+   赤いフラッシュ
+================================ */
+.hora-red-flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle, #ff0000 0%, #660000 50%, #330000 100%);
+    z-index: 999997;
+    pointer-events: none;
+    opacity: 0;
+    mix-blend-mode: overlay;
+}
+
+/* ================================
+   グリッチ攻撃
+================================ */
+.hora-glitch-attack {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999995;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(255, 0, 0, 0.1) 0px,
+        rgba(0, 255, 255, 0.1) 2px,
+        transparent 4px,
+        transparent 6px
+    );
+    animation: hora-glitch-scan 0.05s linear infinite;
+}
+
+@keyframes hora-glitch-scan {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 6px; }
+}
+
+.hora-glitch-body {
+    animation: hora-glitch-distort 0.1s infinite;
+}
+
+@keyframes hora-glitch-distort {
+    0%, 100% { 
+        transform: translate(0); 
+        filter: none;
+    }
+    20% { 
+        transform: translate(-5px, 0) skewX(2deg); 
+        filter: hue-rotate(90deg) saturate(2);
+    }
+    40% { 
+        transform: translate(5px, 0) skewX(-2deg); 
+        filter: hue-rotate(180deg) saturate(2);
+    }
+    60% { 
+        transform: translate(-3px, 2px) skewX(1deg); 
+        filter: hue-rotate(270deg) saturate(2);
+    }
+    80% { 
+        transform: translate(3px, -2px) skewX(-1deg); 
+        filter: hue-rotate(360deg) saturate(2);
+    }
+}
+
+/* ================================
+   暗く侵食
+================================ */
+.hora-dark-creep {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999994;
+    pointer-events: none;
+    background: radial-gradient(
+        circle at center,
+        transparent 0%,
+        transparent 20%,
+        rgba(0, 0, 0, 0.3) 40%,
+        rgba(0, 0, 0, 0.7) 70%,
+        rgba(0, 0, 0, 0.95) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.5s, background 1.5s;
+}
+
+.hora-dark-creep.active {
+    opacity: 1;
+    background: radial-gradient(
+        circle at center,
+        transparent 0%,
+        rgba(0, 0, 0, 0.3) 10%,
+        rgba(0, 0, 0, 0.7) 30%,
+        rgba(0, 0, 0, 0.9) 50%,
+        rgba(0, 0, 0, 0.98) 100%
+    );
+}
+
+/* ================================
+   後ろにいる
+================================ */
+.hora-behind-you {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 999998;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.hora-behind-you.active {
+    opacity: 1;
+}
+
+.hora-behind-text {
+    font-size: 20vw;
+    font-family: 'MS Gothic', 'Meiryo', monospace;
+    color: #ff0000;
+    text-shadow: 
+        0 0 20px #ff0000,
+        0 0 40px #ff0000,
+        0 0 80px #ff0000,
+        0 0 120px #ff0000;
+    animation: hora-behind-pulse 0.5s ease-in-out infinite;
+    letter-spacing: 0.3em;
+}
+
+.hora-behind-subtext {
+    font-size: 3vw;
+    font-family: 'MS Gothic', 'Meiryo', monospace;
+    color: #ffffff;
+    margin-top: 30px;
+    opacity: 0.7;
+    letter-spacing: 0.5em;
+    animation: hora-subtext-fade 1s ease-in-out infinite;
+}
+
+@keyframes hora-behind-pulse {
+    0%, 100% { 
+        transform: scale(1); 
+        opacity: 1;
+    }
+    50% { 
+        transform: scale(1.05); 
+        opacity: 0.8;
+    }
+}
+
+@keyframes hora-subtext-fade {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 0.3; }
+}
+
+/* ================================
+   画面割れ演出（リアル版）
+================================ */
+.hora-shatter-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999999;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+        circle at 50% 50%,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 30%
+    );
+}
+
+.hora-shatter-overlay.active {
+    opacity: 1;
+}
+
+.hora-shatter-overlay.fadeout {
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.hora-shatter-overlay svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* 衝撃点（中心の白い点） */
+.hora-impact-point {
+    fill: #ffffff;
+    opacity: 0;
+    animation: hora-impact-flash 0.3s ease-out forwards;
+}
+
+@keyframes hora-impact-flash {
+    0% { opacity: 0; r: 1; }
+    30% { opacity: 1; r: 5; }
+    100% { opacity: 0.8; r: 3; }
+}
+
+.hora-impact-ring {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.6);
+    stroke-width: 0.5;
+    opacity: 0;
+    animation: hora-ring-expand 0.4s ease-out forwards;
+}
+
+@keyframes hora-ring-expand {
+    0% { opacity: 0; r: 2; stroke-width: 2; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; r: 8; stroke-width: 0.3; }
+}
+
+/* メインのひび割れ（太い線） */
+.hora-crack-main {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.95);
+    stroke-linecap: round;
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    animation: hora-crack-draw 0.2s ease-out forwards;
+    filter: drop-shadow(0 0 1px #fff);
+}
+
+/* サブのひび（分岐した細い線） */
+.hora-crack-sub {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.7);
+    stroke-width: 0.2;
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: hora-crack-draw 0.15s ease-out forwards;
+}
+
+/* 同心円のひび（蜘蛛の巣効果） */
+.hora-crack-arc {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.5);
+    stroke-width: 0.15;
+    stroke-dasharray: 50;
+    stroke-dashoffset: 50;
+    animation: hora-crack-draw 0.2s ease-out forwards;
+}
+
+/* ガラス破片 */
+.hora-shard {
+    fill: rgba(255, 255, 255, 0.15);
+    stroke: rgba(255, 255, 255, 0.4);
+    stroke-width: 0.1;
+    opacity: 0;
+    animation: hora-shard-appear 0.3s ease-out forwards;
+}
+
+@keyframes hora-shard-appear {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+}
+
+/* ひび割れ描画アニメーション */
+@keyframes hora-crack-draw {
+    0% {
+        stroke-dashoffset: 200;
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+    }
+    100% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+}
+
+/* ================================
+   飛び散る文字
+================================ */
+.hora-text-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999998;
+    pointer-events: none;
+}
+
+.hora-text-particles.fadeout {
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.hora-flying-char {
+    position: absolute;
+    font-size: 2rem;
+    font-family: 'MS Gothic', monospace;
+    color: #ff0000;
+    text-shadow: 
+        0 0 10px #ff0000,
+        0 0 20px #ff3300;
+    animation: hora-char-fly 0.8s ease-out forwards;
+}
+
+@keyframes hora-char-fly {
+    0% {
+        transform: translate(0, 0) rotate(0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--fly-x), var(--fly-y)) rotate(var(--fly-rotate)) scale(0);
+        opacity: 0;
+    }
+}
+
+/* ================================
+   グリッチボディ
+================================ */
+.hora-glitch-body {
+    animation: hora-glitch-distort 0.1s infinite;
+}
+
+@keyframes hora-glitch-distort {
+    0%, 100% { 
+        transform: translate(0); 
+        filter: none;
+    }
+    20% { 
+        transform: translate(-5px, 0) skewX(2deg); 
+        filter: hue-rotate(90deg) saturate(2);
+    }
+    40% { 
+        transform: translate(5px, 0) skewX(-2deg); 
+        filter: hue-rotate(180deg) saturate(2);
+    }
+    60% { 
+        transform: translate(-3px, 2px) skewX(1deg); 
+        filter: hue-rotate(270deg) saturate(2);
+    }
+    80% { 
+        transform: translate(3px, -2px) skewX(-1deg); 
+        filter: hue-rotate(360deg) saturate(2);
+    }
+}
+
+/* ================================
+   ガラス破片の追加効果
+================================ */
+.hora-shatter-overlay::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(
+            ellipse at 45% 45%,
+            rgba(255, 255, 255, 0.1) 0%,
+            transparent 50%
+        ),
+        radial-gradient(
+            ellipse at 55% 55%,
+            rgba(255, 255, 255, 0.05) 0%,
+            transparent 40%
+        );
+    pointer-events: none;
+    opacity: 0;
+    animation: hora-glass-sheen 0.5s ease-out forwards;
+    animation-delay: 0.1s;
+}
+
+@keyframes hora-glass-sheen {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+/* 割れた瞬間のフラッシュ */
+.hora-shatter-overlay::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        circle at 50% 50%,
+        rgba(255, 255, 255, 0.8) 0%,
+        rgba(255, 255, 255, 0.3) 20%,
+        transparent 50%
+    );
+    pointer-events: none;
+    animation: hora-impact-flash-bg 0.3s ease-out forwards;
+}
+
+@keyframes hora-impact-flash-bg {
+    0% { opacity: 1; transform: scale(0.5); }
+    100% { opacity: 0; transform: scale(2); }
+}
+
+/* ================================
+   「ください」演出（magic2用）
+================================ */
+.hora-blackout {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    z-index: 999990;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.hora-blackout.active {
+    opacity: 1;
+}
+
+.hora-kudasai-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999991;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.hora-kudasai-container.active .hora-kudasai-text {
+    opacity: 1;
+}
+
+.hora-kudasai-text {
+    position: absolute;
+    font-family: 'MS Gothic', 'Meiryo', monospace;
+    font-size: 2rem;
+    color: #ff0000;
+    white-space: nowrap;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    text-shadow: 
+        0 0 10px #ff0000,
+        0 0 20px #ff0000;
+}
+
+.hora-kudasai-center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 15vw;
+    font-family: 'MS Gothic', 'Meiryo', monospace;
+    color: #ffffff;
+    opacity: 0;
+    text-shadow: 
+        0 0 20px #ffffff,
+        0 0 40px #ffffff,
+        0 0 60px rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.2em;
+}
+
+.hora-kudasai-container.active .hora-kudasai-center {
+    animation: hora-kudasai-center-appear 0.8s ease-out forwards;
+    animation-delay: 0.3s;
+}
+
+@keyframes hora-kudasai-center-appear {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.3);
+        filter: blur(10px);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1);
+        filter: blur(0);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        filter: blur(0);
+    }
+}
+
+.hora-kudasai-container.fadeout {
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+/* ================================
+   ジャンプスケア（掌画像）
+================================ */
+.hora-jumpscare-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: transparent;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hora-jumpscare-image {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+}

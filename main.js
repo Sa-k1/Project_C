@@ -224,7 +224,7 @@ function createtitleWindow() {
     show: false,        // 最初は非表示にして準備してから表示
     alwaysOnTop: true,  // Titleを最前面に
     // フルスクリーン表示にする場合は下のコメントアウトを外してください
-    // fullscreen: true,
+    fullscreen: true,
     icon: path.join(__dirname, "src/pic/app_icon.ico"),
     webPreferences: {
       nodeIntegration: true,  // 既存のコードとの互換性のため維持
@@ -286,7 +286,7 @@ app.whenReady().then(() => {
 
   // スプラッシュのアニメーションを事前に開始（タイトルのフェードアウト中に裏で準備）
   ipcMain.on('prepare-splash', () => {
-    if (splashScreen) {
+    if (splashScreen && !splashScreen.isDestroyed()) {
       splashScreen.webContents.executeJavaScript(`
         document.body.classList.remove('paused');
       `);
@@ -297,19 +297,28 @@ app.whenReady().then(() => {
   ipcMain.on('game-start', () => {
     console.log('button pressed');
     
+    // mainWinが存在している場合（エンディング→タイトル→スタートのケース）
+    if (mainWin && !mainWin.isDestroyed()) {
+      console.log('mainWinが存在: index.htmlに遷移');
+      mainWin.loadFile(path.join(__dirname, 'src', 'html', 'index.html'));
+      return;
+    }
+    
     // スプラッシュ画面を表示
-    if (splashScreen) {
+    if (splashScreen && !splashScreen.isDestroyed()) {
       splashScreen.show();
     }
     
     // タイトル画面を閉じる
-    if (TitleScreen) {
+    if (TitleScreen && !TitleScreen.isDestroyed()) {
       TitleScreen.close();
     }
 
     // スプラッシュ表示後、setTimeoutでメインウィンドウを開く
     setTimeout(() => {
-      splashScreen.close();
+      if (splashScreen && !splashScreen.isDestroyed()) {
+        splashScreen.close();
+      }
       createWindow();
     }, 1500);
     // アニメーションは既に1秒進んでいるので1500msに調整===========================================================================

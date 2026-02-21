@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVE - Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            perspective: 1000px;
+        }
+
+        .command-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .command {
+            position: absolute;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+            white-space: nowrap;
+            text-shadow: 0 0 10px #ffffff, 0 0 20px rgba(255,255,255,0.5);
+            animation: flyThrough var(--duration) linear forwards;
+            opacity: 0;
+        }
+
+        @keyframes flyThrough {
+            0% {
+                transform: translateZ(-2000px) translateX(var(--startX)) translateY(var(--startY));
+                opacity: 0;
+                font-size: 8px;
+            }
+            10% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateZ(500px) translateX(var(--endX)) translateY(var(--endY));
+                opacity: 0;
+                font-size: 120px;
+            }
+        }
+
+        /* グリッチ効果 */
+        .glitch {
+            animation: glitch 0.1s infinite;
+        }
+
+        @keyframes glitch {
+            0% { text-shadow: 2px 0 #ff0000, -2px 0 #00ffff; }
+            25% { text-shadow: -2px 0 #ff0000, 2px 0 #00ffff; }
+            50% { text-shadow: 2px 2px #ff0000, -2px -2px #00ffff; }
+            75% { text-shadow: -2px 2px #ff0000, 2px -2px #00ffff; }
+            100% { text-shadow: 2px 0 #ff0000, -2px 0 #00ffff; }
+        }
+
+        /* スキャンライン */
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* ビネット効果 */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.8) 100%);
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* タイトル表示用 */
+        .title-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .title-text {
+            font-family: 'Courier New', monospace;
+            font-size: 150px;
+            color: #ffffff;
+            text-shadow: 0 0 30px #ffffff, 0 0 60px rgba(255,255,255,0.7), 0 0 90px rgba(255,255,255,0.5);
+            letter-spacing: 30px;
+        }
+
+        .title-overlay.show {
+            animation: titleAppear 2s ease-out forwards;
+        }
+
+        @keyframes titleAppear {
+            0% {
+                opacity: 0;
+                transform: scale(3);
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* ノイズオーバーレイ */
+        .noise {
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            pointer-events: none;
+            z-index: 998;
+            opacity: 0.08;
+            background-image: url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.9"/></svg>');
+            animation: noiseAnim 0.05s steps(3) infinite;
+        }
+
+        @keyframes noiseAnim {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(-5%, -5%); }
+            40% { transform: translate(5%, 3%); }
+            60% { transform: translate(-3%, 5%); }
+            80% { transform: translate(4%, -3%); }
+            100% { transform: translate(-2%, 2%); }
+        }
+
+        /* 砂嵐キャンバス */
+        .tv-static {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 997;
+            opacity: 0.05;
+        }
+
+        /* 時々走るグリッチバー */
+        .glitch-bar {
+            position: fixed;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(0, 255, 255, 0.8);
+            pointer-events: none;
+            z-index: 1001;
+            opacity: 0;
+        }
+
+        .glitch-bar.active {
+            animation: glitchBarAnim 0.15s linear forwards;
+        }
+
+        @keyframes glitchBarAnim {
+            0% { opacity: 1; top: -5px; }
+            100% { opacity: 0; top: 105%; }
+        }
+
+        /* 中央メッセージ */
+        .center-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 500;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .center-message.show {
+            animation: messageAppear 1s ease-out forwards;
+        }
+
+        .center-message-text {
+            font-family: 'Courier New', monospace;
+            font-size: 48px;
+            color: #ffffff;
+            text-shadow: 0 0 20px #ffffff, 0 0 40px rgba(255,255,255,0.5);
+            letter-spacing: 4px;
+            white-space: nowrap;
+            animation: textGlitch 0.15s infinite;
+        }
+
+        @keyframes textGlitch {
+            0% { 
+                text-shadow: 0 0 20px #ffffff, 0 0 40px rgba(255,255,255,0.5);
+                transform: translate(0, 0);
+            }
+            20% { 
+                text-shadow: -2px 0 #ff0000, 2px 0 #00ffff, 0 0 20px #ffffff;
+                transform: translate(1px, 0);
+            }
+            40% { 
+                text-shadow: 2px 0 #ff0000, -2px 0 #00ffff, 0 0 20px #ffffff;
+                transform: translate(-1px, 0);
+            }
+            60% { 
+                text-shadow: 0 0 20px #ffffff, 0 0 40px rgba(255,255,255,0.5);
+                transform: translate(0, 1px);
+            }
+            80% { 
+                text-shadow: -1px 0 #ff0000, 1px 0 #00ffff, 0 0 20px #ffffff;
+                transform: translate(0, -1px);
+            }
+            100% { 
+                text-shadow: 0 0 20px #ffffff, 0 0 40px rgba(255,255,255,0.5);
+                transform: translate(0, 0);
+            }
+        }
+
+        @keyframes messageAppear {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .center-message.hide {
+            animation: messageDisappear 0.5s ease-out forwards;
+        }
+
+        @keyframes messageDisappear {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="command-container" id="commandContainer"></div>
+    <div class="center-message" id="centerMessage">
+        <div class="center-message-text">コマンドを使って脱出しろ！</div>
+    </div>
+    <canvas class="tv-static" id="tvStatic"></canvas>
+    <div class="noise" id="noise"></div>
+    <div class="scanline"></div>
+    <div class="vignette"></div>
+    <div class="glitch-bar" id="glitchBar"></div>
+    <div class="title-overlay" id="titleOverlay">
+        <div class="title-text">EVE</div>
+    </div>
+
+    <script>
+        // テレビ砂嵐エフェクト
+        const staticCanvas = document.getElementById('tvStatic');
+        const staticCtx = staticCanvas.getContext('2d');
+        
+        function resizeCanvas() {
+            staticCanvas.width = window.innerWidth;
+            staticCanvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        function drawStatic() {
+            const imageData = staticCtx.createImageData(staticCanvas.width, staticCanvas.height);
+            const data = imageData.data;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                const val = Math.random() * 255;
+                data[i] = val;     // R
+                data[i + 1] = val; // G
+                data[i + 2] = val; // B
+                data[i + 3] = 255; // A
+            }
+            
+            staticCtx.putImageData(imageData, 0, 0);
+            requestAnimationFrame(drawStatic);
+        }
+        drawStatic();
+
+        const commands = [
+            'help', 'cd', 'dir', 'ls', 'cat', 'open', 'clear', 'trash'
+        ];
+
+        const container = document.getElementById('commandContainer');
+        let commandCount = 0;
+        const maxCommands = 120; // 合計コマンド数
+        let spawnInterval = 100; // 初期スポーン間隔（ms）
+        let intervalId;
+
+        function createCommand() {
+            if (commandCount >= maxCommands) {
+                clearInterval(intervalId);
+                // 最後のコマンドが消えた後にタイトル表示
+                setTimeout(() => {
+                    document.getElementById('titleOverlay').classList.add('show');
+                }, 1500);
+                return;
+            }
+
+            const cmd = document.createElement('div');
+            cmd.className = 'command';
+            cmd.textContent = commands[Math.floor(Math.random() * commands.length)];
+
+            // ランダムな開始位置と終了位置（画面全体に拡大）
+            const startX = (Math.random() - 0.5) * 1200;
+            const startY = (Math.random() - 0.5) * 800;
+            const endX = startX * 2;
+            const endY = startY * 2;
+
+            // アニメーション時間（徐々に速くなる）
+            const duration = 2.5 - (commandCount / maxCommands) * 1.5; // 2.5秒→1秒
+
+            cmd.style.setProperty('--startX', `${startX}px`);
+            cmd.style.setProperty('--startY', `${startY}px`);
+            cmd.style.setProperty('--endX', `${endX}px`);
+            cmd.style.setProperty('--endY', `${endY}px`);
+            cmd.style.setProperty('--duration', `${duration}s`);
+
+            // 時々グリッチ効果
+            if (Math.random() > 0.7) {
+                cmd.classList.add('glitch');
+            }
+
+            container.appendChild(cmd);
+            commandCount++;
+
+            // 終了したら削除
+            cmd.addEventListener('animationend', () => {
+                cmd.remove();
+            });
+
+            // スポーン間隔を徐々に短くする
+            if (commandCount % 8 === 0 && spawnInterval > 30) {
+                spawnInterval -= 8;
+                clearInterval(intervalId);
+                intervalId = setInterval(createCommand, spawnInterval);
+            }
+        }
+
+        // ノイズ音生成
+        let audioContext = null;
+        let noiseNode = null;
+        let gainNode = null;
+
+        function startNoiseSound() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // ホワイトノイズ生成
+            const bufferSize = 2 * audioContext.sampleRate;
+            const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = Math.random() * 2 - 1;
+            }
+            
+            noiseNode = audioContext.createBufferSource();
+            noiseNode.buffer = noiseBuffer;
+            noiseNode.loop = true;
+            
+            // フィルターで高音を抑える
+            const filter = audioContext.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 1000;
+            
+            // 音量調整
+            gainNode = audioContext.createGain();
+            gainNode.gain.value = 0.08; // 控えめな音量
+            
+            noiseNode.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            noiseNode.start();
+        }
+
+        function stopNoiseSound() {
+            if (noiseNode) {
+                noiseNode.stop();
+                noiseNode = null;
+            }
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+        }
+
+        // グリッチバー効果
+        function triggerGlitchBar() {
+            const bar = document.getElementById('glitchBar');
+            bar.classList.remove('active');
+            void bar.offsetWidth; // リフロー
+            bar.classList.add('active');
+        }
+
+        // ランダムにグリッチバーを発動
+        function startGlitchBarLoop() {
+            setInterval(() => {
+                if (Math.random() > 0.6) {
+                    triggerGlitchBar();
+                }
+            }, 300);
+        }
+
+        // 中央メッセージ表示
+        function showCenterMessage() {
+            const msg = document.getElementById('centerMessage');
+            msg.classList.add('show');
+            
+            // 3秒後に非表示
+            setTimeout(() => {
+                msg.classList.remove('show');
+                msg.classList.add('hide');
+            }, 3000);
+        }
+
+        // クリックで開始
+        document.body.addEventListener('click', () => {
+            if (commandCount === 0) {
+                showCenterMessage();
+                startNoiseSound();
+                startGlitchBarLoop();
+                intervalId = setInterval(createCommand, spawnInterval);
+            }
+        });
+
+        // 自動開始（2秒後）
+        setTimeout(() => {
+            if (commandCount === 0) {
+                showCenterMessage();
+                startNoiseSound();
+                startGlitchBarLoop();
+                intervalId = setInterval(createCommand, spawnInterval);
+            }
+        }, 2000);
+
+        // タイトル表示時に音を徐々にフェードアウト
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.target.classList.contains('show')) {
+                    if (gainNode) {
+                        // 2秒かけてフェードアウト
+                        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 2);
+                        setTimeout(stopNoiseSound, 2500);
+                    }
+                }
+            });
+        });
+        observer.observe(document.getElementById('titleOverlay'), { attributes: true, attributeFilter: ['class'] });
+    </script>
+</body>
+</html>

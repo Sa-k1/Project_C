@@ -17,7 +17,6 @@
     </div>
     <script src="../js/save_system.js"></script>
     <script>
-        const { ipcRenderer } = require('electron');
         const startButton = document.getElementById('startBtn');
 
         startButton.addEventListener('click', function() {
@@ -30,14 +29,24 @@
             }
             
             // フェードアウト開始と同時にスプラッシュのアニメーションを開始
-            ipcRenderer.send('prepare-splash');
+            if (window.electronAPI && window.electronAPI.send) {
+                window.electronAPI.send('prepare-splash');
+            } else if (typeof require !== 'undefined') {
+                const { ipcRenderer } = require('electron');
+                ipcRenderer.send('prepare-splash');
+            }
             
             // フェードアウトを開始
             document.body.classList.add('fade-out');
             
             // フェードアウト完了後に画面切り替え
             setTimeout(() => {
-                ipcRenderer.send('game-start');
+                if (window.electronAPI && window.electronAPI.send) {
+                    window.electronAPI.send('game-start');
+                } else if (typeof require !== 'undefined') {
+                    const { ipcRenderer } = require('electron');
+                    ipcRenderer.send('game-start');
+                }
             }, 1000);
         });
     </script>

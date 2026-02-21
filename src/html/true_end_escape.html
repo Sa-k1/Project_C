@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVE - TRUE END</title>
+    <style>
+        @charset "UTF-8";
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Yu Gothic', 'Meiryo', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            max-width: 700px;
+        }
+        .story-text {
+            font-size: 18px;
+            line-height: 2.2;
+            color: #ccc;
+        }
+        .story-text p {
+            margin: 20px 0;
+            opacity: 0;
+            transition: opacity 1.5s ease-out;
+        }
+        .story-text p.show { opacity: 1; }
+        .end-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 2s ease-out;
+        }
+        .end-container.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .end-title {
+            font-size: 48px;
+            color: #f0f0f0;
+            letter-spacing: 12px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(255,255,255,0.3);
+        }
+        .end-subtitle {
+            font-size: 24px;
+            color: #aaa;
+            letter-spacing: 6px;
+        }
+        .start-container { margin-top: 50px; }
+        .start-button {
+            background: transparent;
+            border: 2px solid #888;
+            color: #fff;
+            padding: 15px 40px;
+            font-size: 16px;
+            letter-spacing: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Yu Gothic', 'Meiryo', sans-serif;
+        }
+        .start-button:hover {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+        /* 光のエフェクト */
+        .light-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+            animation: pulse 4s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+    <div class="light-overlay"></div>
+    
+    <div class="container">
+        <div class="story-text" id="storyText">
+            <p>光が見える...</p>
+            <p>暖かい光が、あなたを包み込む</p>
+            <p>自分の体の感覚が戻ってくる</p>
+            <p>指先に、息づかいに、心臓の鼓動に</p>
+            <p>...</p>
+            <p>目を開けると、そこは現実世界だった</p>
+            <p>あなたは、自分の体に戻ることができた</p>
+        </div>
+    </div>
+
+    <div class="end-container" id="endContainer">
+        <div class="end-title">TRUE END</div>
+        <div class="end-subtitle">─ 帰 還 ─</div>
+        <div class="start-container">
+            <button class="start-button" id="continueBtn" style="margin-right: 10px;">続きから再開する</button>
+            <button class="start-button" id="startBtn" style="margin-top: 15px;">タイトルに戻る</button>
+        </div>
+    </div>
+
+    <script src="../js/save_system.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const container = document.querySelector('.container');
+            const endContainer = document.getElementById('endContainer');
+            const paragraphs = document.querySelectorAll('.story-text p');
+            
+            // 背景を徐々に明るく
+            let brightness = 0;
+            const brightenInterval = setInterval(() => {
+                brightness = Math.min(brightness + 0.02, 0.15);
+                document.body.style.background = `rgb(${Math.floor(brightness * 255)}, ${Math.floor(brightness * 255)}, ${Math.floor(brightness * 255)})`;
+            }, 200);
+            
+            // テキストを順番に表示
+            for (let i = 0; i < paragraphs.length; i++) {
+                await new Promise(r => setTimeout(r, 1800));
+                paragraphs[i].classList.add('show');
+            }
+            
+            clearInterval(brightenInterval);
+            
+            // テキスト消去 + エンドタイトル表示
+            await new Promise(r => setTimeout(r, 2500));
+            container.style.transition = 'opacity 1.5s';
+            container.style.opacity = '0';
+            await new Promise(r => setTimeout(r, 1600));
+            container.style.display = 'none';
+            endContainer.classList.add('show');
+        });
+
+        // Titleに戻るボタンの処理
+        document.getElementById('startBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            document.body.style.transition = 'opacity 1s ease-out';
+            document.body.style.opacity = '0';
+            
+            setTimeout(() => {
+                window.location.href = 'title.html';
+            }, 1000);
+        });
+        
+        // 続きから再開するボタンの処理
+        document.getElementById('continueBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            document.body.style.transition = 'opacity 1s ease-out';
+            document.body.style.opacity = '0';
+            
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

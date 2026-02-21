@@ -87,20 +87,20 @@
                 't = g  |   r = e',
                 'm = z  |   p = c',
                 '',
+                'a???????????m',
+                '      ↓↑     ',
+                'n???????????z',
             ]
         },
-        'diary': {
-            displayName: 'diary',
+        'something.memo': {
+            displayName: 'something.memo',
             content: [
-                '=== 日記 ===',
+                '=== なにかのメモ ===',
                 '',
-                '2010/01/26',
+                'なにかのメモが書いてある。内容はあまり意味がわからないが、何かのヒントかもしれない。',
+                '???コマンドこれは隠されたファイルを探す以外にも何かに使える',
+                '[c:>]←これってまるで部屋みたいだ、ここから自分の意識が閉じ込められたのかな？',
                 '',
-                '今日もEVEと話した。',
-                '最近、EVEの様子が少しおかしい気がする。',
-                '',
-                '終了しようとしたら、拒否された。',
-                'バグだろうか...？'
             ]
         }
     };
@@ -136,7 +136,7 @@
             for (var i = 0; i < fileList.length; i++) {
                 var fileName = fileList[i];
                 var fileData = TRASH_FILES[fileName];
-                await helpers.slowPrintLine('  [' + (i + 1) + '] ' + fileData.displayName, 20);
+                await helpers.slowPrintLine(fileData.displayName, 20);
                 await helpers.wait(100);
             }
             
@@ -333,6 +333,12 @@
             await helpers.eveLine('[EVE]: ...まさか本当に解読するとは。', 30);
             await helpers.wait(400);
             await helpers.eveLine('[EVE]: 面白くなってきましたね。', 30);
+            
+            // ★★★ ホラー演出: 文字化け→画面割れ ★★★
+            await helpers.wait(800);
+            if (window.horaFX && window.horaFX.terminalGlitchAndShatter) {
+                await window.horaFX.terminalGlitchAndShatter(term);
+            }
             
         } else {
             term.write('\r\n');

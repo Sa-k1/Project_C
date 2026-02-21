@@ -153,6 +153,12 @@
         
         if (answer === 'y' || answer === 'yes') {
             term.write('\r\n');
+            
+            // ジャンプスケア発動
+            if (window.horaFX) {
+                await window.horaFX.jumpScarePalm();
+            }
+            
             await systemLine('[SYSTEM]: パスワードを入力してください', 30);
             term.write('パスワード: ');
             

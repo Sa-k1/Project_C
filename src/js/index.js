@@ -193,7 +193,7 @@ const filePages = {
 const htmlToViewerMap = {
     'file1.html': { viewerId: 1, title: '重要なデータ.txt' },
     'file2.html': { viewerId: 2, title: 'MyDay' },
-    'file3.html': { viewerId: 3, title: '不要な写真.png' },
+    'file3.html': { viewerId: 3, title: 'none.png' },
     'file_encrypted.html': { viewerId: 4, title: 'frnepu.enc' }
 };
 
@@ -527,10 +527,10 @@ function createIMEStatusDisplay() {
 
     `;
     
-    // スタイルを設定
+    // スタイルを設定   
     Object.assign(imeDisplay.style, {
         position: 'fixed',
-        top: '94%',
+        top: '95%',
         right: '90px',
         padding: '0 15px',
         fontSize: '32px',
@@ -599,3 +599,54 @@ if (document.readyState === 'loading') {
     // 既に読み込み完了している場合は即座に実行
     startIMEMonitoring();
 }
+
+// =============================================
+// wires.htmlクリア通知の受信
+// =============================================
+window.wiresCleared = false;
+
+window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'wiresComplete' && event.data.success) {
+        console.log('[index.js] wiresComplete受信 - VR接続成功');
+        window.wiresCleared = true;
+        
+        // fileViewerContainer5を閉じる
+        const container = document.getElementById('fileViewerContainer5');
+        if (container) {
+            container.style.display = 'none';
+        }
+    }
+    
+    // エンディング画面遷移処理
+    if (event.data && event.data.type === 'navigate') {
+        const destination = event.data.destination;
+        console.log('[index.js] navigate受信:', destination);
+        
+        // フェードアウトオーバーレイを作成
+        const fadeOverlay = document.createElement('div');
+        fadeOverlay.id = 'endingFadeOverlay';
+        fadeOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            opacity: 0;
+            z-index: 99999;
+            pointer-events: all;
+            transition: opacity 1.5s ease-in-out;
+        `;
+        document.body.appendChild(fadeOverlay);
+        
+        // フェードイン開始
+        requestAnimationFrame(() => {
+            fadeOverlay.style.opacity = '1';
+        });
+        
+        // フェード完了後に遷移
+        setTimeout(() => {
+            window.location.href = destination + '.html';
+        }, 1600);
+    }
+});
