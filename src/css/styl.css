@@ -100,6 +100,9 @@ body {
     top: 100px;
     right: 100px;
     z-index: 150;
+    width: fit-content;
+    height: fit-content;
+    pointer-events: none; /* コンテナ自体はクリックを通過 */
 }
 
 .trash-viewer-container {
@@ -107,6 +110,9 @@ body {
     top: 100px;
     right: 100px;
     z-index: 150;
+    width: fit-content;
+    height: fit-content;
+    pointer-events: none; /* コンテナ自体はクリックを通過 */
 }
 
 .terminal-viewer-container {
@@ -114,6 +120,9 @@ body {
     top: 100px;
     left: 100px;
     z-index: 150;
+    width: fit-content;
+    height: fit-content;
+    pointer-events: none; /* コンテナ自体はクリックを通過 */
 }
 
 .file-viewer-window {
@@ -124,6 +133,7 @@ body {
     border-radius: 10px;
     box-sizing: border-box;
     overflow: hidden;
+    pointer-events: auto; /* ウィンドウ本体はクリック可能 */
 }
 
 .file-viewer-window iframe {
